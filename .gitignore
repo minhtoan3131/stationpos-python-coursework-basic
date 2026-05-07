@@ -1,0 +1,81 @@
+# =========================
+# PYTHON
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+.env/
+.venv/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Logs
+*.log
+logs/
+
+# Unit test / coverage
+.coverage
+htmlcov/
+.pytest_cache/
+
+# =========================
+# ENVIRONMENT
+# =========================
+.env
+
+# =========================
+# DATABASE
+# =========================
+*.sqlite3
+*.db
+
+# MySQL dump
+*.sql.gz
+
+# =========================
+# PYCHARM / IDEA
+# =========================
+.idea/
+*.iml
+
+# =========================
+# MACOS
+# =========================
+.DS_Store
+
+# =========================
+# QT / PYSIDE
+# =========================
+
+# Generated Python files from .ui
+*_ui.py
+
+# Qt resource compiled files
+*_rc.py
+
+# Qt Designer backups
+*.ui.autosave
+
+# =========================
+# TEMP FILES
+# =========================
+tmp/
+temp/
+*.tmp
+
+# =========================
+# VS CODE (optional)
+# =========================
+.vscode/
+
+# =========================
+# SEED / EXPORT (optional)
+# =========================
+exports/
+backups/
