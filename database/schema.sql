@@ -28,9 +28,9 @@ CREATE TABLE products (
     category_id INT,
     supplier_id INT,
     base_unit_id INT,
-    cost_price DECIMAL(12,2),
-    retail_price DECIMAL(12,2),
-    wholesale_price DECIMAL(12,2),
+    cost_price DECIMAL(15,4),
+    retail_price DECIMAL(15,4),
+    wholesale_price DECIMAL(15,4),
     min_stock INT DEFAULT 0,
     description TEXT,
     is_active BOOLEAN DEFAULT TRUE,
@@ -40,7 +40,6 @@ CREATE TABLE products (
     FOREIGN KEY (supplier_id) REFERENCES suppliers(id),
     FOREIGN KEY (base_unit_id) REFERENCES units(id)
 );
-
 
 CREATE TABLE unit_conversions (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -61,6 +60,34 @@ CREATE TABLE inventory (
     updated_at DATETIME,
 
     FOREIGN KEY (product_id) REFERENCES products(id)
+);
+
+-- Bảng lưu thông tin chung của Phiếu nhập (Header)
+CREATE TABLE purchase_orders (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    code VARCHAR(50) UNIQUE NOT NULL,       -- Mã phiếu nhập (VD: PN-20231027-001)
+    supplier_id INT,
+    total_amount DECIMAL(12,2),             -- Tổng giá trị phiếu nhập
+    note TEXT,                              -- Ghi chú (Lý do, số hóa đơn gốc...)
+    status ENUM('COMPLETED','CANCELLED') DEFAULT 'COMPLETED',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (supplier_id) REFERENCES suppliers(id)
+);
+
+-- Bảng lưu chi tiết từng món hàng trong Phiếu nhập (Lines/Details)
+CREATE TABLE purchase_order_items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    purchase_order_id INT,
+    product_id INT,
+    unit_id INT,
+    quantity INT,
+    unit_price DECIMAL(15,4),
+    total_price DECIMAL(15,4),
+
+    FOREIGN KEY (purchase_order_id) REFERENCES purchase_orders(id),
+    FOREIGN KEY (product_id) REFERENCES products(id),
+    FOREIGN KEY (unit_id) REFERENCES units(id)
 );
 
 CREATE TABLE stock_transactions (
@@ -93,8 +120,8 @@ CREATE TABLE invoice_items (
     product_id INT,
     unit_id INT,
     quantity INT,
-    unit_price DECIMAL(12,2),
-    total_price DECIMAL(12,2),
+    unit_price DECIMAL(15,4),
+    total_price DECIMAL(15,4),
 
     FOREIGN KEY (invoice_id) REFERENCES invoices(id),
     FOREIGN KEY (product_id) REFERENCES products(id),

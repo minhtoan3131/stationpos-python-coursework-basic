@@ -1,7 +1,6 @@
 import pytest
-from app.modules.product.repositories.impl.inventory_repository_impl import InventoryRepositoryImpl
 
-
+from app.modules.inventory.repositories.impl.inventory_repository_impl import InventoryRepositoryImpl
 
 
 @pytest.fixture

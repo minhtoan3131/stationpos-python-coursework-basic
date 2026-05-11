@@ -1,43 +1,24 @@
+from app.core.database.base_repository import BaseRepository
 from app.modules.product.repositories.supplier_repository import SupplierRepository
-from app.core.database.connection import DatabaseConnection
 
-class SupplierRepositoryImpl(SupplierRepository):
+class SupplierRepositoryImpl(BaseRepository, SupplierRepository):
+
     def get_all(self):
-        conn = DatabaseConnection.get_connection()
-        try:
-            cursor = conn.cursor(dictionary=True)
-            cursor.execute("SELECT id, name FROM suppliers ORDER BY name")
-            return cursor.fetchall()
-        finally:
-            conn.close()
+        self.cursor.execute("SELECT id, name FROM suppliers ORDER BY name")
+        return self.cursor.fetchall()
 
     def exists_by_name(self, name: str) -> bool:
-        conn = DatabaseConnection.get_connection()
-        try:
-            cursor = conn.cursor()
-            cursor.execute("SELECT COUNT(1) FROM suppliers WHERE name = %s", (name,))
-            return cursor.fetchone()[0] > 0
-        finally:
-            conn.close()
+        # Thêm AS total để đặt tên rõ ràng cho cột
+        self.cursor.execute("SELECT COUNT(1) AS total FROM suppliers WHERE name = %s", (name,))
+        result = self.cursor.fetchone()
+        return result['total'] > 0 if result else False
 
     def exists_by_id(self, supplier_id: int) -> bool:
-        conn = DatabaseConnection.get_connection()
-        try:
-            cursor = conn.cursor()
-            cursor.execute("SELECT COUNT(1) FROM suppliers WHERE id = %s", (supplier_id,))
-            return cursor.fetchone()[0] > 0
-        finally:
-            conn.close()
+        # Thêm AS total để đặt tên rõ ràng cho cột
+        self.cursor.execute("SELECT COUNT(1) AS total FROM suppliers WHERE id = %s", (supplier_id,))
+        result = self.cursor.fetchone()
+        return result['total'] > 0 if result else False
 
     def create(self, name: str) -> int:
-        conn = DatabaseConnection.get_connection()
-        try:
-            cursor = conn.cursor()
-            cursor.execute("INSERT INTO suppliers (name) VALUES (%s)", (name,))
-            conn.commit()
-            return cursor.lastrowid
-        except Exception:
-            conn.rollback()
-            raise
-        finally:
-            conn.close()
+        self.cursor.execute("INSERT INTO suppliers (name) VALUES (%s)", (name,))
+        return self.cursor.lastrowid

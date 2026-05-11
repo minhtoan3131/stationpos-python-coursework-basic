@@ -112,3 +112,36 @@ class ProductRepositoryImpl(BaseRepository, ProductRepository):
         self.cursor.execute("SELECT COUNT(*) AS total FROM products WHERE barcode = %s AND id != %s",
                             (barcode, product_id))
         return self.cursor.fetchone()["total"] > 0
+
+    def get_product_import_detail(self, product_id: int) -> Optional[dict]:
+        query = """
+            SELECT p.id, p.sku, p.name, p.base_unit_id, p.cost_price,
+                   u1.name AS base_unit_name,
+                   u2.name AS conversion_unit_name,
+                   uc.to_unit_id AS conversion_unit_id,
+                   uc.ratio AS conversion_ratio
+            FROM products p
+            LEFT JOIN units u1 ON p.base_unit_id = u1.id
+            LEFT JOIN unit_conversions uc ON p.id = uc.product_id
+            LEFT JOIN units u2 ON uc.to_unit_id = u2.id
+            WHERE p.id = %s
+        """
+        self.cursor.execute(query, (product_id,))
+        return self.cursor.fetchone()
+
+    def get_product_detail_for_import(self, product_id: int) -> Optional[dict]:
+        """Hàm chuyên biệt trả về dict chứa đầy đủ thông tin JOIN cho DTO"""
+        query = """
+            SELECT p.*, 
+                   u1.name AS base_unit_name,
+                   u2.name AS conversion_unit_name,
+                   uc.to_unit_id AS conversion_unit_id,
+                   uc.ratio AS conversion_ratio
+            FROM products p
+            LEFT JOIN units u1 ON p.base_unit_id = u1.id
+            LEFT JOIN unit_conversions uc ON p.id = uc.product_id
+            LEFT JOIN units u2 ON uc.to_unit_id = u2.id
+            WHERE p.id = %s
+        """
+        self.cursor.execute(query, (product_id,))
+        return self.cursor.fetchone()  # Trả về dictionary thô

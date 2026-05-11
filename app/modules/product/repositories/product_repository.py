@@ -46,3 +46,11 @@ class ProductRepository(ABC):
 
     @abstractmethod
     def exists_by_barcode_excluding_id(self, barcode: str, product_id: int) -> bool: pass
+
+    @abstractmethod
+    def get_product_import_detail(self, product_id: int) -> Optional[dict]: pass
+
+    @abstractmethod
+    def get_product_detail_for_import(self, product_id: int) -> Optional[dict]:
+        """Lấy thông tin chi tiết sản phẩm kèm theo ĐVT và quy đổi cho nghiệp vụ nhập hàng"""
+        pass

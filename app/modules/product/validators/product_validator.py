@@ -1,11 +1,11 @@
 import re
 from app.core.exceptions.validation_exception import ValidationException
+from app.modules.inventory.repositories.inventory_repository import InventoryRepository
 
 from app.modules.product.dtos.product_create_dto import ProductCreateDTO
 from app.modules.product.dtos.product_update_dto import ProductUpdateDTO
 from app.modules.product.dtos.product_delete_dto import ProductDeleteDTO
 from app.modules.product.repositories.product_repository import ProductRepository
-from app.modules.product.repositories.inventory_repository import InventoryRepository
 
 
 class ProductValidator:

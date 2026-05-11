@@ -3,12 +3,12 @@ from typing import List
 
 from app.core.database.connection import DatabaseConnection
 from app.core.database.transaction import TransactionManager
+from app.modules.inventory.repositories.impl.inventory_repository_impl import InventoryRepositoryImpl
 
 from app.modules.product.services.product_service import ProductService
 
 from app.modules.product.repositories.impl.product_repository_impl import ProductRepositoryImpl
 from app.modules.product.repositories.impl.unit_conversion_repository_impl import UnitConversionRepositoryImpl
-from app.modules.product.repositories.impl.inventory_repository_impl import InventoryRepositoryImpl
 
 from app.modules.product.validators.product_validator import ProductValidator
 from app.modules.product.mappers.product_mapper import ProductMapper
