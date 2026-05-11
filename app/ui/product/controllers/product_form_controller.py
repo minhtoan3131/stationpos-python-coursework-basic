@@ -1,26 +1,40 @@
 from PyQt6.QtWidgets import QDialog, QMessageBox, QInputDialog
 from PyQt6.QtCore import Qt
 
-from app.modules.product.services.reference_data_service import ReferenceDataService
 from app.ui.product.generated.ui_product_form import Ui_ProductFormDialog
-from app.modules.product.services.impl.product_service_impl import ProductServiceImpl
 from app.modules.product.dtos.product_create_dto import ProductCreateDTO
 from app.modules.product.dtos.product_update_dto import ProductUpdateDTO
 from app.core.exceptions.validation_exception import ValidationException
 
+# Import CÁC INTERFACE (Không import Impl)
+from app.modules.product.services.product_service import ProductService
+from app.modules.product.services.category_service import CategoryService
+from app.modules.product.services.supplier_service import SupplierService
+from app.modules.product.services.unit_service import UnitService
+
 
 class ProductFormController(QDialog):
-    def __init__(self, product_id=None):
+    def __init__(self,
+                 product_service: ProductService,
+                 category_service: CategoryService,
+                 supplier_service: SupplierService,
+                 unit_service: UnitService,
+                 product_id=None):
+
         super().__init__()
         self.ui = Ui_ProductFormDialog()
         self.ui.setupUi(self)
-        self.product_service = ProductServiceImpl()
-        self.ref_service = ReferenceDataService()
-        self.product_id = product_id
-        self.format_number_inputs()
 
+        self.product_service = product_service
+        self.category_service = category_service
+        self.supplier_service = supplier_service
+        self.unit_service = unit_service
+
+        self.product_id = product_id
+
+        self.format_number_inputs()
         self.load_comboboxes()
-        self.disable_scroll_hijacking()  #FIX LỖI CUỘN CHUỘT
+        self.disable_scroll_hijacking()  # FIX LỖI CUỘN CHUỘT
 
         # Xử lý phân nhánh: TẠO MỚI hay CẬP NHẬT
         if self.product_id is not None:
@@ -47,17 +61,17 @@ class ProductFormController(QDialog):
     def load_comboboxes(self):
         # Danh mục
         self.ui.cbo_category.clear()
-        for cat in self.ref_service.get_all_categories():
+        for cat in self.category_service.get_all_categories():
             self.ui.cbo_category.addItem(cat['name'], cat['id'])
 
         # Nhà cung cấp
         self.ui.cbo_supplier.clear()
         self.ui.cbo_supplier.addItem("--- Không chọn ---", 0)
-        for sup in self.ref_service.get_all_suppliers():
+        for sup in self.supplier_service.get_all_suppliers():
             self.ui.cbo_supplier.addItem(sup['name'], sup['id'])
 
         # Đơn vị tính (Dùng chung cho cả 2 ô)
-        units = self.ref_service.get_all_units()
+        units = self.unit_service.get_all_units()
 
         self.ui.cbo_base_unit.clear()
         for u in units:
@@ -67,6 +81,7 @@ class ProductFormController(QDialog):
         self.ui.cbo_conversion_unit.addItem("--- Không có ---", 0)
         for u in units:
             self.ui.cbo_conversion_unit.addItem(u['name'], u['id'])
+
     # =========================
     # SETUP CHẾ ĐỘ MÀN HÌNH
     # =========================
@@ -122,7 +137,7 @@ class ProductFormController(QDialog):
     # =========================
     def save_product(self):
         try:
-            # 1. Thu thập dữ liệu thô từ Form
+            # Thu thập dữ liệu thô từ Form
             sku = self.ui.txt_sku.text().strip()
             name = self.ui.txt_name.text().strip()
             barcode = self.ui.txt_barcode.text().strip()
@@ -140,7 +155,7 @@ class ProductFormController(QDialog):
 
             conversion_ratio = self.ui.spn_conversion_ratio.value() if conversion_unit_id else None
 
-            # 2. Xử lý logic theo chế độ Tạo mới / Cập nhật
+            # Xử lý logic theo chế độ Tạo mới / Cập nhật
             if self.product_id is None:
                 # --- CHẾ ĐỘ TẠO MỚI ---
                 dto = ProductCreateDTO(
@@ -185,7 +200,7 @@ class ProductFormController(QDialog):
                 self.product_service.update_product(dto)
                 QMessageBox.information(self, "Thành công", "Cập nhật thông tin sản phẩm thành công!")
 
-            # 3. Đóng Form và gửi tín hiệu cho cửa sổ cha load lại bảng
+            # Đóng Form và gửi tín hiệu cho cửa sổ cha load lại bảng
             self.accept()
 
         except ValidationException as ve:
@@ -240,7 +255,7 @@ class ProductFormController(QDialog):
         text, ok = QInputDialog.getText(self, "Thêm Danh mục", "Nhập tên danh mục mới:")
         if ok and text.strip():
             try:
-                new_id = self.ref_service.create_category(text)
+                new_id = self.category_service.create_category(text)
                 self.ui.cbo_category.addItem(text.strip(), new_id)
                 self.ui.cbo_category.setCurrentIndex(self.ui.cbo_category.count() - 1)
             except Exception as e:
@@ -250,7 +265,7 @@ class ProductFormController(QDialog):
         text, ok = QInputDialog.getText(self, "Thêm Nhà cung cấp", "Nhập tên nhà cung cấp mới:")
         if ok and text.strip():
             try:
-                new_id = self.ref_service.create_supplier(text)
+                new_id = self.supplier_service.create_supplier(text)
                 self.ui.cbo_supplier.addItem(text.strip(), new_id)
                 self.ui.cbo_supplier.setCurrentIndex(self.ui.cbo_supplier.count() - 1)
             except Exception as e:
@@ -260,7 +275,7 @@ class ProductFormController(QDialog):
         text, ok = QInputDialog.getText(self, "Thêm Đơn vị tính", "Nhập tên đơn vị tính mới (VD: Cái, Hộp):")
         if ok and text.strip():
             try:
-                new_id = self.ref_service.create_unit(text)
+                new_id = self.unit_service.create_unit(text)
                 # Thêm vào cả 2 combobox đơn vị
                 self.ui.cbo_base_unit.addItem(text.strip(), new_id)
                 self.ui.cbo_conversion_unit.addItem(text.strip(), new_id)

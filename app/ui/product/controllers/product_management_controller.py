@@ -6,23 +6,35 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt
 
 from app.ui.product.generated.ui_product_management import Ui_ProductManagementWidget
-from app.modules.product.services.impl.product_service_impl import ProductServiceImpl
 from app.modules.product.dtos.product_filter_dto import ProductFilterDTO
 from app.modules.product.dtos.product_delete_dto import ProductDeleteDTO
 from app.core.exceptions.validation_exception import ValidationException
 from app.ui.product.controllers.product_form_controller import ProductFormController
 
+from app.modules.product.services.product_service import ProductService
+from app.modules.product.services.category_service import CategoryService
+from app.modules.product.services.supplier_service import SupplierService
+from app.modules.product.services.unit_service import UnitService
+
 
 class ProductManagementController(QWidget):
 
-    def __init__(self):
+    def __init__(self,
+                 product_service: ProductService,
+                 category_service: CategoryService,
+                 supplier_service: SupplierService,
+                 unit_service: UnitService):
         super().__init__()
 
         self.ui = Ui_ProductManagementWidget()
         self.ui.setupUi(self)
         self.ui.tbl_products.setColumnHidden(0, True)
 
-        self.product_service = ProductServiceImpl()
+        # Nhận service từ bên ngoài truyền vào
+        self.product_service = product_service
+        self.category_service = category_service
+        self.supplier_service = supplier_service
+        self.unit_service = unit_service
 
         self.load_products()
 
@@ -43,8 +55,6 @@ class ProductManagementController(QWidget):
         self.ui.txt_search_keyword.returnPressed.connect(self.search_products)
         # Click đúp vào dòng nào thì tự động mở Form Sửa (Xem chi tiết) dòng đó
         self.ui.tbl_products.cellDoubleClicked.connect(self.open_update_dialog)
-
-
 
     def load_products(self):
         try:
@@ -114,7 +124,6 @@ class ProductManagementController(QWidget):
         except Exception as e:
             QMessageBox.critical(self, "Lỗi tìm kiếm", f"Đã xảy ra lỗi:\n{str(e)}")
 
-
     def delete_product(self):
         selected_row = self.ui.tbl_products.currentRow()
 
@@ -155,7 +164,13 @@ class ProductManagementController(QWidget):
     # =========================
 
     def open_create_dialog(self):
-        dialog = ProductFormController()
+        dialog = ProductFormController(
+            product_service=self.product_service,
+            category_service=self.category_service,
+            supplier_service=self.supplier_service,
+            unit_service=self.unit_service
+        )
+
         # Mở dialog dưới dạng Modal, chờ người dùng đóng lại mới chạy tiếp
         result = dialog.exec()
         if result:
@@ -170,7 +185,14 @@ class ProductManagementController(QWidget):
 
         product_id = int(self.ui.tbl_products.item(selected_row, 0).text())
 
-        dialog = ProductFormController(product_id=product_id)
+        dialog = ProductFormController(
+            product_service=self.product_service,
+            category_service=self.category_service,
+            supplier_service=self.supplier_service,
+            unit_service=self.unit_service,
+            product_id=product_id
+        )
+
         result = dialog.exec()
 
         if result:
