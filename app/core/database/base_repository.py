@@ -1,12 +1,5 @@
-from app.core.database.connection import DatabaseConnection
-
 
 class BaseRepository:
-
-    def __init__(self):
-        self.connection = DatabaseConnection.get_connection()
+    def __init__(self, connection):
+        self.connection = connection
         self.cursor = self.connection.cursor(dictionary=True)
-
-    def close(self):
-        self.cursor.close()
-        self.connection.close()

@@ -1,14 +1,23 @@
-from app.core.database.connection import DatabaseConnection
+import sys
+
+from PyQt6.QtWidgets import QApplication
+
+from app.ui.product.controllers.product_management_controller import (
+    ProductManagementController
+)
 
 
 def main():
-    connection = DatabaseConnection.get_connection()
 
-    if connection.is_connected():
-        print("Application started successfully")
+    app = QApplication(sys.argv)
 
-    connection.close()
+    window = ProductManagementController()
+
+    window.show()
+
+    sys.exit(app.exec())
 
 
 if __name__ == "__main__":
+
     main()

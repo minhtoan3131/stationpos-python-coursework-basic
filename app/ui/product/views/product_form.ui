@@ -1,0 +1,507 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ProductFormDialog</class>
+ <widget class="QDialog" name="ProductFormDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>780</width>
+    <height>800</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Thông tin Sản phẩm</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+/* ENTERPRISE FORM STYLING */
+QDialog { background-color: #f4f6f8; font-family: 'Segoe UI', sans-serif; }
+QLabel#lbl_main_title { font-size: 22px; font-weight: bold; color: #1a1a1a; padding: 10px 0px; }
+QScrollArea { border: none; background-color: transparent; }
+QWidget#scrollAreaWidgetContents { background-color: transparent; }
+QGroupBox { background-color: #ffffff; border: 1px solid #e0e6ed; border-radius: 8px; margin-top: 30px; padding-top: 15px; font-size: 14px; }
+QGroupBox::title { subcontrol-origin: margin; subcontrol-position: top left; padding: 0 10px; color: #0056b3; font-weight: bold; font-size: 15px; top: 5px; left: 15px; }
+QLabel { font-weight: 600; color: #4a5568; font-size: 13px; }
+QLineEdit, QComboBox, QSpinBox, QDoubleSpinBox, QTextEdit { padding: 8px 12px; border: 1px solid #ced4da; border-radius: 6px; background-color: #ffffff; font-size: 14px; color: #2d3748; min-height: 20px; }
+QLineEdit:focus, QComboBox:focus, QSpinBox:focus, QDoubleSpinBox:focus, QTextEdit:focus { border: 2px solid #007bff; background-color: #fff; }
+QLineEdit:disabled, QComboBox:disabled { background-color: #e9ecef; color: #6c757d; }
+QSpinBox::up-button, QSpinBox::down-button, QDoubleSpinBox::up-button, QDoubleSpinBox::down-button { width: 0px; border: none; }
+QFrame#frame_footer { background-color: #ffffff; border-top: 1px solid #e0e6ed; padding: 10px; }
+QPushButton { padding: 10px 25px; border-radius: 6px; font-weight: bold; font-size: 14px; }
+QPushButton#btn_cancel { background-color: transparent; color: #4a5568; border: 1px solid #cbd5e0; }
+QPushButton#btn_cancel:hover { background-color: #f1f3f5; }
+QPushButton#btn_save { background-color: #007bff; color: white; border: none; }
+QPushButton#btn_save:hover { background-color: #0069d9; }
+/* STYLE CHO NÚT CỘNG (Thêm nhanh) */
+QPushButton#btn_add_category, QPushButton#btn_add_supplier, QPushButton#btn_add_base_unit, QPushButton#btn_add_conversion_unit {
+    padding: 0px; border-radius: 4px; background-color: #e9ecef; color: #495057; border: 1px solid #ced4da; font-size: 18px; font-weight: bold;
+}
+QPushButton#btn_add_category:hover, QPushButton#btn_add_supplier:hover, QPushButton#btn_add_base_unit:hover, QPushButton#btn_add_conversion_unit:hover {
+    background-color: #007bff; color: white; border-color: #007bff;
+}
+   </string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_root">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>15</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_title">
+     <property name="leftMargin">
+      <number>25</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="lbl_main_title">
+       <property name="text">
+        <string>THÔNG TIN CHI TIẾT SẢN PHẨM</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QScrollArea" name="scrollArea">
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="scrollAreaWidgetContents">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>-217</y>
+        <width>765</width>
+        <height>834</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_scroll">
+       <property name="spacing">
+        <number>25</number>
+       </property>
+       <property name="leftMargin">
+        <number>25</number>
+       </property>
+       <property name="topMargin">
+        <number>10</number>
+       </property>
+       <property name="rightMargin">
+        <number>25</number>
+       </property>
+       <property name="bottomMargin">
+        <number>25</number>
+       </property>
+       <item>
+        <widget class="QGroupBox" name="grp_identity">
+         <property name="title">
+          <string>1. Thông tin định danh và Phân loại</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_identity">
+          <property name="topMargin">
+           <number>25</number>
+          </property>
+          <property name="horizontalSpacing">
+           <number>20</number>
+          </property>
+          <property name="verticalSpacing">
+           <number>15</number>
+          </property>
+          <item row="0" column="0">
+           <widget class="QLabel" name="lbl_sku">
+            <property name="text">
+             <string>Mã sản phẩm (SKU) *</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="lbl_barcode">
+            <property name="text">
+             <string>Mã vạch (Barcode)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLineEdit" name="txt_sku">
+            <property name="placeholderText">
+             <string>Để trống để hệ thống tự tạo...</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="txt_barcode">
+            <property name="placeholderText">
+             <string>Nhập mã vạch...</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0" colspan="2">
+           <widget class="QLabel" name="lbl_name">
+            <property name="text">
+             <string>Tên sản phẩm *</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0" colspan="2">
+           <widget class="QLineEdit" name="txt_name">
+            <property name="placeholderText">
+             <string>Ví dụ: Bút bi Thiên Long 0.5mm Xanh...</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="lbl_category">
+            <property name="text">
+             <string>Danh mục hàng hóa *</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLabel" name="lbl_supplier">
+            <property name="text">
+             <string>Nhà cung cấp</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <layout class="QHBoxLayout" name="horizontalLayout_cat">
+            <property name="spacing">
+             <number>5</number>
+            </property>
+            <item>
+             <widget class="QComboBox" name="cbo_category">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_add_category">
+              <property name="maximumSize">
+               <size>
+                <width>35</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="cursor">
+               <cursorShape>PointingHandCursor</cursorShape>
+              </property>
+              <property name="text">
+               <string>+</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="5" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout_sup">
+            <property name="spacing">
+             <number>5</number>
+            </property>
+            <item>
+             <widget class="QComboBox" name="cbo_supplier">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_add_supplier">
+              <property name="maximumSize">
+               <size>
+                <width>35</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="cursor">
+               <cursorShape>PointingHandCursor</cursorShape>
+              </property>
+              <property name="text">
+               <string>+</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="grp_pricing">
+         <property name="title">
+          <string>2. Đơn vị tính và Giá cả</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_pricing">
+          <property name="topMargin">
+           <number>25</number>
+          </property>
+          <property name="horizontalSpacing">
+           <number>20</number>
+          </property>
+          <property name="verticalSpacing">
+           <number>15</number>
+          </property>
+          <item row="0" column="0">
+           <widget class="QLabel" name="lbl_base_unit">
+            <property name="text">
+             <string>Đơn vị cơ bản (Ví dụ: Cái) *</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="lbl_cost_price">
+            <property name="text">
+             <string>Giá vốn / nhập (VND) *</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QLabel" name="lbl_retail_price">
+            <property name="text">
+             <string>Giá bán lẻ (VND) *</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <layout class="QHBoxLayout" name="horizontalLayout_base_unit">
+            <property name="spacing">
+             <number>5</number>
+            </property>
+            <item>
+             <widget class="QComboBox" name="cbo_base_unit">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_add_base_unit">
+              <property name="maximumSize">
+               <size>
+                <width>35</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="cursor">
+               <cursorShape>PointingHandCursor</cursorShape>
+              </property>
+              <property name="text">
+               <string>+</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="1" column="1">
+           <widget class="QDoubleSpinBox" name="spn_cost_price">
+            <property name="maximum">
+             <double>999999999.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QDoubleSpinBox" name="spn_retail_price">
+            <property name="maximum">
+             <double>999999999.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="lbl_conversion_unit">
+            <property name="text">
+             <string>Đơn vị sỉ (VD: Hộp)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLabel" name="lbl_conversion_ratio">
+            <property name="text">
+             <string>Tỷ lệ (1 Sỉ = ... Cơ bản)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QLabel" name="lbl_wholesale_price">
+            <property name="text">
+             <string>Giá bán sỉ (VND)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <layout class="QHBoxLayout" name="horizontalLayout_conv_unit">
+            <property name="spacing">
+             <number>5</number>
+            </property>
+            <item>
+             <widget class="QComboBox" name="cbo_conversion_unit">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_add_conversion_unit">
+              <property name="maximumSize">
+               <size>
+                <width>35</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="cursor">
+               <cursorShape>PointingHandCursor</cursorShape>
+              </property>
+              <property name="text">
+               <string>+</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="3" column="1">
+           <widget class="QDoubleSpinBox" name="spn_conversion_ratio">
+            <property name="maximum">
+             <double>99999.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2">
+           <widget class="QDoubleSpinBox" name="spn_wholesale_price">
+            <property name="maximum">
+             <double>999999999.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="grp_other">
+         <property name="title">
+          <string>3. Tồn kho và Mô tả</string>
+         </property>
+         <layout class="QFormLayout" name="formLayout_other">
+          <property name="horizontalSpacing">
+           <number>20</number>
+          </property>
+          <property name="verticalSpacing">
+           <number>15</number>
+          </property>
+          <property name="topMargin">
+           <number>25</number>
+          </property>
+          <item row="0" column="0">
+           <widget class="QLabel" name="lbl_min_stock">
+            <property name="text">
+             <string>Cảnh báo tồn tối thiểu</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QSpinBox" name="spn_min_stock">
+            <property name="minimumSize">
+             <size>
+              <width>150</width>
+              <height>38</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>150</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="maximum">
+             <number>999999</number>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="lbl_description">
+            <property name="text">
+             <string>Mô tả / Ghi chú nội bộ</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QTextEdit" name="txt_description">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>80</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="frame_footer">
+     <layout class="QHBoxLayout" name="horizontalLayout_buttons">
+      <item>
+       <spacer name="horizontalSpacer_footer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btn_cancel">
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="text">
+         <string>Hủy bỏ</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btn_save">
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="text">
+         <string>Lưu thông tin</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

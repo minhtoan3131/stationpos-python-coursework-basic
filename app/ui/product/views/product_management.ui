@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ProductManagementWidget</class>
+ <widget class="QWidget" name="ProductManagementWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1100</width>
+    <height>800</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Quản lý Sản phẩm</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+/* ENTERPRISE MODERN STYLE */
+QWidget#ProductManagementWidget {
+    background-color: #fcfcfc;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* NỀN CÁC KHỐI CHỨC NĂNG */
+QFrame#frame_container {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+}
+
+/* TIÊU ĐỀ */
+QLabel#lbl_title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 10px;
+}
+
+/* THANH TÌM KIẾM TÍCH HỢP */
+QLineEdit#txt_search_keyword {
+    border: 2px solid #edeff2;
+    border-radius: 8px;
+    padding: 10px 15px;
+    background-color: #f4f6f8;
+    font-size: 14px;
+}
+QLineEdit#txt_search_keyword:focus {
+    border: 2px solid #007bff;
+    background-color: #ffffff;
+}
+
+/* NÚT TÁC VỤ */
+QPushButton {
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 600;
+    font-size: 13px;
+    color: white;
+}
+
+QPushButton#btn_search_products { background-color: #007bff; }
+QPushButton#btn_search_products:hover { background-color: #0069d9; }
+
+QPushButton#btn_create_product { background-color: #28a745; }
+QPushButton#btn_create_product:hover { background-color: #218838; }
+
+QPushButton#btn_update_product { background-color: #ffc107; color: #212529; }
+QPushButton#btn_update_product:hover { background-color: #e0a800; }
+
+QPushButton#btn_delete_product { background-color: #dc3545; }
+QPushButton#btn_delete_product:hover { background-color: #c82333; }
+
+QPushButton#btn_refresh_products {
+    background-color: transparent;
+    color: #6c757d;
+    border: 1px solid #ced4da;
+}
+QPushButton#btn_refresh_products:hover { background-color: #f8f9fa; }
+
+/* BẢNG DỮ LIỆU */
+QTableWidget {
+    border: none;
+    gridline-color: #f1f1f1;
+    alternate-background-color: #f9fafb;
+    selection-background-color: #e7f3ff;
+    selection-color: #0056b3;
+}
+QHeaderView::section {
+    background-color: #ffffff;
+    padding: 12px;
+    font-weight: bold;
+    border: none;
+    border-bottom: 2px solid #f1f1f1;
+    color: #4a5568;
+}
+   </string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_root">
+   <property name="spacing">
+    <number>20</number>
+   </property>
+   <property name="leftMargin">
+    <number>30</number>
+   </property>
+   <property name="topMargin">
+    <number>30</number>
+   </property>
+   <property name="rightMargin">
+    <number>30</number>
+   </property>
+   <property name="bottomMargin">
+    <number>30</number>
+   </property>
+   <item>
+    <widget class="QLabel" name="lbl_title">
+     <property name="text">
+      <string>QUẢN LÝ SẢN PHẨM</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="frame_container">
+     <layout class="QVBoxLayout" name="verticalLayout_container">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QFrame" name="frame_top_bar">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>80</height>
+         </size>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_top">
+         <property name="leftMargin">
+          <number>20</number>
+         </property>
+         <property name="rightMargin">
+          <number>20</number>
+         </property>
+         <item>
+          <widget class="QLineEdit" name="txt_search_keyword">
+           <property name="minimumSize">
+            <size>
+             <width>400</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="placeholderText">
+            <string>Tìm nhanh theo SKU, Tên hoặc Barcode...</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btn_search_products">
+           <property name="text">
+            <string>Tìm kiếm</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btn_refresh_products">
+           <property name="text">
+            <string>Làm mới</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_1">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btn_create_product">
+           <property name="text">
+            <string>+ Thêm hàng mới</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTableWidget" name="tbl_products">
+        <property name="alternatingRowColors">
+         <bool>true</bool>
+        </property>
+        <property name="selectionMode">
+         <enum>QAbstractItemView::SingleSelection</enum>
+        </property>
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectRows</enum>
+        </property>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="verticalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
+        <column>
+         <property name="text">
+          <string>ID</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>SKU</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Tên sản phẩm</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Danh mục</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>ĐVT Lẻ</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Giá lẻ</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>ĐVT Sỉ</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Giá sỉ</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Barcode</string>
+         </property>
+        </column>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="frame_bottom_bar">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>60</height>
+         </size>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_bottom">
+         <property name="leftMargin">
+          <number>20</number>
+         </property>
+         <property name="rightMargin">
+          <number>20</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="lbl_total_products">
+           <property name="text">
+            <string>Tổng cộng: 0 sản phẩm</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btn_update_product">
+           <property name="text">
+            <string>Chỉnh sửa</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btn_delete_product">
+           <property name="text">
+            <string>Xóa bỏ</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
