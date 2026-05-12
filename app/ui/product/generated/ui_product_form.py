@@ -27,14 +27,14 @@ class Ui_ProductFormDialog(object):
 "QLineEdit:disabled, QComboBox:disabled { background-color: #e9ecef; color: #6c757d; }\n"
 "QSpinBox::up-button, QSpinBox::down-button, QDoubleSpinBox::up-button, QDoubleSpinBox::down-button { width: 0px; border: none; }\n"
 "QFrame#frame_footer { background-color: #ffffff; border-top: 1px solid #e0e6ed; padding: 10px; }\n"
-"QPushButton { padding: 25px 25px; border-radius: 6px; font-weight: bold; font-size: 14px; }\n"
+"QPushButton { padding: 8px 16px; border-radius: 6px; font-weight: bold; font-size: 14px; }\n"
 "QPushButton#btn_cancel { background-color: transparent; color: #4a5568; border: 1px solid #cbd5e0; }\n"
 "QPushButton#btn_cancel:hover { background-color: #f1f3f5; }\n"
 "QPushButton#btn_save { background-color: #007bff; color: white; border: none; }\n"
 "QPushButton#btn_save:hover { background-color: #0069d9; }\n"
 "/* STYLE CHO NÚT CỘNG (Thêm nhanh) */\n"
 "QPushButton#btn_add_category, QPushButton#btn_add_supplier, QPushButton#btn_add_base_unit, QPushButton#btn_add_conversion_unit {\n"
-"    padding: 0px; border-radius: 4px; background-color: #e9ecef; color: #495057; border: 1px solid #ced4da; font-size: 18px; font-weight: bold;\n"
+"    padding: 4px; border-radius: 4px; background-color: #e9ecef; color: #495057; border: 1px solid #ced4da; font-size: 18px; font-weight: bold;\n"
 "}\n"
 "QPushButton#btn_add_category:hover, QPushButton#btn_add_supplier:hover, QPushButton#btn_add_base_unit:hover, QPushButton#btn_add_conversion_unit:hover {\n"
 "    background-color: #007bff; color: white; border-color: #007bff;\n"
@@ -277,13 +277,3 @@ class Ui_ProductFormDialog(object):
         self.lbl_description.setText(_translate("ProductFormDialog", "Mô tả / Ghi chú nội bộ"))
         self.btn_cancel.setText(_translate("ProductFormDialog", "Hủy bỏ"))
         self.btn_save.setText(_translate("ProductFormDialog", "Lưu thông tin"))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    ProductFormDialog = QtWidgets.QDialog()
-    ui = Ui_ProductFormDialog()
-    ui.setupUi(ProductFormDialog)
-    ProductFormDialog.show()
-    sys.exit(app.exec())

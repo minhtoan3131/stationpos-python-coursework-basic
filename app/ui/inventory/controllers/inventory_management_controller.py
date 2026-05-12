@@ -82,6 +82,7 @@ class InventoryManagementController(QWidget):
             inventory_data = self.inventory_service.get_inventory_list(keyword)
             self.display_inventory_table(inventory_data)
         except Exception as e:
+            traceback.print_exc()
             QMessageBox.critical(self, "Lỗi", f"Không thể tải tồn kho: {str(e)}")
 
     def display_inventory_table(self, data_list):

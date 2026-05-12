@@ -28,14 +28,14 @@ QLineEdit:focus, QComboBox:focus, QSpinBox:focus, QDoubleSpinBox:focus, QTextEdi
 QLineEdit:disabled, QComboBox:disabled { background-color: #e9ecef; color: #6c757d; }
 QSpinBox::up-button, QSpinBox::down-button, QDoubleSpinBox::up-button, QDoubleSpinBox::down-button { width: 0px; border: none; }
 QFrame#frame_footer { background-color: #ffffff; border-top: 1px solid #e0e6ed; padding: 10px; }
-QPushButton { padding: 10px 25px; border-radius: 6px; font-weight: bold; font-size: 14px; }
+QPushButton { padding: 8px 16px; border-radius: 6px; font-weight: bold; font-size: 14px; }
 QPushButton#btn_cancel { background-color: transparent; color: #4a5568; border: 1px solid #cbd5e0; }
 QPushButton#btn_cancel:hover { background-color: #f1f3f5; }
 QPushButton#btn_save { background-color: #007bff; color: white; border: none; }
 QPushButton#btn_save:hover { background-color: #0069d9; }
 /* STYLE CHO NÚT CỘNG (Thêm nhanh) */
 QPushButton#btn_add_category, QPushButton#btn_add_supplier, QPushButton#btn_add_base_unit, QPushButton#btn_add_conversion_unit {
-    padding: 0px; border-radius: 4px; background-color: #e9ecef; color: #495057; border: 1px solid #ced4da; font-size: 18px; font-weight: bold;
+    padding: 4px; border-radius: 4px; background-color: #e9ecef; color: #495057; border: 1px solid #ced4da; font-size: 18px; font-weight: bold;
 }
 QPushButton#btn_add_category:hover, QPushButton#btn_add_supplier:hover, QPushButton#btn_add_base_unit:hover, QPushButton#btn_add_conversion_unit:hover {
     background-color: #007bff; color: white; border-color: #007bff;

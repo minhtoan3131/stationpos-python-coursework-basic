@@ -69,20 +69,17 @@ class InventoryServiceImpl(InventoryService):
         transaction = TransactionManager(connection)
 
         try:
-            # Bơm connection vào các repo, tự động chia sẻ cùng 1 Transaction
             inventory_repo = InventoryRepositoryImpl(connection)
             product_repo = ProductRepositoryImpl(connection)
             supplier_repo = SupplierRepositoryImpl(connection)
 
             validator = InventoryValidator(product_repo, supplier_repo)
 
-            # Validation chạy trên cùng connection, KHÔNG CẦN TRUYỀN CURSOR
             validator.validate_purchase_order(dto)
 
             total_amount = sum(item.quantity * item.unit_price for item in dto.items)
             po_code = f"PN-{int(time.time())}"
 
-            # Gọi Repo, KHÔNG CẦN TRUYỀN CURSOR
             po_id = inventory_repo.create_purchase_order({
                 'code': po_code,
                 'supplier_id': dto.supplier_id,
@@ -91,24 +88,56 @@ class InventoryServiceImpl(InventoryService):
             })
 
             for item in dto.items:
-                product = product_repo.get_product_by_id(item.product_id)
+                # 1. Lấy thông tin sản phẩm (Chứa Tỷ lệ quy đổi & Giá vốn cũ)
+                product_data = product_repo.get_product_detail_for_import(item.product_id)
+                old_cost_price = float(product_data.get('cost_price') or 0)
+
+                # Lấy số lượng tồn kho CŨ (trước khi cộng lô mới)
+                current_qty = inventory_repo.get_inventory_quantity(item.product_id)
 
                 base_qty = item.quantity
-                conv_unit_id = getattr(product, 'conversion_unit_id', None)
-                conv_ratio = getattr(product, 'conversion_ratio', None)
+                conv_unit_id = product_data.get('conversion_unit_id')
+                conv_ratio = product_data.get('conversion_ratio')
 
+                # 2. Quy đổi Số lượng & Giá nhập ra ĐƠN VỊ CƠ BẢN
                 if conv_unit_id and item.unit_id == conv_unit_id and conv_ratio:
-                    base_qty = item.quantity * int(conv_ratio)
+                    ratio_val = float(conv_ratio)
+                    # Nhập Sỉ -> Nhân SL với Tỷ lệ
+                    base_qty = item.quantity * int(ratio_val)
+                    # Nhập Sỉ -> Chia Giá nhập cho Tỷ lệ để ra Giá Cơ bản
+                    base_unit_cost = float(item.unit_price) / ratio_val
+                else:
+                    # Nhập Lẻ -> Giữ nguyên SL và Giá
+                    base_unit_cost = float(item.unit_price)
 
+                # 3. Tính GIÁ VỐN BÌNH QUÂN GIA QUYỀN (MAC)
+                total_new_qty = current_qty + base_qty
+
+                if total_new_qty > 0:
+                    old_total_value = current_qty * old_cost_price
+                    new_total_value = base_qty * base_unit_cost
+
+                    # Công thức MAC = Tổng giá trị / Tổng số lượng
+                    new_mac = (old_total_value + new_total_value) / total_new_qty
+                else:
+                    # Đề phòng trường hợp lỗi kho âm, lấy luôn giá mới làm chuẩn
+                    new_mac = base_unit_cost
+
+                # 4. Lưu Giá vốn bình quân MỚI vào bảng Sản phẩm
+                product_repo.update_cost_price(item.product_id, new_mac)
+
+                # 5. Lưu Chi tiết phiếu nhập (Lưu nguyên trạng ĐVT và Giá mà Thu ngân đã nhập)
                 inventory_repo.create_purchase_order_item({
                     'po_id': po_id, 'product_id': item.product_id, 'unit_id': item.unit_id,
                     'qty': item.quantity, 'price': item.unit_price, 'total': item.quantity * item.unit_price
                 })
 
+                # 6. Ghi nhận lịch sử (Thẻ kho) theo SL Cơ bản
                 inventory_repo.add_stock_transaction({
                     'product_id': item.product_id, 'qty': base_qty, 'ref_id': po_id
                 })
 
+                # 7. Cộng tồn kho theo SL Cơ bản
                 inventory_repo.update_inventory_quantity(item.product_id, base_qty)
 
             transaction.commit()

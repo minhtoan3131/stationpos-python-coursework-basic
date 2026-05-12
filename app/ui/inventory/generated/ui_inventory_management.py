@@ -22,16 +22,14 @@ class Ui_InventoryManagementWidget(object):
 "        color: #334155;\n"
 "    }\n"
 "\n"
-"    /* Khung bao chuyên nghiệp */\n"
 "    QFrame#frame_left, QFrame#frame_right {\n"
 "        background-color: #ffffff;\n"
 "        border: 1px solid #e2e8f0;\n"
 "        border-radius: 10px;\n"
 "    }\n"
 "\n"
-"    /* Tiêu đề Module */\n"
 "    QLabel#lbl_title {\n"
-"        font-size: 22px;\n"
+"        font-size: 26px;\n"
 "        font-weight: 800;\n"
 "        color: #1e293b;\n"
 "        padding-bottom: 5px;\n"
@@ -46,7 +44,6 @@ class Ui_InventoryManagementWidget(object):
 "        padding-bottom: 4px;\n"
 "    }\n"
 "\n"
-"    /* Input & ComboBox */\n"
 "    QLineEdit, QComboBox {\n"
 "        padding: 8px 12px;\n"
 "        border: 1px solid #cbd5e1;\n"
@@ -58,7 +55,6 @@ class Ui_InventoryManagementWidget(object):
 "        background-color: #f0f9ff;\n"
 "    }\n"
 "\n"
-"    /* Table Design chuyên sâu */\n"
 "    QTableWidget {\n"
 "        background-color: #ffffff;\n"
 "        border: none;\n"
@@ -76,40 +72,20 @@ class Ui_InventoryManagementWidget(object):
 "        border-bottom: 1px solid #e2e8f0;\n"
 "    }\n"
 "\n"
-"    /* Button Styles */\n"
 "    QPushButton {\n"
 "        padding: 10px 20px;\n"
 "        border-radius: 6px;\n"
 "        font-weight: bold;\n"
 "    }\n"
 "\n"
-"    /* Nút Search */\n"
-"    QPushButton#btn_search {\n"
-"        background-color: #64748b;\n"
-"        color: white;\n"
-"    }\n"
+"    QPushButton#btn_search { background-color: #64748b; color: white; }\n"
+"    QPushButton#btn_import_action { background-color: #3b82f6; color: white; border: none; }\n"
+"    QPushButton#btn_import_action:hover { background-color: #2563eb; }\n"
+"    QPushButton#btn_clear_all { background-color: #ef4444; color: white; border: none; }\n"
+"    QPushButton#btn_clear_all:hover { background-color: #dc2626; }\n"
+"    QPushButton#btn_save_all { background-color: #10b981; color: white; border: none; }\n"
+"    QPushButton#btn_save_all:hover { background-color: #059669; }\n"
 "\n"
-"    /* Nút Chuyển hàng sang phiếu */\n"
-"    QPushButton#btn_import_action {\n"
-"        background-color: #3b82f6;\n"
-"        color: white;\n"
-"        border: none;\n"
-"    }\n"
-"    QPushButton#btn_import_action:hover {\n"
-"        background-color: #2563eb;\n"
-"    }\n"
-"\n"
-"    /* Nút Lưu tổng thể */\n"
-"    QPushButton#btn_save_all {\n"
-"        background-color: #10b981;\n"
-"        color: white;\n"
-"        font-size: 16px;\n"
-"    }\n"
-"    QPushButton#btn_save_all:hover {\n"
-"        background-color: #059669;\n"
-"    }\n"
-"\n"
-"    /* Tổng tiền */\n"
 "    QLabel#lbl_total_value {\n"
 "        font-size: 26px;\n"
 "        font-weight: 900;\n"
@@ -117,9 +93,12 @@ class Ui_InventoryManagementWidget(object):
 "    }\n"
 "   ")
         self.verticalLayout_main = QtWidgets.QVBoxLayout(InventoryManagementWidget)
-        self.verticalLayout_main.setProperty("contentsMargins", 20)
-        self.verticalLayout_main.setSpacing(15)
+        self.verticalLayout_main.setContentsMargins(15, 15, 15, 15)
+        self.verticalLayout_main.setSpacing(10)
         self.verticalLayout_main.setObjectName("verticalLayout_main")
+        self.lbl_title = QtWidgets.QLabel(parent=InventoryManagementWidget)
+        self.lbl_title.setObjectName("lbl_title")
+        self.verticalLayout_main.addWidget(self.lbl_title)
         self.horizontalLayout_content = QtWidgets.QHBoxLayout()
         self.horizontalLayout_content.setSpacing(20)
         self.horizontalLayout_content.setObjectName("horizontalLayout_content")
@@ -131,9 +110,6 @@ class Ui_InventoryManagementWidget(object):
         self.lbl_sub_left = QtWidgets.QLabel(parent=self.frame_left)
         self.lbl_sub_left.setObjectName("lbl_sub_left")
         self.verticalLayout_left.addWidget(self.lbl_sub_left)
-        self.lbl_title = QtWidgets.QLabel(parent=self.frame_left)
-        self.lbl_title.setObjectName("lbl_title")
-        self.verticalLayout_left.addWidget(self.lbl_title)
         self.layout_search = QtWidgets.QHBoxLayout()
         self.layout_search.setObjectName("layout_search")
         self.txt_search_inventory = QtWidgets.QLineEdit(parent=self.frame_left)
@@ -225,31 +201,32 @@ class Ui_InventoryManagementWidget(object):
         item = QtWidgets.QTableWidgetItem()
         self.tbl_items.setHorizontalHeaderItem(6, item)
         self.verticalLayout_right.addWidget(self.tbl_items)
-        self.layout_footer = QtWidgets.QHBoxLayout()
-        self.layout_footer.setObjectName("layout_footer")
-        self.btn_clear_all = QtWidgets.QPushButton(parent=self.frame_right)
-        self.btn_clear_all.setStyleSheet("color: #ef4444; border: none; font-weight: normal; text-decoration: underline;")
-        self.btn_clear_all.setObjectName("btn_clear_all")
-        self.layout_footer.addWidget(self.btn_clear_all)
-        spacerItem1 = QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
-        self.layout_footer.addItem(spacerItem1)
         self.layout_total = QtWidgets.QVBoxLayout()
+        self.layout_total.setContentsMargins(-1, -1, -1, 10)
         self.layout_total.setObjectName("layout_total")
         self.lbl_total_text = QtWidgets.QLabel(parent=self.frame_right)
         self.lbl_total_text.setStyleSheet("font-weight: bold; color: #64748b;")
-        self.lbl_total_text.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
+        self.lbl_total_text.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight|QtCore.Qt.AlignmentFlag.AlignTrailing|QtCore.Qt.AlignmentFlag.AlignVCenter)
         self.lbl_total_text.setObjectName("lbl_total_text")
         self.layout_total.addWidget(self.lbl_total_text)
         self.lbl_total_value = QtWidgets.QLabel(parent=self.frame_right)
-        self.lbl_total_value.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
+        self.lbl_total_value.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight|QtCore.Qt.AlignmentFlag.AlignTrailing|QtCore.Qt.AlignmentFlag.AlignVCenter)
         self.lbl_total_value.setObjectName("lbl_total_value")
         self.layout_total.addWidget(self.lbl_total_value)
-        self.layout_footer.addLayout(self.layout_total)
-        self.verticalLayout_right.addLayout(self.layout_footer)
+        self.verticalLayout_right.addLayout(self.layout_total)
+        self.layout_right_btns = QtWidgets.QHBoxLayout()
+        self.layout_right_btns.setObjectName("layout_right_btns")
+        self.btn_clear_all = QtWidgets.QPushButton(parent=self.frame_right)
+        self.btn_clear_all.setMinimumSize(QtCore.QSize(120, 40))
+        self.btn_clear_all.setObjectName("btn_clear_all")
+        self.layout_right_btns.addWidget(self.btn_clear_all)
+        spacerItem1 = QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
+        self.layout_right_btns.addItem(spacerItem1)
         self.btn_save_all = QtWidgets.QPushButton(parent=self.frame_right)
-        self.btn_save_all.setMinimumSize(QtCore.QSize(0, 50))
+        self.btn_save_all.setMinimumSize(QtCore.QSize(180, 40))
         self.btn_save_all.setObjectName("btn_save_all")
-        self.verticalLayout_right.addWidget(self.btn_save_all)
+        self.layout_right_btns.addWidget(self.btn_save_all)
+        self.verticalLayout_right.addLayout(self.layout_right_btns)
         self.horizontalLayout_content.addWidget(self.frame_right)
         self.horizontalLayout_content.setStretch(0, 1)
         self.horizontalLayout_content.setStretch(1, 1)
@@ -261,8 +238,8 @@ class Ui_InventoryManagementWidget(object):
     def retranslateUi(self, InventoryManagementWidget):
         _translate = QtCore.QCoreApplication.translate
         InventoryManagementWidget.setWindowTitle(_translate("InventoryManagementWidget", "Quản lý Kho & Nhập hàng Hệ thống"))
-        self.lbl_sub_left.setText(_translate("InventoryManagementWidget", "Danh sách Tồn kho"))
         self.lbl_title.setText(_translate("InventoryManagementWidget", "Quản lý kho hàng"))
+        self.lbl_sub_left.setText(_translate("InventoryManagementWidget", "Danh sách Tồn kho"))
         self.txt_search_inventory.setPlaceholderText(_translate("InventoryManagementWidget", "Tìm theo mã SKU, tên sản phẩm hoặc barcode..."))
         self.btn_search.setText(_translate("InventoryManagementWidget", "Tìm kiếm"))
         item = self.tbl_inventory.horizontalHeaderItem(0)
@@ -296,17 +273,7 @@ class Ui_InventoryManagementWidget(object):
         item.setText(_translate("InventoryManagementWidget", "Giá nhập"))
         item = self.tbl_items.horizontalHeaderItem(5)
         item.setText(_translate("InventoryManagementWidget", "Thành tiền"))
-        self.btn_clear_all.setText(_translate("InventoryManagementWidget", "Hủy"))
         self.lbl_total_text.setText(_translate("InventoryManagementWidget", "TỔNG TIỀN PHIẾU NHẬP:"))
         self.lbl_total_value.setText(_translate("InventoryManagementWidget", "0 VND"))
-        self.btn_save_all.setText(_translate("InventoryManagementWidget", "XÁC NHẬN NHẬP KHO THÀNH PHẨM (F9)"))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    InventoryManagementWidget = QtWidgets.QWidget()
-    ui = Ui_InventoryManagementWidget()
-    ui.setupUi(InventoryManagementWidget)
-    InventoryManagementWidget.show()
-    sys.exit(app.exec())
+        self.btn_clear_all.setText(_translate("InventoryManagementWidget", "Hủy phiếu"))
+        self.btn_save_all.setText(_translate("InventoryManagementWidget", "XÁC NHẬN NHẬP KHO (F9)"))

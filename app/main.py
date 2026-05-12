@@ -1,34 +1,47 @@
 import sys
-from PyQt6.QtWidgets import QApplication
+import traceback
+from PyQt6.QtWidgets import QApplication, QMessageBox
 
-# ==========================================
-# IMPORT SERVICES (Tầng nghiệp vụ lõi)
-# ==========================================
-from app.modules.product.services.impl.supplier_service_impl import SupplierServiceImpl
-from app.modules.inventory.services.impl.inventory_service_impl import InventoryServiceImpl
+# Import Database Connection để test kết nối trước khi khởi động
+from app.core.database.connection import DatabaseConnection
 
-# ==========================================
-# IMPORT CONTROLLER (Tầng giao diện UI)
-# ==========================================
-from app.ui.inventory.controllers.inventory_management_controller import InventoryManagementController
+# Import MainWindow (Đảm bảo đường dẫn này khớp với thư mục của bạn)
+from app.ui.main_window.main_window import MainWindow
+
 
 def main():
+    # 1. Khởi tạo Application
     app = QApplication(sys.argv)
 
-    # 1. Khởi tạo Service rỗng
-    # (Vì bên trong __init__ của Service chúng ta đã bỏ khai báo Repo,
-    # Service sẽ tự động lấy DatabaseConnection mỗi khi thực thi hàm)
-    supplier_service = SupplierServiceImpl()
-    inventory_service = InventoryServiceImpl()
+    # Ép sử dụng style "Fusion" để giao diện đồng bộ, đẹp mắt trên cả Mac và Windows
+    app.setStyle("Fusion")
 
-    # 2. Khởi tạo UI Controller
-    window = InventoryManagementController(
-        inventory_service=inventory_service,
-        supplier_service=supplier_service
-    )
+    # 2. Kiểm tra kết nối CSDL (Fail-Fast: Báo lỗi sớm nếu MySQL chưa bật)
+    try:
+        print("Đang kiểm tra kết nối Database...")
+        conn = DatabaseConnection.get_connection()
+        conn.close()
+        print("Kết nối Database thành công!")
+    except Exception as e:
+        QMessageBox.critical(
+            None,
+            "Lỗi kết nối CSDL",
+            f"Không thể kết nối đến Database. Vui lòng kiểm tra lại MySQL (XAMPP/Docker) của bạn.\n\nChi tiết lỗi: {str(e)}"
+        )
+        sys.exit(1)
 
-    window.show()
-    sys.exit(app.exec())
+    # 3. Khởi chạy giao diện chính
+    try:
+        window = MainWindow()
+        window.showMaximized()  # Hiển thị full màn hình ngay khi mở
+
+        # Bắt đầu vòng lặp sự kiện chính của App
+        sys.exit(app.exec())
+
+    except Exception as e:
+        traceback.print_exc()
+        QMessageBox.critical(None, "Lỗi hệ thống", f"Không thể khởi động ứng dụng:\n{str(e)}")
+
 
 if __name__ == "__main__":
     main()

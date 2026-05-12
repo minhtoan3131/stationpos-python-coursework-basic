@@ -20,14 +20,12 @@ class Ui_ProductManagementWidget(object):
 "    font-family: \'Segoe UI\', sans-serif;\n"
 "}\n"
 "\n"
-"/* NỀN CÁC KHỐI CHỨC NĂNG */\n"
 "QFrame#frame_container {\n"
 "    background-color: #ffffff;\n"
 "    border: 1px solid #e0e0e0;\n"
 "    border-radius: 12px;\n"
 "}\n"
 "\n"
-"/* TIÊU ĐỀ */\n"
 "QLabel#lbl_title {\n"
 "    font-size: 26px;\n"
 "    font-weight: 700;\n"
@@ -35,7 +33,6 @@ class Ui_ProductManagementWidget(object):
 "    margin-bottom: 10px;\n"
 "}\n"
 "\n"
-"/* THANH TÌM KIẾM TÍCH HỢP */\n"
 "QLineEdit#txt_search_keyword {\n"
 "    border: 2px solid #edeff2;\n"
 "    border-radius: 8px;\n"
@@ -48,7 +45,6 @@ class Ui_ProductManagementWidget(object):
 "    background-color: #ffffff;\n"
 "}\n"
 "\n"
-"/* NÚT TÁC VỤ */\n"
 "QPushButton {\n"
 "    border-radius: 8px;\n"
 "    padding: 10px 20px;\n"
@@ -59,16 +55,12 @@ class Ui_ProductManagementWidget(object):
 "\n"
 "QPushButton#btn_search_products { background-color: #007bff; }\n"
 "QPushButton#btn_search_products:hover { background-color: #0069d9; }\n"
-"\n"
 "QPushButton#btn_create_product { background-color: #28a745; }\n"
 "QPushButton#btn_create_product:hover { background-color: #218838; }\n"
-"\n"
 "QPushButton#btn_update_product { background-color: #ffc107; color: #212529; }\n"
 "QPushButton#btn_update_product:hover { background-color: #e0a800; }\n"
-"\n"
 "QPushButton#btn_delete_product { background-color: #dc3545; }\n"
 "QPushButton#btn_delete_product:hover { background-color: #c82333; }\n"
-"\n"
 "QPushButton#btn_refresh_products {\n"
 "    background-color: transparent;\n"
 "    color: #6c757d;\n"
@@ -76,7 +68,6 @@ class Ui_ProductManagementWidget(object):
 "}\n"
 "QPushButton#btn_refresh_products:hover { background-color: #f8f9fa; }\n"
 "\n"
-"/* BẢNG DỮ LIỆU */\n"
 "QTableWidget {\n"
 "    border: none;\n"
 "    gridline-color: #f1f1f1;\n"
@@ -94,8 +85,8 @@ class Ui_ProductManagementWidget(object):
 "}\n"
 "   ")
         self.verticalLayout_root = QtWidgets.QVBoxLayout(ProductManagementWidget)
-        self.verticalLayout_root.setContentsMargins(30, 30, 30, 30)
-        self.verticalLayout_root.setSpacing(20)
+        self.verticalLayout_root.setContentsMargins(15, 15, 15, 15)
+        self.verticalLayout_root.setSpacing(10)
         self.verticalLayout_root.setObjectName("verticalLayout_root")
         self.lbl_title = QtWidgets.QLabel(parent=ProductManagementWidget)
         self.lbl_title.setObjectName("lbl_title")
@@ -208,13 +199,3 @@ class Ui_ProductManagementWidget(object):
         self.lbl_total_products.setText(_translate("ProductManagementWidget", "Tổng cộng: 0 sản phẩm"))
         self.btn_update_product.setText(_translate("ProductManagementWidget", "Chỉnh sửa"))
         self.btn_delete_product.setText(_translate("ProductManagementWidget", "Xóa bỏ"))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    ProductManagementWidget = QtWidgets.QWidget()
-    ui = Ui_ProductManagementWidget()
-    ui.setupUi(ProductManagementWidget)
-    ProductManagementWidget.show()
-    sys.exit(app.exec())

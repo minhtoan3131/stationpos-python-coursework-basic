@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1400</width>
+    <height>900</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>POS MINI - Hệ thống Quản lý VPP Enterprise</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+    /* Tổng thể hệ thống */
+    QMainWindow {
+        background-color: #f8fafc;
+    }
+
+    /* Sidebar Side - Modern Enterprise Design với Gradient nền */
+    QFrame#frame_sidebar {
+        /* Chuyển sắc từ Trắng (trên) xuống Xám Xanh đậm dần (dưới) */
+        background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                    stop:0 #ffffff, stop:1 #cbd5e1);
+        border-right: 1px solid #e1e7ef;
+        min-width: 280px;
+        max-width: 280px;
+        /* Thêm shadow để hiện đại hơn */
+        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Header Logo Area - Gradient và Modern */
+    QLabel#lbl_logo {
+        color: #ffffff;
+        font-size: 20px;
+        font-weight: 700;
+        padding: 20px;
+        background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                    stop:0 #4f46e5, stop:1 #7c3aed);
+        /* Gradient xanh tím enterprise */
+        border-bottom: 1px solid #e1e7ef;
+    }
+
+    /* List Menu Điều hướng - Cải tiến với border-radius và spacing */
+    QListWidget#sidebar_menu {
+        background-color: transparent;
+        border: none;
+        outline: none;
+        padding-top: 20px;
+        padding-bottom: 20px;
+    }
+    QListWidget#sidebar_menu::item {
+        color: #374151;
+        padding: 16px 24px;
+        border-left: 4px solid transparent;
+        font-size: 14px;
+        font-weight: 500;
+        border-radius: 8px;
+        /* Thêm bo góc hiện đại */
+        margin: 4px 12px;
+        /* Tăng margin để không chạm viền */
+    }
+    QListWidget#sidebar_menu::item:hover {
+        background-color: #f3f4f6;
+        color: #1f2937;
+        border-radius: 8px;
+    }
+    QListWidget#sidebar_menu::item:selected {
+        background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                    stop:0 #dbeafe, stop:1 #bfdbfe);
+        /* Gradient xanh nhạt */
+        color: #1e40af;
+        border-left: 4px solid #3b82f6;
+        font-weight: 600;
+        border-radius: 8px;
+    }
+
+    /* Scrollbar cho QListWidget - Làm thanh cuộn đẹp hơn và dài hơn */
+    QListWidget#sidebar_menu QScrollBar:vertical {
+        background: transparent;
+        width: 8px;
+        border-radius: 4px;
+    }
+    QListWidget#sidebar_menu QScrollBar::handle:vertical {
+        background: #cbd5e1;
+        border-radius: 4px;
+        min-height: 40px; /* Tăng min-height để thanh cuộn dài hơn */
+    }
+    QListWidget#sidebar_menu QScrollBar::handle:vertical:hover {
+        background: #94a3b8;
+    }
+    QListWidget#sidebar_menu QScrollBar::add-line:vertical,
+    QListWidget#sidebar_menu QScrollBar::sub-line:vertical {
+        border: none;
+        background: none;
+    }
+
+    /* Vùng hiển thị nội dung bên phải */
+    QStackedWidget#content_stack {
+        background-color: #f8fafc;
+    }
+
+    /* Footer Sidebar */
+    QLabel#lbl_version {
+        color: #9ca3af;
+        font-size: 11px;
+        padding: 16px;
+        background-color: transparent;
+        border-top: 1px solid #e5e7eb;
+    }
+   </string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="horizontalLayout_main">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="QFrame" name="frame_sidebar">
+      <layout class="QVBoxLayout" name="verticalLayout_sidebar">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="lbl_logo">
+         <property name="text">
+          <string>POS MINI</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QListWidget" name="sidebar_menu">
+         <property name="font">
+          <font>
+           <pointsize>17</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <item>
+          <property name="text">
+           <string>🏷️  Quản lý sản phẩm</string>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>17</pointsize>
+           </font>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>📦  Quản lý kho</string>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>17</pointsize>
+           </font>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>🛒  Bán hàng</string>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>17</pointsize>
+           </font>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>📊  Báo cáo và thống kê</string>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>17</pointsize>
+           </font>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>🧾  Quản lý thuế</string>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>17</pointsize>
+           </font>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>⚙️  Cấu hình hệ thống</string>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>17</pointsize>
+           </font>
+          </property>
+         </item>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QStackedWidget" name="content_stack">
+      <property name="currentIndex">
+       <number>-1</number>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

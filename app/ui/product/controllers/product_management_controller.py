@@ -104,6 +104,7 @@ class ProductManagementController(QWidget):
 
             # Cột 8: Barcode
             self.ui.tbl_products.setItem(row_index, 8, QTableWidgetItem(product.barcode or ""))
+            self.ui.lbl_total_products.setText(f"Tổng cộng: {len(products):,} sản phẩm")
 
     def search_products(self):
         try:

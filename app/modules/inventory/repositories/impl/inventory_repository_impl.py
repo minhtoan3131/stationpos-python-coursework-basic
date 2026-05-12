@@ -49,8 +49,8 @@ class InventoryRepositoryImpl(BaseRepository, InventoryRepository):
         """
         params = []
         if search_keyword:
-            query += " AND (p.sku LIKE %s OR p.name LIKE %s)"
-            params.extend([f"%{search_keyword}%", f"%{search_keyword}%"])
+            query += " AND (p.sku LIKE %s OR p.name LIKE %s OR p.barcode LIKE %s)"
+            params.extend([f"%{search_keyword}%", f"%{search_keyword}%", f"%{search_keyword}%"])
 
         self.cursor.execute(query, tuple(params))
         return self.cursor.fetchall()

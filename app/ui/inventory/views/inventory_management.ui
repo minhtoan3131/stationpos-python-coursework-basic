@@ -23,16 +23,14 @@
         color: #334155;
     }
 
-    /* Khung bao chuyên nghiệp */
     QFrame#frame_left, QFrame#frame_right {
         background-color: #ffffff;
         border: 1px solid #e2e8f0;
         border-radius: 10px;
     }
 
-    /* Tiêu đề Module */
     QLabel#lbl_title {
-        font-size: 22px;
+        font-size: 26px;
         font-weight: 800;
         color: #1e293b;
         padding-bottom: 5px;
@@ -47,7 +45,6 @@
         padding-bottom: 4px;
     }
 
-    /* Input &amp; ComboBox */
     QLineEdit, QComboBox {
         padding: 8px 12px;
         border: 1px solid #cbd5e1;
@@ -59,7 +56,6 @@
         background-color: #f0f9ff;
     }
 
-    /* Table Design chuyên sâu */
     QTableWidget {
         background-color: #ffffff;
         border: none;
@@ -77,40 +73,20 @@
         border-bottom: 1px solid #e2e8f0;
     }
 
-    /* Button Styles */
     QPushButton {
         padding: 10px 20px;
         border-radius: 6px;
         font-weight: bold;
     }
 
-    /* Nút Search */
-    QPushButton#btn_search {
-        background-color: #64748b;
-        color: white;
-    }
+    QPushButton#btn_search { background-color: #64748b; color: white; }
+    QPushButton#btn_import_action { background-color: #3b82f6; color: white; border: none; }
+    QPushButton#btn_import_action:hover { background-color: #2563eb; }
+    QPushButton#btn_clear_all { background-color: #ef4444; color: white; border: none; }
+    QPushButton#btn_clear_all:hover { background-color: #dc2626; }
+    QPushButton#btn_save_all { background-color: #10b981; color: white; border: none; }
+    QPushButton#btn_save_all:hover { background-color: #059669; }
 
-    /* Nút Chuyển hàng sang phiếu */
-    QPushButton#btn_import_action {
-        background-color: #3b82f6;
-        color: white;
-        border: none;
-    }
-    QPushButton#btn_import_action:hover {
-        background-color: #2563eb;
-    }
-
-    /* Nút Lưu tổng thể */
-    QPushButton#btn_save_all {
-        background-color: #10b981;
-        color: white;
-        font-size: 16px;
-    }
-    QPushButton#btn_save_all:hover {
-        background-color: #059669;
-    }
-
-    /* Tổng tiền */
     QLabel#lbl_total_value {
         font-size: 26px;
         font-weight: 900;
@@ -120,11 +96,27 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_main">
    <property name="spacing">
+    <number>10</number>
+   </property>
+   <property name="leftMargin">
     <number>15</number>
    </property>
-   <property name="contentsMargins" stdset="0">
-    <number>20</number>
+   <property name="topMargin">
+    <number>15</number>
    </property>
+   <property name="rightMargin">
+    <number>15</number>
+   </property>
+   <property name="bottomMargin">
+    <number>15</number>
+   </property>
+   <item>
+    <widget class="QLabel" name="lbl_title">
+     <property name="text">
+      <string>Quản lý kho hàng</string>
+     </property>
+    </widget>
+   </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_content" stretch="1,1">
      <property name="spacing">
@@ -140,13 +132,6 @@
          <widget class="QLabel" name="lbl_sub_left">
           <property name="text">
            <string>Danh sách Tồn kho</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="lbl_title">
-          <property name="text">
-           <string>Quản lý kho hàng</string>
           </property>
          </widget>
         </item>
@@ -346,14 +331,47 @@
          </widget>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="layout_footer">
+         <layout class="QVBoxLayout" name="layout_total">
+          <property name="bottomMargin">
+           <number>10</number>
+          </property>
           <item>
-           <widget class="QPushButton" name="btn_clear_all">
+           <widget class="QLabel" name="lbl_total_text">
             <property name="styleSheet">
-             <string notr="true">color: #ef4444; border: none; font-weight: normal; text-decoration: underline;</string>
+             <string notr="true">font-weight: bold; color: #64748b;</string>
             </property>
             <property name="text">
-             <string>Hủy</string>
+             <string>TỔNG TIỀN PHIẾU NHẬP:</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="lbl_total_value">
+            <property name="text">
+             <string>0 VND</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="layout_right_btns">
+          <item>
+           <widget class="QPushButton" name="btn_clear_all">
+            <property name="minimumSize">
+             <size>
+              <width>120</width>
+              <height>40</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Hủy phiếu</string>
             </property>
            </widget>
           </item>
@@ -371,46 +389,19 @@
            </spacer>
           </item>
           <item>
-           <layout class="QVBoxLayout" name="layout_total">
-            <item>
-             <widget class="QLabel" name="lbl_total_text">
-              <property name="styleSheet">
-               <string notr="true">font-weight: bold; color: #64748b;</string>
-              </property>
-              <property name="text">
-               <string>TỔNG TIỀN PHIẾU NHẬP:</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight</set>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="lbl_total_value">
-              <property name="text">
-               <string>0 VND</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight</set>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           <widget class="QPushButton" name="btn_save_all">
+            <property name="minimumSize">
+             <size>
+              <width>180</width>
+              <height>40</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>XÁC NHẬN NHẬP KHO (F9)</string>
+            </property>
+           </widget>
           </item>
          </layout>
-        </item>
-        <item>
-         <widget class="QPushButton" name="btn_save_all">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>50</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>XÁC NHẬN NHẬP KHO THÀNH PHẨM (F9)</string>
-          </property>
-         </widget>
         </item>
        </layout>
       </widget>
