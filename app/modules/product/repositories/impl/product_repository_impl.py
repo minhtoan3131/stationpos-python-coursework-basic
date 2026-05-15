@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import List, Optional
 from app.core.database.base_repository import BaseRepository
 from app.modules.product.repositories.product_repository import ProductRepository
@@ -145,3 +146,8 @@ class ProductRepositoryImpl(BaseRepository, ProductRepository):
         """
         self.cursor.execute(query, (product_id,))
         return self.cursor.fetchone()  # Trả về dictionary thô
+
+    def update_cost_price(self, product_id: int, new_cost_price: Decimal) -> None:
+        """Cập nhật lại Giá vốn bình quân vào bảng products"""
+        sql = "UPDATE products SET cost_price = %s WHERE id = %s"
+        self.cursor.execute(sql, (new_cost_price, product_id))

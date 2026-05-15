@@ -2,19 +2,22 @@ import datetime
 import traceback
 
 from PyQt6.QtWidgets import QWidget, QHeaderView, QTableWidgetItem, QComboBox, QMessageBox, QPushButton, \
-    QAbstractItemView
+    QAbstractItemView, QFileDialog, QSpinBox, QInputDialog, QDialog
 from PyQt6.QtCore import Qt
 
+from app.ui.inventory.controllers.purchase_order_confirm_controller import PurchaseOrderConfirmController
 from app.ui.inventory.generated.ui_inventory_management import Ui_InventoryManagementWidget
 from app.modules.inventory.services.inventory_service import InventoryService
 from app.modules.product.services.supplier_service import SupplierService
 from app.modules.inventory.dtos.inventory_dto import PurchaseOrderCreateDTO, PurchaseOrderItemDTO
 from app.core.exceptions.validation_exception import ValidationException
+from app.ui.inventory.models.purchase_cart import PurchaseCart
 
 
 class InventoryManagementController(QWidget):
     def __init__(self, inventory_service: InventoryService, supplier_service: SupplierService):
         super().__init__()
+        self.cart = PurchaseCart()
         self.ui = Ui_InventoryManagementWidget()
         self.ui.setupUi(self)
 
@@ -62,6 +65,7 @@ class InventoryManagementController(QWidget):
         self.ui.btn_import_action.clicked.connect(self.add_selected_to_cart)
         self.ui.tbl_inventory.cellDoubleClicked.connect(self.add_selected_to_cart)
         self.ui.btn_export_excel.clicked.connect(self.export_excel)
+        self.ui.btn_add_supplier.clicked.connect(self.quick_add_supplier)
 
         # Events bên phải (Purchase Order)
         self.ui.btn_save_all.clicked.connect(self.handle_save_purchase)
@@ -107,10 +111,11 @@ class InventoryManagementController(QWidget):
             min_stock.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
             self.ui.tbl_inventory.setItem(row, 4, min_stock)
 
-            status_item = QTableWidgetItem(item.status)
-            if item.total_base_quantity <= item.min_stock:
+            if item.is_low_stock:
+                status_item = QTableWidgetItem("Sắp hết hàng")
                 status_item.setForeground(Qt.GlobalColor.red)
             else:
+                status_item = QTableWidgetItem("Bình thường")
                 status_item.setForeground(Qt.GlobalColor.darkGreen)
             self.ui.tbl_inventory.setItem(row, 5, status_item)
 
@@ -119,21 +124,20 @@ class InventoryManagementController(QWidget):
     # ==========================================
 
     def add_selected_to_cart(self):
-        """Xử lý yêu cầu 2: Hiện đủ đơn vị sỉ khi thêm vào phiếu"""
+        """Xử lý thêm vào phiếu và hiển thị SpinBox Số lượng"""
         selected_row = self.ui.tbl_inventory.currentRow()
         if selected_row < 0: return
 
         product_info = self.raw_inventory_data[selected_row]
 
-        # 1. Kiểm tra trùng trong giỏ
+        # 1. KIỂM TRA TRÙNG LẶP: Tăng giá trị SpinBox thay vì đổi text
         for r in range(self.ui.tbl_items.rowCount()):
             if self.ui.tbl_items.item(r, 0).text() == product_info.sku:
-                cur_qty = int(self.ui.tbl_items.item(r, 3).text())
-                self.ui.tbl_items.item(r, 3).setText(str(cur_qty + 1))
+                spn = self.ui.tbl_items.cellWidget(r, 3)  # Lấy widget SpinBox ra
+                spn.setValue(spn.value() + 1)  # Tăng thêm 1
                 return
 
-        # 2. Lấy thông tin đầy đủ của SP (bao gồm cả ĐVT quy đổi) từ Service
-        # search_products_for_import trả về List[ProductDetailDTO]
+        # 2. THÊM DÒNG MỚI
         full_product_list = self.inventory_service.search_products_for_import(product_info.sku)
         if not full_product_list: return
         p = full_product_list[0]
@@ -147,22 +151,31 @@ class InventoryManagementController(QWidget):
         self.ui.tbl_items.setItem(row_idx, 0, sku_item)
         self.ui.tbl_items.setItem(row_idx, 1, QTableWidgetItem(p.name))
 
-        # FIX YÊU CẦU 2: Đổ dữ liệu vào ComboBox ĐVT
+        # ĐVT (ComboBox)
         cbo_unit = QComboBox()
-        # Luôn có đơn vị cơ bản
         cbo_unit.addItem(p.base_unit_name, p.base_unit_id)
-
-        # Nếu sản phẩm có đơn vị quy đổi (Sỉ), thêm vào ComboBox
         if p.conversion_unit_id and p.conversion_unit_id != p.base_unit_id:
             cbo_unit.addItem(p.conversion_unit_name, p.conversion_unit_id)
-            # Tùy chọn: Tự động chọn đơn vị sỉ nếu đây là phiếu nhập hàng sỉ
-            # cbo_unit.setCurrentIndex(1)
-
         cbo_unit.currentIndexChanged.connect(lambda: self.calculate_cart_total())
         self.ui.tbl_items.setCellWidget(row_idx, 2, cbo_unit)
 
-        # SL & Giá
-        self.ui.tbl_items.setItem(row_idx, 3, QTableWidgetItem("1"))
+        # === TẠO SPINBOX SỐ LƯỢNG ===
+        spn_qty = QSpinBox()
+        spn_qty.setMinimum(1)  # Ít nhất là nhập 1
+        spn_qty.setMaximum(999999)  # Giới hạn số lượng nhập tối đa
+        spn_qty.setValue(1)  # Mặc định là 1
+        spn_qty.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        # Sửa lỗi UX cuộn chuột (Giống bên Form Sản phẩm)
+        spn_qty.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        spn_qty.wheelEvent = lambda event: event.ignore()
+
+        # Bắt sự kiện: Cứ hễ người dùng bấm mũi tên tăng/giảm hoặc gõ phím -> Tính lại tiền
+        spn_qty.valueChanged.connect(self.calculate_cart_total)
+        self.ui.tbl_items.setCellWidget(row_idx, 3, spn_qty)
+        # ======================================
+
+        # Giá nhập
         cost_val = float(p.cost_price) if p.cost_price else 0
         self.ui.tbl_items.setItem(row_idx, 4, QTableWidgetItem(f"{cost_val:,.0f}"))
 
@@ -186,26 +199,48 @@ class InventoryManagementController(QWidget):
 
     def calculate_cart_total(self, *args):
         self.ui.tbl_items.blockSignals(True)
-        total = 0
-        for r in range(self.ui.tbl_items.rowCount()):
-            try:
-                qty_text = self.ui.tbl_items.item(r, 3).text()
-                price_text = self.ui.tbl_items.item(r, 4).text().replace(",", "")
+        self.cart.clear()
 
-                line_total = int(qty_text) * float(price_text)
-                self.ui.tbl_items.setItem(r, 5, QTableWidgetItem(f"{line_total:,.0f}"))
-                total += line_total
-            except:
+        for r in range(self.ui.tbl_items.rowCount()):
+            sku_item = self.ui.tbl_items.item(r, 0)
+            spn_qty = self.ui.tbl_items.cellWidget(r, 3)
+            price_item = self.ui.tbl_items.item(r, 4)
+
+            # Nếu dòng chưa được vẽ đầy đủ UI -> Bỏ qua an toàn
+            if not sku_item or not spn_qty or not price_item:
                 continue
 
-        self.ui.lbl_total_value.setText(f"{total:,.0f} VND")
-        self.ui.tbl_items.blockSignals(False)
+            product_id = sku_item.data(Qt.ItemDataRole.UserRole)
+            qty_val = spn_qty.value()
+            price_text = price_item.text().replace(",", "")
 
+            try:
+                price_val = float(price_text)
+                self.cart.update_item(product_id, qty_val, price_val)
+                line_total = self.cart.items[product_id].line_total
+                self.ui.tbl_items.setItem(r, 5, QTableWidgetItem(f"{line_total:,.0f}"))
+
+            except ValueError:
+                # Lỗi 1: Do dữ liệu sai định dạng (Expected Error) -> Bỏ qua nhẹ nhàng
+                print(f"Cảnh báo: Dữ liệu giá không hợp lệ ở dòng {r}. Đang bỏ qua...")
+                continue
+
+            except Exception as e:
+                # Lỗi 2: Vét các lỗi không lường trước (Unexpected Error) -> Ghi Log để dev sửa, không làm sập app
+                print(f"Lỗi hệ thống không xác định tại dòng {r}: {str(e)}")
+                traceback.print_exc()  # In chi tiết dòng code gây lỗi ra console/file log
+                continue
+
+        # CẬP NHẬT TỔNG TIỀN CUỐI CÙNG
+        self.ui.lbl_total_value.setText(f"{self.cart.total_amount:,.0f} VND")
+
+        self.ui.tbl_items.blockSignals(False)
     def clear_purchase_cart(self):
         self.ui.tbl_items.setRowCount(0)
         self.ui.txt_notes.clear()
         self.ui.cbo_supplier.setCurrentIndex(0)
         self.ui.txt_import_date.setText(datetime.datetime.now().strftime("%d/%m/%Y %H:%M"))
+        self.cart.clear()
         self.calculate_cart_total()
 
     def handle_save_purchase(self):
@@ -215,14 +250,31 @@ class InventoryManagementController(QWidget):
             return
 
         items = []
+        raw_details_for_confirm = []  # Mảng lưu thông tin chữ để hiển thị lên bảng Confirm
+
         for r in range(self.ui.tbl_items.rowCount()):
             cbo_unit = self.ui.tbl_items.cellWidget(r, 2)
+            spn_qty = self.ui.tbl_items.cellWidget(r, 3)
+
+            qty_val = spn_qty.value()
+            price_val = float(self.ui.tbl_items.item(r, 4).text().replace(",", ""))
+
+            # Build DTO cho Service
             items.append(PurchaseOrderItemDTO(
                 product_id=self.ui.tbl_items.item(r, 0).data(Qt.ItemDataRole.UserRole),
                 unit_id=cbo_unit.currentData(),
-                quantity=int(self.ui.tbl_items.item(r, 3).text()),
-                unit_price=float(self.ui.tbl_items.item(r, 4).text().replace(",", ""))
+                quantity=qty_val,
+                unit_price=price_val
             ))
+
+            # Build dữ liệu hiển thị cho Dialog Confirm
+            raw_details_for_confirm.append({
+                'sku': self.ui.tbl_items.item(r, 0).text(),
+                'name': self.ui.tbl_items.item(r, 1).text(),
+                'unit_name': cbo_unit.currentText(),
+                'qty': qty_val,
+                'price': price_val
+            })
 
         if not items:
             QMessageBox.warning(self, "Lỗi", "Giỏ hàng nhập đang trống!")
@@ -234,10 +286,24 @@ class InventoryManagementController(QWidget):
                 note=self.ui.txt_notes.text(),
                 items=items
             )
+
+            # ==========================================
+            # BƯỚC MỚI: HIỆN HỘP THOẠI XÁC NHẬN (CONFIRM)
+            # ==========================================
+            supplier_name = self.ui.cbo_supplier.currentText()
+            confirm_dialog = PurchaseOrderConfirmController(dto, supplier_name, raw_details_for_confirm)
+
+            # Nếu người dùng bấm "Quay lại" (Reject) -> Dừng tiến trình lưu
+            if confirm_dialog.exec() != QDialog.DialogCode.Accepted:
+                return
+
+                # ==========================================
+            # NẾU ĐỒNG Ý: GỌI SERVICE ĐỂ LƯU VÀO DATABASE
+            # ==========================================
             po_id = self.inventory_service.create_purchase_order(dto)
             QMessageBox.information(self, "Thành công", f"Đã nhập kho thành công! (Mã phiếu: {po_id})")
 
-            # Sau khi lưu xong thì dọn sạch giỏ hàng và làm mới bảng tồn kho bên trái
+            # Dọn sạch giỏ hàng và làm mới bảng tồn kho
             self.clear_purchase_cart()
             self.handle_search()
 
@@ -248,4 +314,55 @@ class InventoryManagementController(QWidget):
             QMessageBox.critical(self, "Lỗi hệ thống", str(e))
 
     def export_excel(self):
-        QMessageBox.information(self, "Excel", "Tính năng đang được phát triển...")
+        """Xử lý sự kiện khi người dùng bấm nút Xuất File Báo Cáo"""
+
+        # Tạo tên file mặc định có chứa ngày tháng hiện tại
+        default_filename = f"BaoCaoTonKho_{datetime.datetime.now().strftime('%Y%m%d_%H%M')}.xlsx"
+
+        # Mở hộp thoại chọn nơi lưu file
+        file_path, _ = QFileDialog.getSaveFileName(
+            self,
+            "Lưu báo cáo tồn kho",
+            default_filename,
+            "Excel Files (*.xlsx);;All Files (*)"
+        )
+
+        # Nếu người dùng bấm "Hủy" trong hộp thoại lưu file
+        if not file_path:
+            return
+
+        # Gọi Service để tạo và ghi file Excel
+        try:
+            # Đảm bảo file có đuôi .xlsx
+            if not file_path.endswith('.xlsx'):
+                file_path += '.xlsx'
+
+            success = self.inventory_service.export_inventory_to_excel(file_path)
+
+            if success:
+                QMessageBox.information(self, "Thành công", f"Đã xuất báo cáo thành công tại:\n{file_path}")
+
+        except Exception as e:
+            traceback.print_exc()
+            QMessageBox.critical(self, "Lỗi hệ thống", f"Không thể xuất file Excel:\n{str(e)}")
+
+    def quick_add_supplier(self):
+        text, ok = QInputDialog.getText(self, "Thêm Nhà cung cấp", "Nhập tên nhà cung cấp mới:")
+        if ok and text.strip():
+            try:
+                new_id = self.supplier_service.create_supplier(text.strip())
+
+                # Cập nhật UI: Thêm vào combobox và chọn luôn NCC đó
+                self.ui.cbo_supplier.addItem(text.strip(), new_id)
+                self.ui.cbo_supplier.setCurrentIndex(self.ui.cbo_supplier.count() - 1)
+
+            except Exception as e:
+                QMessageBox.warning(self, "Lỗi", f"Không thể thêm nhà cung cấp: {str(e)}")
+
+    def showEvent(self, event):
+        """Sự kiện kích hoạt mỗi khi màn hình này được hiển thị"""
+        super().showEvent(event)
+        # Làm mới danh sách nhà cung cấp trong ComboBox
+        self.load_initial_data()
+        # Làm mới luôn danh sách tồn kho (để cập nhật nếu có SP mới vừa thêm)
+        self.refresh_inventory_list()

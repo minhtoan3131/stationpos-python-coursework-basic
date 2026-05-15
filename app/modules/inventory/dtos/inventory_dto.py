@@ -34,4 +34,4 @@ class InventoryListDTO:
     total_base_quantity: int          # Tổng tồn kho hiện tại (Tính bằng đơn vị cơ bản)
     conversion_quantity_str: str      # Chuỗi hiển thị quy đổi (VD: "10 Hộp + 5 Cây")
     min_stock: int
-    status: str                       # Trạng thái cảnh báo (VD: "Bình thường", "Sắp hết hàng")
+    is_low_stock: bool

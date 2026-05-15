@@ -1,5 +1,6 @@
 # app/modules/product/repositories/product_repository.py
 from abc import ABC, abstractmethod
+from decimal import Decimal
 from typing import List, Optional
 from app.modules.product.entities.product import Product
 
@@ -55,7 +56,7 @@ class ProductRepository(ABC):
         """Lấy thông tin chi tiết sản phẩm kèm theo ĐVT và quy đổi cho nghiệp vụ nhập hàng"""
         pass
 
-    def update_cost_price(self, product_id: int, new_cost_price: float):
-        """Cập nhật lại Giá vốn bình quân vào bảng products"""
-        sql = "UPDATE products SET cost_price = %s WHERE id = %s"
-        self.cursor.execute(sql, (new_cost_price, product_id))
+    @abstractmethod
+    def update_cost_price(self, product_id: int, new_cost_price: Decimal) -> None:
+        """Cập nhật lại Giá vốn bình quân (MAC) bằng kiểu Decimal"""
+        pass

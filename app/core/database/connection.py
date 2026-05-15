@@ -17,9 +17,6 @@ class DatabaseConnection:
                 password=DB_CONFIG["password"]
             )
 
-            if connection.is_connected():
-                print("Connected to MySQL")
-
             return connection
 
         except Error as e:

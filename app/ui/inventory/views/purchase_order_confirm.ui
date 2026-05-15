@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PurchaseOrderConfirmDialog</class>
+ <widget class="QDialog" name="PurchaseOrderConfirmDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>850</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Xác nhận Phiếu Nhập Kho</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+    QDialog { background-color: #f8fafc; font-family: 'Segoe UI'; }
+    QLabel#lbl_title { font-size: 22px; font-weight: bold; color: #1e293b; text-align: center; }
+    QLabel { font-size: 14px; color: #334155; }
+    QLabel.info_label { font-weight: bold; color: #0f172a; }
+    QTableWidget { background-color: white; border: 1px solid #cbd5e1; }
+    QHeaderView::section { background-color: #f1f5f9; font-weight: bold; padding: 8px; border: none; border-bottom: 1px solid #cbd5e1; }
+    QPushButton { padding: 10px 20px; font-weight: bold; border-radius: 6px; font-size: 14px; }
+    QPushButton#btn_cancel { background-color: #e2e8f0; color: #475569; border: none; }
+    QPushButton#btn_cancel:hover { background-color: #cbd5e1; }
+    QPushButton#btn_confirm { background-color: #10b981; color: white; border: none; }
+    QPushButton#btn_confirm:hover { background-color: #059669; }
+    QLabel#lbl_total_amount { font-size: 20px; font-weight: 900; color: #ef4444; }
+   </string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>15</number>
+   </property>
+   <property name="leftMargin">
+    <number>20</number>
+   </property>
+   <property name="topMargin">
+    <number>20</number>
+   </property>
+   <property name="rightMargin">
+    <number>20</number>
+   </property>
+   <property name="bottomMargin">
+    <number>20</number>
+   </property>
+   <item>
+    <widget class="QLabel" name="lbl_title">
+     <property name="text">
+      <string>PHIẾU XÁC NHẬN NHẬP KHO</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="gridLayout" columnstretch="0,1">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Nhà cung cấp:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLabel" name="lbl_supplier_name">
+       <property name="text">
+        <string>---</string>
+       </property>
+       <property name="class" stdset="0">
+        <string>info_label</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>Ghi chú:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLabel" name="lbl_note">
+       <property name="text">
+        <string>---</string>
+       </property>
+       <property name="class" stdset="0">
+        <string>info_label</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QTableWidget" name="tbl_items">
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::NoSelection</enum>
+     </property>
+     <column>
+      <property name="text">
+       <string>Mã SKU</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Tên sản phẩm</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>ĐVT</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>SL</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Đơn giá</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Thành tiền</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>TỔNG CỘNG THÀNH TIỀN:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="lbl_total_amount">
+       <property name="text">
+        <string>0 đ</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_cancel">
+       <property name="text">
+        <string>Quay lại chỉnh sửa</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_confirm">
+       <property name="text">
+        <string>CHÍNH THỨC NHẬP KHO</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

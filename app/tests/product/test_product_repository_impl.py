@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import pytest
 from app.modules.product.entities.product import Product
 from app.modules.product.repositories.impl.product_repository_impl import ProductRepositoryImpl
@@ -105,3 +107,27 @@ def test_exists_checks(product_repo, sample_product):
     sample_product.sku = "SKU-002"
     product_repo.create_product(sample_product)
     assert product_repo.exists_by_sku_excluding_id("SKU-002", pid) is True
+
+
+# ---------------------------------------------------------
+# KIỂM THỬ NGHIỆP VỤ KẾ TOÁN (SỐ THẬP PHÂN & MAC)
+# ---------------------------------------------------------
+
+def test_update_cost_price_with_decimal(product_repo, sample_product):
+    """
+    Kiểm tra xem hàm update_cost_price có nhận, xử lý và lưu trữ
+    chính xác kiểu Decimal xuống Database hay không.
+    """
+    pid = product_repo.create_product(sample_product)
+
+    # Khởi tạo một con số MAC cực kỳ "xấu" có nhiều số thập phân
+    new_mac = Decimal('33333.3333')
+
+    product_repo.update_cost_price(pid, new_mac)
+
+    updated_product = product_repo.get_product_by_id(pid)
+
+    # Xác minh (Assertion)
+    # Ép chuỗi về Decimal một lần nữa để so sánh 1-1,
+    # đảm bảo DB (DECIMAL(15,4)) trả về đúng số mà không bị sai số nhị phân.
+    assert Decimal(str(updated_product.cost_price)) == new_mac

@@ -58,6 +58,7 @@ CREATE TABLE inventory (
     product_id INT PRIMARY KEY,
     quantity INT DEFAULT 0,
     updated_at DATETIME,
+    total_value DECIMAL(15,4) DEFAULT 0, -- Tổng giá trị tồn kho của sản phầm này hiện tại
 
     FOREIGN KEY (product_id) REFERENCES products(id)
 );

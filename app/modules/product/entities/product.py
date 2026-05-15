@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from decimal import Decimal
 from typing import Optional
 from datetime import datetime
 
@@ -17,9 +18,9 @@ class Product:
 
     base_unit_id: int
 
-    cost_price: float
-    retail_price: float
-    wholesale_price: float
+    cost_price: Decimal
+    retail_price: Decimal
+    wholesale_price: Decimal
 
     min_stock: int
 

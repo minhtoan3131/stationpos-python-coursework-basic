@@ -45,7 +45,7 @@ def test_get_inventory_quantity_has_data(inventory_repo, setup_dummy_product, db
     cursor.close()
 
     # WHEN: Gọi hàm của Repository
-    quantity = inventory_repo.get_inventory_quantity(product_id)
+    quantity = inventory_repo.get_inventory_status(product_id).get('quantity')
 
     # THEN: Phải đọc lên được số 150
     assert quantity == 150
@@ -58,7 +58,7 @@ def test_get_inventory_quantity_no_data(inventory_repo, setup_dummy_product):
     product_id = setup_dummy_product
 
     # WHEN
-    quantity = inventory_repo.get_inventory_quantity(product_id)
+    quantity = inventory_repo.get_inventory_status(product_id).get('quantity')
 
     # THEN: Logic `if row else 0` phải hoạt động và trả về 0
     assert quantity == 0
@@ -68,7 +68,7 @@ def test_get_inventory_quantity_invalid_id(inventory_repo):
     """Kịch bản 3: Truy vấn một ID sản phẩm hoàn toàn không có thực"""
 
     # WHEN
-    quantity = inventory_repo.get_inventory_quantity(999999)
+    quantity = inventory_repo.get_inventory_status(999999).get('quantity')
 
     # THEN: Cũng phải trả về 0 một cách an toàn mà không bị crash
     assert quantity == 0

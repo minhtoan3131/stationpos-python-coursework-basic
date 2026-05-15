@@ -2,6 +2,7 @@ from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QGraphics
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont, QColor
 
+from app.core.database.unit_of_work import UnitOfWork
 from app.ui.main_window.ui_main_window import Ui_MainWindow
 
 # ----------------- IMPORT SERVICES (Bản mới tự quản lý connection) -----------------
@@ -14,6 +15,9 @@ from app.modules.inventory.services.impl.inventory_service_impl import Inventory
 # ----------------- IMPORT CONTROLLERS -----------------
 from app.ui.inventory.controllers.inventory_management_controller import InventoryManagementController
 from app.ui.product.controllers.product_management_controller import ProductManagementController
+from app.ui.report.controllers.report_management_controller import ReportManagementController
+from app.ui.sale.controllers.sales_management_controller import SalesManagementController
+from app.ui.tax.controllers.tax_management_controller import TaxManagementController
 
 
 class MainWindow(QMainWindow):
@@ -26,7 +30,7 @@ class MainWindow(QMainWindow):
         self.supplier_service = SupplierServiceImpl()
         self.unit_service = UnitServiceImpl()
         self.product_service = ProductServiceImpl()
-        self.inventory_service = InventoryServiceImpl()
+        self.inventory_service = InventoryServiceImpl(uow_factory=UnitOfWork)
 
         # Xử lý UI cho macOS và Hiệu ứng
         self.fix_macos_font_issue()
@@ -75,9 +79,13 @@ class MainWindow(QMainWindow):
         )
 
         # Các Page khác (Placeholder)
-        self.page_sales = self.create_placeholder("🛒 Bán hàng tại quầy\n(Đang phát triển)")
-        self.page_reports = self.create_placeholder("📊 Báo cáo và thống kê\n(Đang phát triển)")
-        self.page_tax = self.create_placeholder("🧾 Quản lý Thuế\n(Đang phát triển)")
+        self.page_sales = SalesManagementController(
+            inventory_service=self.inventory_service,
+            product_service=self.product_service
+        )
+
+        self.page_reports = ReportManagementController()
+        self.page_tax = TaxManagementController()
         self.page_settings = self.create_placeholder("⚙️ Cấu hình Hệ thống\n(Đang phát triển)")
 
         # Thêm vào stack theo đúng thứ tự index của sidebar_menu
@@ -106,6 +114,8 @@ class MainWindow(QMainWindow):
             self.page_product.load_products()
         elif index == 1:
             self.page_inventory.handle_search()
+        elif index == 2:
+            self.page_sales.handle_search()
 
     def closeEvent(self, event):
         """Đóng ứng dụng an toàn"""

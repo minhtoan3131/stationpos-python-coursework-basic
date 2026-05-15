@@ -4,11 +4,19 @@ from app.modules.inventory.repositories.inventory_repository import InventoryRep
 
 class InventoryRepositoryImpl(BaseRepository, InventoryRepository):
 
-    def get_inventory_quantity(self, product_id: int) -> int:
-        query = "SELECT quantity FROM inventory WHERE product_id = %s"
+    def get_inventory_status(self, product_id: int) -> dict:
+        """Lấy tồn kho và tổng giá trị, CÓ KHÓA DÒNG (FOR UPDATE) để chống đụng độ"""
+        query = "SELECT quantity, total_value FROM inventory WHERE product_id = %s FOR UPDATE"
         self.cursor.execute(query, (product_id,))
         row = self.cursor.fetchone()
-        return row["quantity"] if row else 0
+
+        if row:
+            return {
+                "quantity": row["quantity"],
+                "total_value": row["total_value"] if row["total_value"] is not None else 0
+            }
+        # Nếu chưa từng nhập kho bao giờ
+        return {"quantity": 0, "total_value": 0}
 
     def create_purchase_order(self, po_data):
         sql = "INSERT INTO purchase_orders (code, supplier_id, total_amount, note) VALUES (%s, %s, %s, %s)"
@@ -27,10 +35,16 @@ class InventoryRepositoryImpl(BaseRepository, InventoryRepository):
         sql = "INSERT INTO stock_transactions (product_id, change_quantity, type, reference_id) VALUES (%s, %s, 'IMPORT', %s)"
         self.cursor.execute(sql, (trans_data['product_id'], trans_data['qty'], trans_data['ref_id']))
 
-    def update_inventory_quantity(self, product_id, delta_qty):
-        sql = """INSERT INTO inventory (product_id, quantity, updated_at) VALUES (%s, %s, NOW())
-                 ON DUPLICATE KEY UPDATE quantity = quantity + VALUES(quantity), updated_at = NOW()"""
-        self.cursor.execute(sql, (product_id, delta_qty))
+    def update_inventory_status(self, product_id: int, new_qty: int, new_total_value):
+        """Cập nhật đè trực tiếp Số lượng và Tổng giá trị mới nhất"""
+        sql = """INSERT INTO inventory (product_id, quantity, total_value, updated_at) 
+                 VALUES (%s, %s, %s, NOW())
+                 ON DUPLICATE KEY UPDATE 
+                    quantity = %s, 
+                    total_value = %s, 
+                    updated_at = NOW()"""
+        # Truyền 5 tham số: 3 cho INSERT, 2 cho trường hợp UPDATE
+        self.cursor.execute(sql, (product_id, new_qty, new_total_value, new_qty, new_total_value))
 
     def get_inventory_list_data(self, search_keyword: str = None) -> list:
         query = """
@@ -53,4 +67,26 @@ class InventoryRepositoryImpl(BaseRepository, InventoryRepository):
             params.extend([f"%{search_keyword}%", f"%{search_keyword}%", f"%{search_keyword}%"])
 
         self.cursor.execute(query, tuple(params))
+        return self.cursor.fetchall()
+
+    def get_inventory_report_data(self) -> list:
+        """
+        Thực thi câu lệnh SQL lấy dữ liệu cho báo cáo.
+        """
+        query = """
+            SELECT 
+                p.sku, 
+                p.name AS product_name, 
+                u.name AS unit_name,
+                p.cost_price, 
+                p.min_stock,
+                COALESCE(i.quantity, 0) AS quantity,
+                COALESCE(i.total_value, 0) AS total_value
+            FROM products p
+            LEFT JOIN units u ON p.base_unit_id = u.id
+            LEFT JOIN inventory i ON p.id = i.product_id
+            WHERE p.is_active = 1
+            ORDER BY p.name ASC
+        """
+        self.cursor.execute(query)
         return self.cursor.fetchall()

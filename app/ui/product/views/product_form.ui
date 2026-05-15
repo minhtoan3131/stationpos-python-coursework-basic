@@ -81,7 +81,7 @@ QPushButton#btn_add_category:hover, QPushButton#btn_add_supplier:hover, QPushBut
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-217</y>
+        <y>0</y>
         <width>765</width>
         <height>834</height>
        </rect>
@@ -169,7 +169,7 @@ QPushButton#btn_add_category:hover, QPushButton#btn_add_supplier:hover, QPushBut
           <item row="4" column="1">
            <widget class="QLabel" name="lbl_supplier">
             <property name="text">
-             <string>Nhà cung cấp</string>
+             <string>Nhà cung cấp mặc định</string>
             </property>
            </widget>
           </item>

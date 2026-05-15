@@ -85,6 +85,7 @@ class Ui_InventoryManagementWidget(object):
 "    QPushButton#btn_clear_all:hover { background-color: #dc2626; }\n"
 "    QPushButton#btn_save_all { background-color: #10b981; color: white; border: none; }\n"
 "    QPushButton#btn_save_all:hover { background-color: #059669; }\n"
+"    QPushButton#btn_add_supplier { padding: 8px; }\n"
 "\n"
 "    QLabel#lbl_total_value {\n"
 "        font-size: 26px;\n"
@@ -164,15 +165,23 @@ class Ui_InventoryManagementWidget(object):
         self.lbl1 = QtWidgets.QLabel(parent=self.frame_right)
         self.lbl1.setObjectName("lbl1")
         self.layout_header_info.addWidget(self.lbl1, 0, 0, 1, 1)
-        self.cbo_supplier = QtWidgets.QComboBox(parent=self.frame_right)
-        self.cbo_supplier.setObjectName("cbo_supplier")
-        self.layout_header_info.addWidget(self.cbo_supplier, 0, 1, 1, 1)
         self.lbl2 = QtWidgets.QLabel(parent=self.frame_right)
         self.lbl2.setObjectName("lbl2")
         self.layout_header_info.addWidget(self.lbl2, 1, 0, 1, 1)
         self.txt_notes = QtWidgets.QLineEdit(parent=self.frame_right)
         self.txt_notes.setObjectName("txt_notes")
-        self.layout_header_info.addWidget(self.txt_notes, 1, 1, 1, 1)
+        self.layout_header_info.addWidget(self.txt_notes, 1, 1, 1, 3)
+        self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_3.setSpacing(0)
+        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
+        self.cbo_supplier = QtWidgets.QComboBox(parent=self.frame_right)
+        self.cbo_supplier.setObjectName("cbo_supplier")
+        self.horizontalLayout_3.addWidget(self.cbo_supplier)
+        self.btn_add_supplier = QtWidgets.QPushButton(parent=self.frame_right)
+        self.btn_add_supplier.setMaximumSize(QtCore.QSize(28, 16777215))
+        self.btn_add_supplier.setObjectName("btn_add_supplier")
+        self.horizontalLayout_3.addWidget(self.btn_add_supplier)
+        self.layout_header_info.addLayout(self.horizontalLayout_3, 0, 1, 1, 1)
         self.lbl3 = QtWidgets.QLabel(parent=self.frame_right)
         self.lbl3.setObjectName("lbl3")
         self.layout_header_info.addWidget(self.lbl3, 0, 2, 1, 1)
@@ -181,6 +190,7 @@ class Ui_InventoryManagementWidget(object):
         self.txt_import_date.setReadOnly(True)
         self.txt_import_date.setObjectName("txt_import_date")
         self.layout_header_info.addWidget(self.txt_import_date, 0, 3, 1, 1)
+        self.layout_header_info.setColumnStretch(1, 3)
         self.verticalLayout_right.addLayout(self.layout_header_info)
         self.tbl_items = QtWidgets.QTableWidget(parent=self.frame_right)
         self.tbl_items.setObjectName("tbl_items")
@@ -260,6 +270,7 @@ class Ui_InventoryManagementWidget(object):
         self.lbl1.setText(_translate("InventoryManagementWidget", "Nhà cung cấp:"))
         self.lbl2.setText(_translate("InventoryManagementWidget", "Ghi chú phiếu:"))
         self.txt_notes.setPlaceholderText(_translate("InventoryManagementWidget", "Lý do nhập, số hóa đơn đỏ..."))
+        self.btn_add_supplier.setText(_translate("InventoryManagementWidget", "+"))
         self.lbl3.setText(_translate("InventoryManagementWidget", "Ngày nhập:"))
         item = self.tbl_items.horizontalHeaderItem(0)
         item.setText(_translate("InventoryManagementWidget", "Mã SKU"))

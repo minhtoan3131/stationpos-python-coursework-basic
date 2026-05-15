@@ -29,3 +29,11 @@ class InventoryService(ABC):
     def search_products_for_import(self, keyword: str) -> List[ProductDetailDTO]:
         """Tìm sản phẩm nhanh để đưa vào phiếu nhập (lấy cả thông tin quy đổi)"""
         pass
+
+    @abstractmethod
+    def export_inventory_to_excel(self, file_path: str) -> bool:
+        """
+        Xuất dữ liệu tồn kho hiện tại ra file Excel theo đường dẫn chỉ định.
+        Trả về True nếu lưu thành công, ném ra Exception nếu có lỗi.
+        """
+        pass
