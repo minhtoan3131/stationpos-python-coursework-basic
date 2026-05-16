@@ -3,7 +3,7 @@ import types
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QDialog
 
-from app.ui.inventory.controllers.inventory_management_controller import InventoryManagementController
+from app.modules.inventory.ui.controllers.inventory_management_controller import InventoryManagementController
 from app.core.exceptions.validation_exception import ValidationException
 
 
@@ -49,7 +49,7 @@ def seed_cart_data(window, qtbot):
 # ==========================================
 def test_should_show_warning_and_prevent_save_when_no_supplier_is_selected(qtbot, inventory_window, mocker):
     """Khi chưa chọn Nhà cung cấp, bấm Lưu phải hiện cảnh báo và chặn lệnh lưu DB"""
-    mock_warning = mocker.patch('app.ui.inventory.controllers.inventory_management_controller.QMessageBox.warning')
+    mock_warning = mocker.patch('app.modules.inventory.ui.controllers.inventory_management_controller.QMessageBox.warning')
     inventory_window.ui.cbo_supplier.setCurrentIndex(0)
 
     qtbot.mouseClick(inventory_window.ui.btn_save_all, Qt.MouseButton.LeftButton)
@@ -60,7 +60,7 @@ def test_should_show_warning_and_prevent_save_when_no_supplier_is_selected(qtbot
 
 def test_should_show_warning_and_prevent_save_when_cart_is_empty(qtbot, inventory_window, mocker):
     """Khi giỏ hàng trống, bấm Lưu phải hiện cảnh báo và chặn lệnh lưu DB"""
-    mock_warning = mocker.patch('app.ui.inventory.controllers.inventory_management_controller.QMessageBox.warning')
+    mock_warning = mocker.patch('app.modules.inventory.ui.controllers.inventory_management_controller.QMessageBox.warning')
     inventory_window.ui.cbo_supplier.setCurrentIndex(1)
 
     qtbot.mouseClick(inventory_window.ui.btn_save_all, Qt.MouseButton.LeftButton)
@@ -78,8 +78,8 @@ def test_should_clear_cart_and_show_success_message_when_purchase_order_is_saved
     seed_cart_data(inventory_window, qtbot)
 
     mocker.patch(
-        'app.ui.inventory.controllers.inventory_management_controller.PurchaseOrderConfirmController').return_value.exec.return_value = QDialog.DialogCode.Accepted
-    mock_info = mocker.patch('app.ui.inventory.controllers.inventory_management_controller.QMessageBox.information')
+        'app.modules.inventory.ui.controllers.inventory_management_controller.PurchaseOrderConfirmController').return_value.exec.return_value = QDialog.DialogCode.Accepted
+    mock_info = mocker.patch('app.modules.inventory.ui.controllers.inventory_management_controller.QMessageBox.information')
     inventory_window.mock_inventory_service.create_purchase_order.return_value = 888
 
     qtbot.mouseClick(inventory_window.ui.btn_save_all, Qt.MouseButton.LeftButton)
@@ -98,7 +98,7 @@ def test_should_abort_save_process_when_user_cancels_at_confirmation_dialog(qtbo
     seed_cart_data(inventory_window, qtbot)
 
     mock_confirm = mocker.patch(
-        'app.ui.inventory.controllers.inventory_management_controller.PurchaseOrderConfirmController')
+        'app.modules.inventory.ui.controllers.inventory_management_controller.PurchaseOrderConfirmController')
     mock_confirm.return_value.exec.return_value = QDialog.DialogCode.Rejected
 
     qtbot.mouseClick(inventory_window.ui.btn_save_all, Qt.MouseButton.LeftButton)
@@ -111,8 +111,8 @@ def test_should_show_warning_and_preserve_cart_data_when_backend_returns_validat
     seed_cart_data(inventory_window, qtbot)
 
     mocker.patch(
-        'app.ui.inventory.controllers.inventory_management_controller.PurchaseOrderConfirmController').return_value.exec.return_value = QDialog.DialogCode.Accepted
-    mock_warning = mocker.patch('app.ui.inventory.controllers.inventory_management_controller.QMessageBox.warning')
+        'app.modules.inventory.ui.controllers.inventory_management_controller.PurchaseOrderConfirmController').return_value.exec.return_value = QDialog.DialogCode.Accepted
+    mock_warning = mocker.patch('app.modules.inventory.ui.controllers.inventory_management_controller.QMessageBox.warning')
 
     inventory_window.mock_inventory_service.create_purchase_order.side_effect = ValidationException("Sản phẩm đã khóa")
 
@@ -127,8 +127,8 @@ def test_should_show_critical_error_and_preserve_cart_data_when_backend_crashes(
     seed_cart_data(inventory_window, qtbot)
 
     mocker.patch(
-        'app.ui.inventory.controllers.inventory_management_controller.PurchaseOrderConfirmController').return_value.exec.return_value = QDialog.DialogCode.Accepted
-    mock_critical = mocker.patch('app.ui.inventory.controllers.inventory_management_controller.QMessageBox.critical')
+        'app.modules.inventory.ui.controllers.inventory_management_controller.PurchaseOrderConfirmController').return_value.exec.return_value = QDialog.DialogCode.Accepted
+    mock_critical = mocker.patch('app.modules.inventory.ui.controllers.inventory_management_controller.QMessageBox.critical')
 
     inventory_window.mock_inventory_service.create_purchase_order.side_effect = Exception("Mất kết nối MySQL")
 

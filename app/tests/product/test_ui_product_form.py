@@ -4,7 +4,7 @@ from PyQt6.QtCore import Qt
 
 from app.core.exceptions.validation_exception import ValidationException
 from app.modules.product.dtos.product_create_dto import ProductCreateDTO
-from app.ui.product.controllers.product_form_controller import ProductFormController
+from app.modules.product.ui.controllers.product_form_controller import ProductFormController
 from app.modules.product.dtos.product_detail_dto import ProductDetailDTO
 
 
@@ -106,7 +106,7 @@ def test_init_update_mode_success(qtbot, mock_ref_data, mock_product_detail):
 
 def test_quick_add_category_success(qtbot, create_form, mocker):
     form = create_form
-    mocker.patch('app.ui.product.controllers.product_form_controller.QInputDialog.getText',
+    mocker.patch('app.modules.product.ui.controllers.product_form_controller.QInputDialog.getText',
                  return_value=("Văn phòng phẩm", True))
     form.mock_category_service.create_category.return_value = 99
 
@@ -120,7 +120,7 @@ def test_quick_add_category_success(qtbot, create_form, mocker):
 
 def test_quick_add_supplier_success(qtbot, create_form, mocker):
     form = create_form
-    mocker.patch('app.ui.product.controllers.product_form_controller.QInputDialog.getText',
+    mocker.patch('app.modules.product.ui.controllers.product_form_controller.QInputDialog.getText',
                  return_value=("Bến Nghé", True))
     form.mock_supplier_service.create_supplier.return_value = 55
 
@@ -131,7 +131,7 @@ def test_quick_add_supplier_success(qtbot, create_form, mocker):
 
 def test_quick_add_unit_success_updates_both_comboboxes(qtbot, create_form, mocker):
     form = create_form
-    mocker.patch('app.ui.product.controllers.product_form_controller.QInputDialog.getText', return_value=("Lốc", True))
+    mocker.patch('app.modules.product.ui.controllers.product_form_controller.QInputDialog.getText', return_value=("Lốc", True))
     form.mock_unit_service.create_unit.return_value = 88
 
     initial_base_count = form.ui.cbo_base_unit.count()
@@ -147,7 +147,7 @@ def test_quick_add_unit_success_updates_both_comboboxes(qtbot, create_form, mock
 
 def test_quick_add_cancel_or_empty(qtbot, create_form, mocker):
     form = create_form
-    mocker.patch('app.ui.product.controllers.product_form_controller.QInputDialog.getText',
+    mocker.patch('app.modules.product.ui.controllers.product_form_controller.QInputDialog.getText',
                  return_value=("Một cái tên", False))
     qtbot.mouseClick(form.ui.btn_add_supplier, Qt.MouseButton.LeftButton)
     form.mock_supplier_service.create_supplier.assert_not_called()
@@ -171,7 +171,7 @@ def test_save_new_product_success(qtbot, create_form, mocker):
     form.ui.spn_min_stock.setValue(15)
 
     form.mock_prod_service.create_product.return_value = 999
-    mock_info = mocker.patch('app.ui.product.controllers.product_form_controller.QMessageBox.information')
+    mock_info = mocker.patch('app.modules.product.ui.controllers.product_form_controller.QMessageBox.information')
     mock_accept = mocker.patch.object(form, 'accept')
 
     qtbot.mouseClick(form.ui.btn_save, Qt.MouseButton.LeftButton)
@@ -195,7 +195,7 @@ def test_save_new_product_success(qtbot, create_form, mocker):
 def test_save_product_validation_error(qtbot, create_form, mocker):
     form = create_form
     form.mock_prod_service.create_product.side_effect = ValidationException("Tên sản phẩm rỗng")
-    mock_warning = mocker.patch('app.ui.product.controllers.product_form_controller.QMessageBox.warning')
+    mock_warning = mocker.patch('app.modules.product.ui.controllers.product_form_controller.QMessageBox.warning')
     mock_accept = mocker.patch.object(form, 'accept')
 
     qtbot.mouseClick(form.ui.btn_save, Qt.MouseButton.LeftButton)
@@ -208,7 +208,7 @@ def test_save_product_validation_error(qtbot, create_form, mocker):
 def test_save_product_system_error(qtbot, create_form, mocker):
     form = create_form
     form.mock_prod_service.create_product.side_effect = Exception("Mất kết nối DB")
-    mock_critical = mocker.patch('app.ui.product.controllers.product_form_controller.QMessageBox.critical')
+    mock_critical = mocker.patch('app.modules.product.ui.controllers.product_form_controller.QMessageBox.critical')
     mock_accept = mocker.patch.object(form, 'accept')
 
     qtbot.mouseClick(form.ui.btn_save, Qt.MouseButton.LeftButton)

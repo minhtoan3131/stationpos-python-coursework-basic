@@ -6,9 +6,8 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt
 
-from app.modules.sale.utils.sale_calculator import SaleCalculator
-from app.ui.sale.generated.ui_sales_management import Ui_SalesManagementWidget
-from app.ui.sale.controllers.checkout_dialog_controller import CheckoutDialogController
+from app.modules.sale.ui.generated.ui_sales_management import Ui_SalesManagementWidget
+from app.modules.sale.ui.controllers.checkout_dialog_controller import CheckoutDialogController
 
 from app.modules.inventory.services.inventory_service import InventoryService
 from app.modules.product.services.product_service import ProductService

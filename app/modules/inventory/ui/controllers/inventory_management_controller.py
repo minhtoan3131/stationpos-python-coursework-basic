@@ -5,13 +5,13 @@ from PyQt6.QtWidgets import QWidget, QHeaderView, QTableWidgetItem, QComboBox, Q
     QAbstractItemView, QFileDialog, QSpinBox, QInputDialog, QDialog
 from PyQt6.QtCore import Qt
 
-from app.ui.inventory.controllers.purchase_order_confirm_controller import PurchaseOrderConfirmController
-from app.ui.inventory.generated.ui_inventory_management import Ui_InventoryManagementWidget
+from app.modules.inventory.ui.controllers.purchase_order_confirm_controller import PurchaseOrderConfirmController
+from app.modules.inventory.ui.generated.ui_inventory_management import Ui_InventoryManagementWidget
 from app.modules.inventory.services.inventory_service import InventoryService
 from app.modules.product.services.supplier_service import SupplierService
 from app.modules.inventory.dtos.inventory_dto import PurchaseOrderCreateDTO, PurchaseOrderItemDTO
 from app.core.exceptions.validation_exception import ValidationException
-from app.ui.inventory.models.purchase_cart import PurchaseCart
+from app.modules.inventory.ui.models.purchase_cart import PurchaseCart
 
 
 class InventoryManagementController(QWidget):

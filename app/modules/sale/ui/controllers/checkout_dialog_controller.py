@@ -3,7 +3,7 @@ from PyQt6.QtCore import Qt
 from datetime import datetime
 from decimal import Decimal
 
-from app.ui.sale.generated.ui_checkout_confirmation import Ui_CheckoutDialog
+from app.modules.sale.ui.generated.ui_checkout_confirmation import Ui_CheckoutDialog
 from app.modules.sale.dtos.sale_dto import CheckoutDTO
 from app.modules.sale.utils.sale_calculator import SaleCalculator
 from app.modules.sale.utils.invoice_code_generator import InvoiceCodeGenerator

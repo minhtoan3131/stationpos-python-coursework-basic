@@ -3,6 +3,7 @@ from app.core.database.connection import DatabaseConnection
 from app.modules.inventory.repositories.impl.inventory_repository_impl import InventoryRepositoryImpl
 from app.modules.product.repositories.impl.product_repository_impl import ProductRepositoryImpl
 from app.modules.product.repositories.impl.supplier_repository_impl import SupplierRepositoryImpl
+from app.modules.report.repositories.impl.report_repository_impl import ReportRepositoryImpl
 from app.modules.sale.repositories.impl.sale_repository_impl import SaleRepositoryImpl
 
 
@@ -26,6 +27,7 @@ class UnitOfWork:
         self.product_repo = ProductRepositoryImpl(self.connection)
         self.supplier_repo = SupplierRepositoryImpl(self.connection)
         self.sale_repo = SaleRepositoryImpl(self.connection)
+        self.report_repo = ReportRepositoryImpl(self.connection)
 
         return self
 

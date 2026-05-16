@@ -2,7 +2,7 @@ import pytest
 import types
 from PyQt6.QtCore import Qt
 
-from app.ui.inventory.controllers.inventory_management_controller import InventoryManagementController
+from app.modules.inventory.ui.controllers.inventory_management_controller import InventoryManagementController
 
 
 # ==========================================
@@ -43,7 +43,7 @@ def test_should_display_product_in_table_when_search_by_keyword_is_successful(qt
 def test_should_show_critical_error_and_not_crash_when_search_fails_with_system_exception(qtbot, inventory_window,
                                                                                           mocker):
     """Khi mất kết nối DB lúc tìm kiếm, phải báo lỗi Critical nhưng không được văng app"""
-    mock_critical = mocker.patch('app.ui.inventory.controllers.inventory_management_controller.QMessageBox.critical')
+    mock_critical = mocker.patch('app.modules.inventory.ui.controllers.inventory_management_controller.QMessageBox.critical')
     inventory_window.mock_inventory_service.get_inventory_list.side_effect = Exception("Database Timeout")
 
     qtbot.keyClick(inventory_window.ui.txt_search_inventory, Qt.Key.Key_Return)
@@ -58,7 +58,7 @@ def test_should_show_critical_error_and_not_crash_when_search_fails_with_system_
 def test_should_cancel_export_process_when_user_closes_file_dialog(qtbot, inventory_window, mocker):
     """Khi người dùng tắt hộp thoại chọn nơi lưu, tiến trình xuất Excel phải bị hủy"""
     mock_dialog = mocker.patch(
-        'app.ui.inventory.controllers.inventory_management_controller.QFileDialog.getSaveFileName')
+        'app.modules.inventory.ui.controllers.inventory_management_controller.QFileDialog.getSaveFileName')
     mock_dialog.return_value = ('', '')  # Giả lập bấm Cancel
 
     qtbot.mouseClick(inventory_window.ui.btn_export_excel, Qt.MouseButton.LeftButton)
@@ -67,9 +67,9 @@ def test_should_cancel_export_process_when_user_closes_file_dialog(qtbot, invent
 
 def test_should_show_success_message_when_exporting_excel_completes(qtbot, inventory_window, mocker):
     """Khi xuất file Excel thành công, phải hiện thông báo hoàn tất"""
-    mocker.patch('app.ui.inventory.controllers.inventory_management_controller.QFileDialog.getSaveFileName',
+    mocker.patch('app.modules.inventory.ui.controllers.inventory_management_controller.QFileDialog.getSaveFileName',
                  return_value=('/path/file.xlsx', ''))
-    mock_info = mocker.patch('app.ui.inventory.controllers.inventory_management_controller.QMessageBox.information')
+    mock_info = mocker.patch('app.modules.inventory.ui.controllers.inventory_management_controller.QMessageBox.information')
     inventory_window.mock_inventory_service.export_inventory_to_excel.return_value = True
 
     qtbot.mouseClick(inventory_window.ui.btn_export_excel, Qt.MouseButton.LeftButton)
@@ -78,9 +78,9 @@ def test_should_show_success_message_when_exporting_excel_completes(qtbot, inven
 
 def test_should_show_critical_error_when_export_fails_due_to_system_issue(qtbot, inventory_window, mocker):
     """Khi không lưu được file do lỗi ổ cứng/quyền, phải hiện lỗi Critical"""
-    mocker.patch('app.ui.inventory.controllers.inventory_management_controller.QFileDialog.getSaveFileName',
+    mocker.patch('app.modules.inventory.ui.controllers.inventory_management_controller.QFileDialog.getSaveFileName',
                  return_value=('/path/file.xlsx', ''))
-    mock_critical = mocker.patch('app.ui.inventory.controllers.inventory_management_controller.QMessageBox.critical')
+    mock_critical = mocker.patch('app.modules.inventory.ui.controllers.inventory_management_controller.QMessageBox.critical')
     inventory_window.mock_inventory_service.export_inventory_to_excel.side_effect = Exception("Permission Denied")
 
     qtbot.mouseClick(inventory_window.ui.btn_export_excel, Qt.MouseButton.LeftButton)
@@ -102,7 +102,7 @@ def test_should_update_cart_totals_correctly_when_adding_modifying_and_removing_
 # ==========================================
 def test_should_not_create_supplier_when_user_cancels_quick_add_dialog(qtbot, inventory_window, mocker):
     """Khi tắt popup nhập tên NCC mới, Service không được phép gọi"""
-    mocker.patch('app.ui.inventory.controllers.inventory_management_controller.QInputDialog.getText',
+    mocker.patch('app.modules.inventory.ui.controllers.inventory_management_controller.QInputDialog.getText',
                  return_value=("", False))
     qtbot.mouseClick(inventory_window.ui.btn_add_supplier, Qt.MouseButton.LeftButton)
     inventory_window.mock_supplier_service.create_supplier.assert_not_called()
@@ -110,7 +110,7 @@ def test_should_not_create_supplier_when_user_cancels_quick_add_dialog(qtbot, in
 
 def test_should_select_new_supplier_in_dropdown_when_quick_add_is_successful(qtbot, inventory_window, mocker):
     """Khi thêm NCC mới thành công, Combobox phải tự động trỏ vào NCC đó"""
-    mocker.patch('app.ui.inventory.controllers.inventory_management_controller.QInputDialog.getText',
+    mocker.patch('app.modules.inventory.ui.controllers.inventory_management_controller.QInputDialog.getText',
                  return_value=("NCC Mới", True))
     inventory_window.mock_supplier_service.create_supplier.return_value = 99
 
@@ -120,9 +120,9 @@ def test_should_select_new_supplier_in_dropdown_when_quick_add_is_successful(qtb
 
 def test_should_show_warning_when_quick_add_supplier_name_already_exists(qtbot, inventory_window, mocker):
     """Khi tạo NCC bị trùng tên, phải hiện Warning và không làm văng app"""
-    mocker.patch('app.ui.inventory.controllers.inventory_management_controller.QInputDialog.getText',
+    mocker.patch('app.modules.inventory.ui.controllers.inventory_management_controller.QInputDialog.getText',
                  return_value=("Trùng Tên", True))
-    mock_warning = mocker.patch('app.ui.inventory.controllers.inventory_management_controller.QMessageBox.warning')
+    mock_warning = mocker.patch('app.modules.inventory.ui.controllers.inventory_management_controller.QMessageBox.warning')
     inventory_window.mock_supplier_service.create_supplier.side_effect = Exception("Tên NCC đã tồn tại")
 
     qtbot.mouseClick(inventory_window.ui.btn_add_supplier, Qt.MouseButton.LeftButton)

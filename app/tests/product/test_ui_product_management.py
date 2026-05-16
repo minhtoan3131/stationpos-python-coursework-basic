@@ -4,7 +4,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QMessageBox
 
 from app.core.exceptions.validation_exception import ValidationException
-from app.ui.product.controllers.product_management_controller import ProductManagementController
+from app.modules.product.ui.controllers.product_management_controller import ProductManagementController
 from app.modules.product.dtos.product_list_dto import ProductListDTO
 
 
@@ -92,7 +92,7 @@ def test_search_enter_key(qtbot, manager_window, mock_products):
 
 def test_open_create_dialog_success(qtbot, manager_window, mocker):
     manager_window.mock_service.reset_mock()
-    mock_dialog_class = mocker.patch('app.ui.product.controllers.product_management_controller.ProductFormController')
+    mock_dialog_class = mocker.patch('app.modules.product.ui.controllers.product_management_controller.ProductFormController')
     mock_dialog_class.return_value.exec.return_value = 1
 
     qtbot.mouseClick(manager_window.ui.btn_create_product, Qt.MouseButton.LeftButton)
@@ -109,8 +109,8 @@ def test_open_create_dialog_success(qtbot, manager_window, mocker):
 
 def test_open_update_dialog_without_selection(qtbot, manager_window, mocker):
     manager_window.ui.tbl_products.clearSelection()
-    mock_msg_box = mocker.patch('app.ui.product.controllers.product_management_controller.QMessageBox.information')
-    mock_dialog_class = mocker.patch('app.ui.product.controllers.product_management_controller.ProductFormController')
+    mock_msg_box = mocker.patch('app.modules.product.ui.controllers.product_management_controller.QMessageBox.information')
+    mock_dialog_class = mocker.patch('app.modules.product.ui.controllers.product_management_controller.ProductFormController')
 
     qtbot.mouseClick(manager_window.ui.btn_update_product, Qt.MouseButton.LeftButton)
 
@@ -123,7 +123,7 @@ def test_open_update_dialog_success(qtbot, manager_window, mocker):
     manager_window.ui.tbl_products.setCurrentCell(0, 0)
     expected_id = int(manager_window.ui.tbl_products.item(0, 0).text())
 
-    mock_dialog_class = mocker.patch('app.ui.product.controllers.product_management_controller.ProductFormController')
+    mock_dialog_class = mocker.patch('app.modules.product.ui.controllers.product_management_controller.ProductFormController')
     mock_dialog_class.return_value.exec.return_value = 1
 
     qtbot.mouseClick(manager_window.ui.btn_update_product, Qt.MouseButton.LeftButton)
@@ -141,7 +141,7 @@ def test_open_update_dialog_success(qtbot, manager_window, mocker):
 
 def test_delete_product_without_selection(qtbot, manager_window, mocker):
     manager_window.ui.tbl_products.clearSelection()
-    mock_info = mocker.patch('app.ui.product.controllers.product_management_controller.QMessageBox.information')
+    mock_info = mocker.patch('app.modules.product.ui.controllers.product_management_controller.QMessageBox.information')
     qtbot.mouseClick(manager_window.ui.btn_delete_product, Qt.MouseButton.LeftButton)
     manager_window.mock_service.delete_product.assert_not_called()
 
@@ -150,9 +150,9 @@ def test_delete_product_confirm_yes_success(qtbot, manager_window, mocker):
     manager_window.mock_service.reset_mock()
     manager_window.ui.tbl_products.setCurrentCell(0, 0)
 
-    mocker.patch('app.ui.product.controllers.product_management_controller.QMessageBox.question',
+    mocker.patch('app.modules.product.ui.controllers.product_management_controller.QMessageBox.question',
                  return_value=QMessageBox.StandardButton.Yes)
-    mocker.patch('app.ui.product.controllers.product_management_controller.QMessageBox.information')
+    mocker.patch('app.modules.product.ui.controllers.product_management_controller.QMessageBox.information')
 
     qtbot.mouseClick(manager_window.ui.btn_delete_product, Qt.MouseButton.LeftButton)
 
@@ -164,9 +164,9 @@ def test_delete_product_validation_error(qtbot, manager_window, mocker):
     manager_window.mock_service.reset_mock()
     manager_window.ui.tbl_products.setCurrentCell(0, 0)
 
-    mocker.patch('app.ui.product.controllers.product_management_controller.QMessageBox.question',
+    mocker.patch('app.modules.product.ui.controllers.product_management_controller.QMessageBox.question',
                  return_value=QMessageBox.StandardButton.Yes)
-    mock_warning = mocker.patch('app.ui.product.controllers.product_management_controller.QMessageBox.warning')
+    mock_warning = mocker.patch('app.modules.product.ui.controllers.product_management_controller.QMessageBox.warning')
 
     manager_window.mock_service.delete_product.side_effect = ValidationException("Sản phẩm vẫn còn tồn kho!")
     qtbot.mouseClick(manager_window.ui.btn_delete_product, Qt.MouseButton.LeftButton)

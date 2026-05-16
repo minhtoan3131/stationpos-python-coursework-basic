@@ -1,8 +1,7 @@
 from PyQt6.QtWidgets import QDialog, QTableWidgetItem, QHeaderView
 from PyQt6.QtCore import Qt
-from app.ui.inventory.generated.ui_purchase_order_confirm import Ui_PurchaseOrderConfirmDialog
+from app.modules.inventory.ui.generated.ui_purchase_order_confirm import Ui_PurchaseOrderConfirmDialog
 from app.modules.inventory.dtos.inventory_dto import PurchaseOrderCreateDTO
-from app.ui.inventory.models.purchase_cart import PurchaseCart
 
 
 class PurchaseOrderConfirmController(QDialog):

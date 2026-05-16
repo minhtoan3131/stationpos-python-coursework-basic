@@ -2,7 +2,7 @@ import pytest
 from decimal import Decimal
 from PyQt6.QtCore import Qt
 
-from app.ui.sale.controllers.checkout_dialog_controller import CheckoutDialogController
+from app.modules.sale.ui.controllers.checkout_dialog_controller import CheckoutDialogController
 from app.modules.sale.dtos.sale_dto import CheckoutDTO, CartItemDTO
 
 
@@ -114,7 +114,7 @@ def test_should_display_warning_and_red_text_when_cash_is_insufficient(checkout_
 def test_should_show_warning_and_prevent_confirmation_when_cash_is_insufficient(qtbot, checkout_dialog, mocker):
     """Bấm Xác nhận mà tiền mặt đưa thiếu -> Chặn lại, hiện cảnh báo, Dialog không được đóng"""
     dialog = checkout_dialog
-    mock_warning = mocker.patch('app.ui.sale.controllers.checkout_dialog_controller.QMessageBox.warning')
+    mock_warning = mocker.patch('app.modules.sale.ui.controllers.checkout_dialog_controller.QMessageBox.warning')
     mock_accept = mocker.patch.object(dialog, 'accept')
 
     # GIVEN: Tiền thiếu

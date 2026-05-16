@@ -5,11 +5,11 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt
 
-from app.ui.product.generated.ui_product_management import Ui_ProductManagementWidget
+from app.modules.product.ui.generated.ui_product_management import Ui_ProductManagementWidget
 from app.modules.product.dtos.product_filter_dto import ProductFilterDTO
 from app.modules.product.dtos.product_delete_dto import ProductDeleteDTO
 from app.core.exceptions.validation_exception import ValidationException
-from app.ui.product.controllers.product_form_controller import ProductFormController
+from app.modules.product.ui.controllers.product_form_controller import ProductFormController
 
 from app.modules.product.services.product_service import ProductService
 from app.modules.product.services.category_service import CategoryService

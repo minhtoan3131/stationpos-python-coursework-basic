@@ -109,7 +109,7 @@ class InventoryServiceImpl(InventoryService):
                         'qty': item.quantity, 'price': item.unit_price, 'total': item.quantity * item.unit_price
                     })
                     db.inventory_repo.add_stock_transaction({
-                        'product_id': item.product_id, 'qty': base_qty, 'ref_id': po_id
+                        'product_id': item.product_id, 'qty': base_qty,'type': 'IMPORT', 'ref_id': po_id
                     })
 
                 return po_id

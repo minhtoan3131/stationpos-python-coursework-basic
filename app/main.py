@@ -6,7 +6,7 @@ from PyQt6.QtWidgets import QApplication, QMessageBox
 from app.core.database.connection import DatabaseConnection
 
 # Import MainWindow (Đảm bảo đường dẫn này khớp với thư mục của bạn)
-from app.ui.main_window.main_window import MainWindow
+from app.modules.main_window.main_window import MainWindow
 
 
 def main():

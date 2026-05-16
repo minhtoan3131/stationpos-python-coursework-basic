@@ -3,7 +3,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont, QColor
 
 from app.core.database.unit_of_work import UnitOfWork
-from app.ui.main_window.ui_main_window import Ui_MainWindow
+from app.modules.main_window.ui_main_window import Ui_MainWindow
 
 from app.modules.product.services.impl.category_service_impl import CategoryServiceImpl
 from app.modules.product.services.impl.supplier_service_impl import SupplierServiceImpl
@@ -11,12 +11,13 @@ from app.modules.product.services.impl.unit_service_impl import UnitServiceImpl
 from app.modules.product.services.impl.product_service_impl import ProductServiceImpl
 from app.modules.inventory.services.impl.inventory_service_impl import InventoryServiceImpl
 from app.modules.sale.services.impl.sale_service_impl import SaleServiceImpl
+from app.modules.report.services.impl.report_service_impl import ReportServiceImpl
 
-from app.ui.inventory.controllers.inventory_management_controller import InventoryManagementController
-from app.ui.product.controllers.product_management_controller import ProductManagementController
-from app.ui.report.controllers.report_management_controller import ReportManagementController
-from app.ui.sale.controllers.sales_management_controller import SalesManagementController
-from app.ui.tax.controllers.tax_management_controller import TaxManagementController
+from app.modules.inventory.ui.controllers.inventory_management_controller import InventoryManagementController
+from app.modules.product.ui.controllers.product_management_controller import ProductManagementController
+from app.modules.report.ui.controllers.report_management_controller import ReportManagementController
+from app.modules.sale.ui.controllers.sales_management_controller import SalesManagementController
+from app.modules.tax.ui.controllers.tax_management_controller import TaxManagementController
 
 
 class MainWindow(QMainWindow):
@@ -31,6 +32,7 @@ class MainWindow(QMainWindow):
         self.product_service = ProductServiceImpl()
         self.inventory_service = InventoryServiceImpl(uow_factory=UnitOfWork)
         self.sale_service = SaleServiceImpl(uow_factory=UnitOfWork)
+        self.report_service = ReportServiceImpl(uow_factory=UnitOfWork)
 
         # Xử lý UI cho macOS và Hiệu ứng
         self.fix_macos_font_issue()
@@ -76,14 +78,18 @@ class MainWindow(QMainWindow):
             supplier_service=self.supplier_service
         )
 
-        # Quản lý Bán hàng
+        # Page 3: Quản lý Bán hàng
         self.page_sales = SalesManagementController(
             inventory_service=self.inventory_service,
             product_service=self.product_service,
             sale_service=self.sale_service
         )
 
-        self.page_reports = ReportManagementController()
+        # Page 4: Quản lý Báo cáo (BỔ SUNG TRUYỀN SERVICE VÀO)
+        self.page_reports = ReportManagementController(
+            report_service=self.report_service
+        )
+
         self.page_tax = TaxManagementController()
         self.page_settings = self.create_placeholder("⚙️ Cấu hình Hệ thống\n(Đang phát triển)")
 
@@ -115,6 +121,9 @@ class MainWindow(QMainWindow):
             self.page_inventory.handle_search()
         elif index == 2:
             self.page_sales.handle_search()
+        elif index == 3:
+            # Tự động refresh báo cáo "Hôm nay" mỗi khi mở tab Báo cáo
+            self.page_reports.handle_filter_today()
 
     def closeEvent(self, event):
         """Đóng ứng dụng an toàn"""

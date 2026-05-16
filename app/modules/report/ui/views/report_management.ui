@@ -1,0 +1,557 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ReportManagementWidget</class>
+ <widget class="QWidget" name="ReportManagementWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1400</width>
+    <height>900</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Báo cáo &amp; Thống kê Hệ thống</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+    /* Tổng thể Dashboard */
+    QWidget#ReportManagementWidget {
+        background-color: #e2e8f0;
+        font-family: 'Segoe UI', 'Roboto', sans-serif;
+    }
+
+    QScrollArea {
+        border: none;
+        background-color: transparent;
+    }
+
+    #scrollContents {
+        background-color: #e2e8f0;
+    }
+
+    /* Thẻ chỉ số (KPI Cards) */
+    QFrame.kpi-card {
+        background-color: #ffffff;
+        border-radius: 12px;
+        border: none;
+        min-height: 100px;
+    }
+
+    QLabel#lbl_title_main {
+        font-size: 26px;
+        font-weight: 800;
+        color: #0f172a;
+    }
+
+    QLabel.kpi-label {
+        font-size: 14px;
+        font-weight: 600;
+        color: #64748b;
+        text-transform: uppercase;
+    }
+
+    QLabel.kpi-value {
+        font-size: 28px;
+        font-weight: 800;
+    }
+
+    QLabel#val_revenue { color: #10b981; }
+    QLabel#val_profit { color: #3b82f6; }
+    QLabel#val_orders { color: #8b5cf6; }
+    QLabel#val_stock_value { color: #f59e0b; }
+
+    /* Khu vực Biểu đồ &amp; Bảng */
+    QFrame#frame_charts, QFrame#frame_history, QFrame#frame_inventory, QFrame#frame_diagram {
+        background-color: #ffffff;
+        border-radius: 12px;
+        margin-bottom: 5px;
+    }
+
+    QLabel.section-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1e293b;
+        padding: 10px 15px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    /* Bộ lọc (Filters) */
+    QPushButton.btn-filter {
+        background-color: #ffffff;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        padding: 8px 15px;
+        font-weight: 600;
+        color: #475569;
+    }
+    QPushButton.btn-filter:checked {
+        background-color: #3b82f6;
+        color: white;
+    }
+
+    QPushButton#btn_run_filter {
+        background-color: #0f172a;
+        color: white;
+        border-radius: 6px;
+        padding: 8px 20px;
+        font-weight: 700;
+    }
+
+    QTableWidget {
+        border: none;
+        gridline-color: #f1f5f9;
+        background-color: white;
+    }
+    QHeaderView::section {
+        background-color: #f8fafc;
+        padding: 10px;
+        font-weight: bold;
+        border: none;
+        border-bottom: 2px solid #e2e8f0;
+        color: #475569;
+    }
+   </string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_root">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QScrollArea" name="scrollArea">
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="scrollContents">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>1385</width>
+        <height>1409</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="scrollLayout">
+       <property name="spacing">
+        <number>20</number>
+       </property>
+       <property name="leftMargin">
+        <number>25</number>
+       </property>
+       <property name="topMargin">
+        <number>25</number>
+       </property>
+       <property name="rightMargin">
+        <number>25</number>
+       </property>
+       <property name="bottomMargin">
+        <number>25</number>
+       </property>
+       <item>
+        <layout class="QHBoxLayout" name="layout_header">
+         <item>
+          <widget class="QLabel" name="lbl_title_main">
+           <property name="text">
+            <string>Báo cáo &amp; Thống kê Tổng quan</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="layout_filters">
+           <property name="spacing">
+            <number>10</number>
+           </property>
+           <item>
+            <widget class="QPushButton" name="btn_filter_today">
+             <property name="text">
+              <string>Hôm nay</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+             <property name="class" stdset="0">
+              <string>btn-filter</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btn_filter_yesterday">
+             <property name="text">
+              <string>Hôm qua</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="class" stdset="0">
+              <string>btn-filter</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btn_filter_month">
+             <property name="text">
+              <string>Tháng này</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="class" stdset="0">
+              <string>btn-filter</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="Line" name="line">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDateEdit" name="date_from">
+             <property name="calendarPopup">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label">
+             <property name="text">
+              <string>→</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDateEdit" name="date_to">
+             <property name="calendarPopup">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btn_run_filter">
+             <property name="text">
+              <string>LỌC</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="layout_kpi_cards">
+         <property name="spacing">
+          <number>20</number>
+         </property>
+         <item>
+          <widget class="QFrame" name="card_revenue">
+           <property name="class" stdset="0">
+            <string>kpi-card</string>
+           </property>
+           <layout class="QVBoxLayout">
+            <item>
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>Doanh thu</string>
+              </property>
+              <property name="class" stdset="0">
+               <string>kpi-label</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="val_revenue">
+              <property name="text">
+               <string>0 VND</string>
+              </property>
+              <property name="class" stdset="0">
+               <string>kpi-value</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QFrame" name="card_profit">
+           <property name="class" stdset="0">
+            <string>kpi-card</string>
+           </property>
+           <layout class="QVBoxLayout">
+            <item>
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>Lợi nhuận gộp</string>
+              </property>
+              <property name="class" stdset="0">
+               <string>kpi-label</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="val_profit">
+              <property name="text">
+               <string>0 VND</string>
+              </property>
+              <property name="class" stdset="0">
+               <string>kpi-value</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QFrame" name="card_orders">
+           <property name="class" stdset="0">
+            <string>kpi-card</string>
+           </property>
+           <layout class="QVBoxLayout">
+            <item>
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>Số hóa đơn</string>
+              </property>
+              <property name="class" stdset="0">
+               <string>kpi-label</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="val_orders">
+              <property name="text">
+               <string>0</string>
+              </property>
+              <property name="class" stdset="0">
+               <string>kpi-value</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QFrame" name="card_stock">
+           <property name="class" stdset="0">
+            <string>kpi-card</string>
+           </property>
+           <layout class="QVBoxLayout">
+            <item>
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>Giá trị tồn kho</string>
+              </property>
+              <property name="class" stdset="0">
+               <string>kpi-label</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="val_stock_value">
+              <property name="text">
+               <string>0 VND</string>
+              </property>
+              <property name="class" stdset="0">
+               <string>kpi-value</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="layout_charts" stretch="7,3">
+         <property name="spacing">
+          <number>20</number>
+         </property>
+         <item>
+          <widget class="QFrame" name="frame_revenue_trend">
+           <layout class="QVBoxLayout">
+            <item>
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>📈 Xu hướng doanh thu</string>
+              </property>
+              <property name="class" stdset="0">
+               <string>section-title</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QWidget" name="chart_revenue" native="true">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>300</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QFrame" name="frame_top_products">
+           <layout class="QVBoxLayout">
+            <item>
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>🏆 Top sản phẩm</string>
+              </property>
+              <property name="class" stdset="0">
+               <string>section-title</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QWidget" name="chart_top_products" native="true">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>300</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QFrame" name="frame_history">
+         <layout class="QVBoxLayout">
+          <item>
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>📜 Lịch sử giao dịch hóa đơn</string>
+            </property>
+            <property name="class" stdset="0">
+             <string>section-title</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTableWidget" name="tbl_transactions">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>300</height>
+             </size>
+            </property>
+            <column>
+             <property name="text">
+              <string>Mã HĐ</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Thời gian</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Tổng tiền</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Thanh toán</string>
+             </property>
+            </column>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFrame" name="frame_inventory">
+         <layout class="QVBoxLayout">
+          <item>
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>📦 Báo cáo giá trị tồn kho hiện tại</string>
+            </property>
+            <property name="class" stdset="0">
+             <string>section-title</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTableWidget" name="tbl_inventory_report">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>300</height>
+             </size>
+            </property>
+            <column>
+             <property name="text">
+              <string>Sản phẩm</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>ĐVT lẻ</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Tồn kho</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Giá vốn (MAC)</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Giá trị tồn</string>
+             </property>
+            </column>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

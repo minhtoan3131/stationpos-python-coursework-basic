@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QDialog, QMessageBox, QInputDialog
 from PyQt6.QtCore import Qt
 
-from app.ui.product.generated.ui_product_form import Ui_ProductFormDialog
+from app.modules.product.ui.generated.ui_product_form import Ui_ProductFormDialog
 from app.modules.product.dtos.product_create_dto import ProductCreateDTO
 from app.modules.product.dtos.product_update_dto import ProductUpdateDTO
 from app.core.exceptions.validation_exception import ValidationException

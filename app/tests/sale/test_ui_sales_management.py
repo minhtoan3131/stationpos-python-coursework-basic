@@ -2,7 +2,7 @@ import pytest
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QDialog, QMessageBox
 
-from app.ui.sale.controllers.sales_management_controller import SalesManagementController
+from app.modules.sale.ui.controllers.sales_management_controller import SalesManagementController
 
 
 # ==========================================
@@ -118,7 +118,7 @@ def test_should_clear_all_items_when_user_confirms_cancel_bill(qtbot, sales_wind
     """Bấm Hủy Hóa Đơn và chọn Yes -> Xóa trắng giỏ hàng"""
     seed_cart_data(sales_window, qtbot)
 
-    mocker.patch('app.ui.sale.controllers.sales_management_controller.QMessageBox.question',
+    mocker.patch('app.modules.sale.ui.controllers.sales_management_controller.QMessageBox.question',
                  return_value=QMessageBox.StandardButton.Yes)
 
     qtbot.mouseClick(sales_window.ui.btn_cancel_bill, Qt.MouseButton.LeftButton)
@@ -132,7 +132,7 @@ def test_should_clear_all_items_when_user_confirms_cancel_bill(qtbot, sales_wind
 # ==========================================
 def test_should_show_warning_and_prevent_checkout_when_cart_is_empty(qtbot, sales_window, mocker):
     """Giỏ hàng trống thì cấm mở Hộp thoại thanh toán"""
-    mock_warning = mocker.patch('app.ui.sale.controllers.sales_management_controller.QMessageBox.warning')
+    mock_warning = mocker.patch('app.modules.sale.ui.controllers.sales_management_controller.QMessageBox.warning')
 
     qtbot.mouseClick(sales_window.ui.btn_checkout, Qt.MouseButton.LeftButton)
 
@@ -148,13 +148,13 @@ def test_should_process_checkout_and_reset_ui_when_checkout_dialog_is_confirmed(
     seed_cart_data(sales_window, qtbot)
 
     # Giả lập Popup thanh toán ấn Xác nhận
-    mock_dialog_class = mocker.patch('app.ui.sale.controllers.sales_management_controller.CheckoutDialogController')
+    mock_dialog_class = mocker.patch('app.modules.sale.ui.controllers.sales_management_controller.CheckoutDialogController')
     mock_dialog_instance = mock_dialog_class.return_value
     mock_dialog_instance.exec.return_value = QDialog.DialogCode.Accepted
     mock_dialog_instance.is_confirmed = True
 
     sales_window.mock_sale_service.process_checkout.return_value = "HD-TEST-123"
-    mock_info = mocker.patch('app.ui.sale.controllers.sales_management_controller.QMessageBox.information')
+    mock_info = mocker.patch('app.modules.sale.ui.controllers.sales_management_controller.QMessageBox.information')
 
     # Bấm nút THANH TOÁN
     qtbot.mouseClick(sales_window.ui.btn_checkout, Qt.MouseButton.LeftButton)
@@ -176,7 +176,7 @@ def test_should_abort_checkout_when_user_cancels_at_dialog(qtbot, sales_window, 
     """Khi Popup thanh toán hiện lên nhưng thu ngân ấn Hủy/Esc -> Dừng tiến trình"""
     seed_cart_data(sales_window, qtbot)
 
-    mock_dialog_class = mocker.patch('app.ui.sale.controllers.sales_management_controller.CheckoutDialogController')
+    mock_dialog_class = mocker.patch('app.modules.sale.ui.controllers.sales_management_controller.CheckoutDialogController')
     mock_dialog_instance = mock_dialog_class.return_value
     mock_dialog_instance.exec.return_value = QDialog.DialogCode.Rejected
 
@@ -190,14 +190,14 @@ def test_should_show_error_and_preserve_cart_when_checkout_fails_at_backend(qtbo
     seed_cart_data(sales_window, qtbot)
 
     # Dialog cho qua
-    mock_dialog_class = mocker.patch('app.ui.sale.controllers.sales_management_controller.CheckoutDialogController')
+    mock_dialog_class = mocker.patch('app.modules.sale.ui.controllers.sales_management_controller.CheckoutDialogController')
     mock_dialog_instance = mock_dialog_class.return_value
     mock_dialog_instance.exec.return_value = QDialog.DialogCode.Accepted
     mock_dialog_instance.is_confirmed = True
 
     # Service bị đứt mạng / Lỗi Validation
     sales_window.mock_sale_service.process_checkout.side_effect = Exception("Không đủ tồn kho!")
-    mock_critical = mocker.patch('app.ui.sale.controllers.sales_management_controller.QMessageBox.critical')
+    mock_critical = mocker.patch('app.modules.sale.ui.controllers.sales_management_controller.QMessageBox.critical')
 
     qtbot.mouseClick(sales_window.ui.btn_checkout, Qt.MouseButton.LeftButton)
 
