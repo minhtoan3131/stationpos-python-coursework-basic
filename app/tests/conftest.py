@@ -15,22 +15,40 @@ def db_test_connection():
     yield connection
     connection.close()
 
+
 @pytest.fixture(autouse=True)
 def clean_db(db_test_connection):
-    """Xóa sạch để đảm bảo tính độc lập."""
+    """Xóa sạch toàn bộ các bảng trong CSDL Test trước MỖI bài test để đảm bảo tính cô lập."""
     cursor = db_test_connection.cursor()
+
+    # 1. Tắt kiểm tra khóa ngoại (Foreign Key) để có thể Truncate thoải mái
     cursor.execute("SET FOREIGN_KEY_CHECKS = 0")
 
-    cursor.execute("TRUNCATE TABLE stock_transactions")
+    # 2. Xóa sạch dữ liệu tất cả các bảng
+
+    # Nhóm Bán hàng (Sale)
+    cursor.execute("TRUNCATE TABLE invoice_logs;")
+    cursor.execute("TRUNCATE TABLE invoice_items;")
+    cursor.execute("TRUNCATE TABLE invoices;")
+
+    # Nhóm Nhập kho & Tồn kho (Inventory)
+    cursor.execute("TRUNCATE TABLE stock_transactions;")
     cursor.execute("TRUNCATE TABLE purchase_order_items;")
     cursor.execute("TRUNCATE TABLE purchase_orders;")
-    cursor.execute("TRUNCATE TABLE inventory")
-    cursor.execute("TRUNCATE TABLE unit_conversions")
-    cursor.execute("TRUNCATE TABLE products")
-    cursor.execute("TRUNCATE TABLE categories")
-    cursor.execute("TRUNCATE TABLE suppliers")
-    cursor.execute("TRUNCATE TABLE units")
+    cursor.execute("TRUNCATE TABLE inventory;")
 
+    # Nhóm Sản phẩm (Product) & Phụ trợ
+    cursor.execute("TRUNCATE TABLE unit_conversions;")
+    cursor.execute("TRUNCATE TABLE products;")
+    cursor.execute("TRUNCATE TABLE categories;")
+    cursor.execute("TRUNCATE TABLE suppliers;")
+    cursor.execute("TRUNCATE TABLE units;")
+
+    # Nhóm Cấu hình chung (Cứ clear cho chắc chắn)
+    cursor.execute("TRUNCATE TABLE tax_config;")
+    cursor.execute("TRUNCATE TABLE settings;")
+
+    # 3. Bật lại kiểm tra khóa ngoại
     cursor.execute("SET FOREIGN_KEY_CHECKS = 1")
 
     db_test_connection.commit()

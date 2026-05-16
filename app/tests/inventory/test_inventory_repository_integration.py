@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import pytest
 import mysql.connector
 from app.modules.inventory.repositories.impl.inventory_repository_impl import InventoryRepositoryImpl
@@ -61,3 +63,53 @@ def test_create_purchase_order_fails_foreign_key_constraint(inv_repo):
 
     # mysql.connector ném ra lỗi liên quan đến FOREIGN KEY
     assert "foreign key constraint fails" in str(exc_info.value).lower()
+
+
+def test_get_inventory_status_for_sale(inv_repo, seed_inventory_data):
+    """Đảm bảo lấy đúng tồn kho và tổng giá trị để SaleService kiểm tra trước khi bán"""
+    status = inv_repo.get_inventory_status(100)
+
+    assert status is not None
+    assert status['quantity'] == 25
+    # So sánh với chuỗi Decimal để tránh sai số thập phân
+    assert Decimal(str(status['total_value'])) == Decimal('125000.0000')
+
+
+def test_update_inventory_status_after_sale(inv_repo, seed_inventory_data, db_test_connection):
+    """Đảm bảo lệnh UPDATE trừ kho và cập nhật giá vốn MAC ghi xuống DB thành công"""
+
+    # ACT: Bán đi 5 cây, tổng giá trị kho còn lại 100k
+    inv_repo.update_inventory_status(100, 20, Decimal('100000.0000'))
+    db_test_connection.commit()
+
+    # ASSERT: Query trực tiếp xuống DB để kiểm chứng
+    cursor = db_test_connection.cursor(dictionary=True)
+    cursor.execute("SELECT quantity, total_value FROM inventory WHERE product_id = 100")
+    row = cursor.fetchone()
+
+    assert row['quantity'] == 20
+    assert Decimal(str(row['total_value'])) == Decimal('100000.0000')
+
+
+def test_add_stock_transaction_for_sale(inv_repo, seed_inventory_data, db_test_connection):
+    """Lệnh INSERT log lịch sử biến động kho (SALE) phải map đúng cột"""
+
+    trans_data = {
+        'product_id': 100,
+        'qty': -5,
+        'type': 'SALE',
+        'ref_id': 888
+    }
+
+    # ACT
+    inv_repo.add_stock_transaction(trans_data)
+    db_test_connection.commit()
+
+    # ASSERT
+    cursor = db_test_connection.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM stock_transactions WHERE product_id = 100 AND type = 'SALE'")
+    logs = cursor.fetchall()
+
+    assert len(logs) == 1
+    assert logs[0]['change_quantity'] == -5
+    assert logs[0]['reference_id'] == 888

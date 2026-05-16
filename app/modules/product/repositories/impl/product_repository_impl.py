@@ -151,3 +151,29 @@ class ProductRepositoryImpl(BaseRepository, ProductRepository):
         """Cập nhật lại Giá vốn bình quân vào bảng products"""
         sql = "UPDATE products SET cost_price = %s WHERE id = %s"
         self.cursor.execute(sql, (new_cost_price, product_id))
+
+
+    def get_product_sale_list(self, keyword: str = None) -> List[dict]:
+        sql = """
+            SELECT 
+                p.id, p.sku, p.name, p.base_unit_id, p.retail_price, p.wholesale_price,
+                u_base.name as base_unit_name,
+                inv.quantity as stock_qty,
+                uc.to_unit_id as conversion_unit_id,
+                u_conv.name as conversion_unit_name,
+                uc.ratio
+            FROM products p
+            JOIN units u_base ON p.base_unit_id = u_base.id
+            LEFT JOIN inventory inv ON p.id = inv.product_id
+            LEFT JOIN unit_conversions uc ON p.id = uc.product_id
+            LEFT JOIN units u_conv ON uc.to_unit_id = u_conv.id
+            WHERE p.is_active = TRUE
+        """
+        params = []
+        if keyword:
+            sql += " AND (p.name LIKE %s OR p.sku LIKE %s OR p.barcode LIKE %s)"
+            search_term = f"%{keyword}%"
+            params.extend([search_term, search_term, search_term])
+
+        self.cursor.execute(sql, params)
+        return self.cursor.fetchall()

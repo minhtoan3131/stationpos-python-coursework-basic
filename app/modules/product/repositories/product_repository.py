@@ -60,3 +60,6 @@ class ProductRepository(ABC):
     def update_cost_price(self, product_id: int, new_cost_price: Decimal) -> None:
         """Cập nhật lại Giá vốn bình quân (MAC) bằng kiểu Decimal"""
         pass
+
+    @abstractmethod
+    def get_product_sale_list(self, keyword: str = None) -> List[dict]: pass

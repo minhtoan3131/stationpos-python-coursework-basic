@@ -3,6 +3,7 @@ from app.core.database.connection import DatabaseConnection
 from app.modules.inventory.repositories.impl.inventory_repository_impl import InventoryRepositoryImpl
 from app.modules.product.repositories.impl.product_repository_impl import ProductRepositoryImpl
 from app.modules.product.repositories.impl.supplier_repository_impl import SupplierRepositoryImpl
+from app.modules.sale.repositories.impl.sale_repository_impl import SaleRepositoryImpl
 
 
 class UnitOfWork:
@@ -16,19 +17,20 @@ class UnitOfWork:
         self.connection = None
 
     def __enter__(self):
-        # 1. Mở kết nối MỚI
+        # Mở kết nối MỚI
         self.connection = DatabaseConnection.get_connection()
         self.connection.autocommit = False  # Tắt auto-commit để dùng Transaction
 
-        # 2. Khởi tạo các Repo và bơm chung 1 connection vào
+        # Khởi tạo các Repo và bơm chung 1 connection vào
         self.inventory_repo = InventoryRepositoryImpl(self.connection)
         self.product_repo = ProductRepositoryImpl(self.connection)
         self.supplier_repo = SupplierRepositoryImpl(self.connection)
+        self.sale_repo = SaleRepositoryImpl(self.connection)
 
         return self
 
     def __exit__(self, exc_type, exc_val, traceback):
-        # 3. Kết thúc khối 'with': Xử lý Transaction và ĐÓNG kết nối
+        # Kết thúc khối 'with': Xử lý Transaction và ĐÓNG kết nối
         try:
             if exc_type is not None:
                 self.connection.rollback()  # Có lỗi -> Rollback

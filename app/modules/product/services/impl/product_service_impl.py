@@ -191,3 +191,13 @@ class ProductServiceImpl(ProductService):
         finally:
             connection.close()
 
+    def get_product_sale_list(self, keyword: str = None) -> list:
+        connection = DatabaseConnection.get_connection()
+        try:
+            product_repo = ProductRepositoryImpl(connection)
+            return product_repo.get_product_sale_list(keyword)
+        except Exception as e:
+            print(f"Lỗi khi lấy danh sách sản phẩm POS: {e}")
+            raise
+        finally:
+            connection.close()

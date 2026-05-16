@@ -50,3 +50,8 @@ class ProductService(ABC):
             dto: ProductDeleteDTO
     ) -> bool:
         pass
+
+    @abstractmethod
+    def get_product_sale_list(self, keyword: str = None) -> list:
+        """Lấy danh sách sản phẩm và tồn kho tối ưu cho màn hình POS"""
+        pass

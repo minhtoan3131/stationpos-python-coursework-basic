@@ -26,9 +26,9 @@ CREATE TABLE products (
     name VARCHAR(255) NOT NULL,
     barcode VARCHAR(50),
     category_id INT,
-    supplier_id INT,
+    supplier_id INT, -- Nhà cung cấp mặc định, chứ không phải là thực tế
     base_unit_id INT,
-    cost_price DECIMAL(15,4),
+    cost_price DECIMAL(15,4), -- mac hiện tại của sản phẩm
     retail_price DECIMAL(15,4),
     wholesale_price DECIMAL(15,4),
     min_stock INT DEFAULT 0,
@@ -110,6 +110,8 @@ CREATE TABLE invoices (
     total_amount DECIMAL(12,2),
     discount DECIMAL(12,2) DEFAULT 0,
     final_amount DECIMAL(12,2),
+    payment_method ENUM('CASH', 'TRANSFER') DEFAULT 'CASH',
+    cash_received DECIMAL(15,4) DEFAULT 0,
     status ENUM('COMPLETED','CANCELLED') DEFAULT 'COMPLETED',
     cancel_reason TEXT
 );

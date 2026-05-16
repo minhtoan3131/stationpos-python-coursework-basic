@@ -5,14 +5,13 @@ from PyQt6.QtGui import QFont, QColor
 from app.core.database.unit_of_work import UnitOfWork
 from app.ui.main_window.ui_main_window import Ui_MainWindow
 
-# ----------------- IMPORT SERVICES (Bản mới tự quản lý connection) -----------------
 from app.modules.product.services.impl.category_service_impl import CategoryServiceImpl
 from app.modules.product.services.impl.supplier_service_impl import SupplierServiceImpl
 from app.modules.product.services.impl.unit_service_impl import UnitServiceImpl
 from app.modules.product.services.impl.product_service_impl import ProductServiceImpl
 from app.modules.inventory.services.impl.inventory_service_impl import InventoryServiceImpl
+from app.modules.sale.services.impl.sale_service_impl import SaleServiceImpl
 
-# ----------------- IMPORT CONTROLLERS -----------------
 from app.ui.inventory.controllers.inventory_management_controller import InventoryManagementController
 from app.ui.product.controllers.product_management_controller import ProductManagementController
 from app.ui.report.controllers.report_management_controller import ReportManagementController
@@ -31,15 +30,14 @@ class MainWindow(QMainWindow):
         self.unit_service = UnitServiceImpl()
         self.product_service = ProductServiceImpl()
         self.inventory_service = InventoryServiceImpl(uow_factory=UnitOfWork)
+        self.sale_service = SaleServiceImpl(uow_factory=UnitOfWork)
 
         # Xử lý UI cho macOS và Hiệu ứng
         self.fix_macos_font_issue()
         self.apply_sidebar_shadow()
 
-        # 3. Khởi tạo các Page (Controllers)
         self.init_pages()
 
-        # 4. Kết nối sự kiện menu
         self.ui.sidebar_menu.currentRowChanged.connect(self.switch_module)
 
         # Mặc định mở Dashboard (Index 0)
@@ -78,10 +76,11 @@ class MainWindow(QMainWindow):
             supplier_service=self.supplier_service
         )
 
-        # Các Page khác (Placeholder)
+        # Quản lý Bán hàng
         self.page_sales = SalesManagementController(
             inventory_service=self.inventory_service,
-            product_service=self.product_service
+            product_service=self.product_service,
+            sale_service=self.sale_service
         )
 
         self.page_reports = ReportManagementController()
@@ -89,12 +88,12 @@ class MainWindow(QMainWindow):
         self.page_settings = self.create_placeholder("⚙️ Cấu hình Hệ thống\n(Đang phát triển)")
 
         # Thêm vào stack theo đúng thứ tự index của sidebar_menu
-        self.ui.content_stack.addWidget(self.page_product)    # Index 0
+        self.ui.content_stack.addWidget(self.page_product)  # Index 0
         self.ui.content_stack.addWidget(self.page_inventory)  # Index 1
-        self.ui.content_stack.addWidget(self.page_sales)      # Index 2
-        self.ui.content_stack.addWidget(self.page_reports)    # Index 3
-        self.ui.content_stack.addWidget(self.page_tax)        # Index 4
-        self.ui.content_stack.addWidget(self.page_settings)   # Index 5
+        self.ui.content_stack.addWidget(self.page_sales)  # Index 2
+        self.ui.content_stack.addWidget(self.page_reports)  # Index 3
+        self.ui.content_stack.addWidget(self.page_tax)  # Index 4
+        self.ui.content_stack.addWidget(self.page_settings)  # Index 5
 
     def create_placeholder(self, text: str) -> QWidget:
         widget = QWidget()
