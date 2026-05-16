@@ -40,9 +40,13 @@ def test_create_invoice_and_items_sql_syntax(real_sale_repo, db_test_connection)
 
     items = [
         CartItemDTO(product_id=100, sku="SP01", name="Bút", unit_id=10, unit_name="Cái", quantity=5,
-                    price=Decimal('10000'), total=Decimal('50000')),
+                    price=Decimal('10000'), total=Decimal('50000'),
+                    cost_price=Decimal('4000')  # ĐÃ THÊM GIÁ VỐN
+                    ),
         CartItemDTO(product_id=101, sku="SP02", name="Thước", unit_id=10, unit_name="Cái", quantity=5,
-                    price=Decimal('20000'), total=Decimal('100000'))
+                    price=Decimal('20000'), total=Decimal('100000'),
+                    cost_price=Decimal('8000')  # ĐÃ THÊM GIÁ VỐN
+                    )
     ]
 
     # 2. ACT: Gọi hàm thật đâm xuống MySQL
@@ -57,14 +61,19 @@ def test_create_invoice_and_items_sql_syntax(real_sale_repo, db_test_connection)
     assert saved_invoice['code'] == "HD-TEST-001"
     assert saved_invoice['final_amount'] == Decimal('150000.00')
 
-    # Kiểm tra Details (Invoice_items) xem executemany có ăn đủ 2 dòng không
+    # Kiểm tra Details (Invoice_items) xem executemany có ăn đủ 2 dòng không và có lưu giá vốn không
     cursor.execute("SELECT * FROM invoice_items WHERE invoice_id = %s ORDER BY product_id", (invoice_id,))
     saved_items = cursor.fetchall()
     assert len(saved_items) == 2
+
     assert saved_items[0]['product_id'] == 100
     assert saved_items[0]['quantity'] == 5
+    # MySQL kiểu DECIMAL(15,4) sẽ trả về chuỗi có 4 số 0 ở thập phân
+    assert saved_items[0]['cost_price'] == Decimal('4000.0000')
+
     assert saved_items[1]['product_id'] == 101
     assert saved_items[1]['quantity'] == 5
+    assert saved_items[1]['cost_price'] == Decimal('8000.0000')
 
 
 # ==========================================
@@ -75,8 +84,10 @@ def test_create_invoice_items_fails_foreign_key(real_sale_repo):
 
     # Chuẩn bị món hàng có product_id = 9999 (Sản phẩm ma, không tồn tại trong bảng products)
     items = [
-        CartItemDTO(product_id=9999, sku="MA", name="MA", unit_id=10, unit_name="Cái", quantity=1, price=Decimal('1'),
-                    total=Decimal('1'))
+        CartItemDTO(product_id=9999, sku="MA", name="MA", unit_id=10, unit_name="Cái", quantity=1,
+                    price=Decimal('1'), total=Decimal('1'),
+                    cost_price=Decimal('1')
+                    )
     ]
 
     # Cố tình nhét vào một Hóa đơn cũng MA nốt (invoice_id = 9999)

@@ -123,7 +123,8 @@ def valid_checkout_dto():
     item = CartItemDTO(
         product_id=100, sku="SP01", name="Bút bi",
         unit_id=10, unit_name="Cái", quantity=5,  # Mua 5 cái
-        price=Decimal('10000'), total=Decimal('50000')
+        price=Decimal('10000'), total=Decimal('50000'),
+        cost_price=Decimal('4000')
     )
     return CheckoutDTO(
         code="", total_amount=Decimal('50000'), discount=Decimal('0'),

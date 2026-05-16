@@ -14,7 +14,7 @@ def sample_checkout_dto():
     """Tạo DTO mồi mô phỏng giỏ hàng được truyền từ màn hình chính sang"""
     items = [
         CartItemDTO(product_id=1, sku="SP01", name="Bút bi", unit_id=10, unit_name="Cái",
-                    quantity=5, price=Decimal('10000'), total=Decimal('50000'))
+                    quantity=5, price=Decimal('10000'), total=Decimal('50000'), cost_price=Decimal('4000'))
     ]
     return CheckoutDTO(
         code="",  # Cố tình để trống để test logic tự sinh mã

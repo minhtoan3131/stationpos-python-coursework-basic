@@ -136,22 +136,23 @@ def sale_service(uow):
 # ==========================================
 
 def test_checkout_happy_path_state_changes(sale_service, uow):
-
     # ==========================================
     # GIVEN: Khách mua 2 mặt hàng (1 bán lẻ, 1 bán sỉ)
     # ==========================================
-    # Món 1 (Lẻ): Mua 5 cái Bút bi (Giá bán 10k/cái)
+    # Món 1 (Lẻ): Mua 5 cái Bút bi (Giá bán 10k/cái, Giá vốn 4k/cái)
     item_base = CartItemDTO(
         product_id=100, sku="SP01", name="Bút bi",
         unit_id=10, unit_name="Cái", quantity=5,
-        price=Decimal('10000'), total=Decimal('50000')
+        price=Decimal('10000'), total=Decimal('50000'),
+        cost_price=Decimal('4000')
     )
 
-    # Món 2 (Sỉ): Mua 2 Hộp Sổ tay (1 Hộp = 10 cuốn, Giá bán 60k/hộp)
+    # Món 2 (Sỉ): Mua 2 Hộp Sổ tay (1 Hộp = 10 cuốn, Giá bán 60k/hộp, Giá vốn 50k/hộp)
     item_conv = CartItemDTO(
         product_id=200, sku="SP02", name="Sổ tay",
         unit_id=21, unit_name="Hộp", quantity=2,
-        price=Decimal('60000'), total=Decimal('120000')
+        price=Decimal('60000'), total=Decimal('120000'),
+        cost_price=Decimal('50000')  # ĐÃ THÊM GIÁ VỐN
     )
 
     dto = CheckoutDTO(
@@ -179,10 +180,16 @@ def test_checkout_happy_path_state_changes(sale_service, uow):
     assert invoice['payment_method'] == 'CASH'
     assert invoice['code'] == saved_invoice_code  # Mã HĐ phải được gán vào DTO và trả về
 
-    # --- TC_Post_02: Kiểm tra bảng Invoice_Items (Details) ---
+    # --- TC_Post_02: Kiểm tra bảng Invoice_Items (Details) CHẮC CHẮN GHI GIÁ VỐN ---
     assert len(db_sale.invoice_items) == 2
+
+    # Kiểm tra dòng Bút bi
     assert db_sale.invoice_items[0]['item'].product_id == 100
+    assert db_sale.invoice_items[0]['item'].cost_price == Decimal('4000')
+
+    # Kiểm tra dòng Sổ tay
     assert db_sale.invoice_items[1]['item'].product_id == 200
+    assert db_sale.invoice_items[1]['item'].cost_price == Decimal('50000')
 
     # --- TC_Post_03: Kiểm tra trừ kho & Quy đổi ---
     # Bút bi (Lẻ): Tồn kho cũ 50, bán 5 -> Còn 45

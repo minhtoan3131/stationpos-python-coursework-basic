@@ -157,6 +157,7 @@ class ProductRepositoryImpl(BaseRepository, ProductRepository):
         sql = """
             SELECT 
                 p.id, p.sku, p.name, p.base_unit_id, p.retail_price, p.wholesale_price,
+                p.cost_price,
                 u_base.name as base_unit_name,
                 inv.quantity as stock_qty,
                 uc.to_unit_id as conversion_unit_id,

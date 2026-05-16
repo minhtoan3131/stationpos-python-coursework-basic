@@ -19,6 +19,7 @@ def sales_window(qtbot, mocker):
         {
             'id': 100, 'sku': 'SP01', 'name': 'Bút bi',
             'base_unit_id': 10, 'base_unit_name': 'Cái', 'retail_price': 5000,
+            'cost_price': 3000,
             'stock_qty': 25,
             'conversion_unit_id': 11, 'conversion_unit_name': 'Hộp',
             'wholesale_price': 45000, 'ratio': 10
@@ -26,6 +27,7 @@ def sales_window(qtbot, mocker):
         {
             'id': 101, 'sku': 'SP02', 'name': 'Sổ tay',
             'base_unit_id': 12, 'base_unit_name': 'Quyển', 'retail_price': 15000,
+            'cost_price': 10000,
             'stock_qty': 0,  # HẾT HÀNG -> Sẽ bị UI ẩn đi
             'conversion_unit_id': 12, 'conversion_unit_name': 'Quyển',
             'wholesale_price': None, 'ratio': None

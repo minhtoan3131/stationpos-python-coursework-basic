@@ -27,17 +27,17 @@ class SaleRepositoryImpl(BaseRepository, SaleRepository):
     def create_invoice_items(self, invoice_id: int, items: List[CartItemDTO]) -> None:
         sql = """
             INSERT INTO invoice_items (
-                invoice_id, product_id, unit_id, 
+                invoice_id, product_id, unit_id, cost_price,
                 quantity, unit_price, total_price
-            ) VALUES (%s, %s, %s, %s, %s, %s)
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
-        # Sử dụng executemany để tối ưu hiệu năng (bulk insert)
         params_list = [
-            (invoice_id, item.product_id, item.unit_id,
+            (invoice_id, item.product_id, item.unit_id, item.cost_price,
              item.quantity, item.price, item.total)
             for item in items
         ]
         self.cursor.executemany(sql, params_list)
+
 
     def add_invoice_log(self, invoice_id: int, action: str, note: str) -> None:
         sql = """

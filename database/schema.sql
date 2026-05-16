@@ -123,6 +123,7 @@ CREATE TABLE invoice_items (
     product_id INT,
     unit_id INT,
     quantity INT,
+    cost_price DECIMAL(15,4),
     unit_price DECIMAL(15,4),
     total_price DECIMAL(15,4),
 

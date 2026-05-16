@@ -15,18 +15,14 @@ class SaleCalculator:
         return cash_received - final_amount
 
     @staticmethod
-    def calculate_conversion_details(wholesale_price, base_stock: int, ratio) -> Tuple[float, int]:
+    def calculate_conversion_details(wholesale_price, cost_price, base_stock: int, ratio) -> tuple:
         """
-        Tính toán giá và tồn kho cho đơn vị quy đổi (Sỉ).
-        Trả về tuple: (Giá sỉ thực tế, Tồn kho quy đổi)
+        Tính toán giá bán sỉ, giá vốn sỉ và tồn kho cho đơn vị quy đổi (Sỉ).
+        Trả về tuple: (Giá sỉ thực tế, Giá vốn sỉ thực tế, Tồn kho quy đổi)
         """
-        # Đảm bảo ratio luôn hợp lệ (tránh chia cho 0 hoặc None)
         safe_ratio = float(ratio) if ratio else 1.0
-
-        # Tính giá: Giá sỉ cơ bản * Tỷ lệ quy đổi
         actual_price = float(wholesale_price or 0) * safe_ratio
-
-        # Tính tồn kho: Tồn kho cơ bản // Tỷ lệ quy đổi
+        actual_cost = float(cost_price or 0) * safe_ratio  # Tính giá vốn sỉ thực tế
         converted_stock = int(base_stock // safe_ratio)
 
-        return actual_price, converted_stock
+        return actual_price, actual_cost, converted_stock

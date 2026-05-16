@@ -12,6 +12,7 @@ class CartItemDTO:
     quantity: int
     price: Decimal
     total: Decimal
+    cost_price: Decimal
 
 @dataclass
 class CheckoutDTO:

@@ -88,6 +88,7 @@ class SalesManagementController(QWidget):
         for p in data_list:
             # Lấy số lượng tồn kho cơ bản
             stock_qty = p.get('stock_qty') or 0
+            base_cost = p.get('cost_price') or 0  # Lấy giá vốn cơ bản
 
             # DÒNG ĐƠN VỊ CƠ BẢN (Ví dụ: Cái)
             # --> CHỈ HIỂN THỊ NẾU TỒN KHO > 0
@@ -97,6 +98,7 @@ class SalesManagementController(QWidget):
                     'product_id': p['id'], 'sku': p['sku'], 'name': p['name'],
                     'unit_id': p['base_unit_id'], 'unit_name': p['base_unit_name'],
                     'price': p['retail_price'],
+                    'cost_price': base_cost,
                 }
                 self.ui.tbl_products_sales.setItem(row_index, 0, QTableWidgetItem(p['sku']))
                 self.ui.tbl_products_sales.setItem(row_index, 1, QTableWidgetItem(p['name']))
@@ -114,8 +116,9 @@ class SalesManagementController(QWidget):
             if p.get('conversion_unit_id') and p['conversion_unit_id'] != p['base_unit_id']:
 
                 # Gọi Util để tính giá sỉ thực tế và số lượng quy đổi (Số hộp)
-                actual_wholesale_price, conv_stock = SaleCalculator.calculate_conversion_details(
+                actual_wholesale_price, actual_cost, conv_stock = SaleCalculator.calculate_conversion_details(
                     wholesale_price=p['wholesale_price'],
+                    cost_price=base_cost,
                     base_stock=stock_qty,
                     ratio=p.get('ratio')
                 )
@@ -128,6 +131,7 @@ class SalesManagementController(QWidget):
                         'product_id': p['id'], 'sku': p['sku'], 'name': p['name'],
                         'unit_id': p['conversion_unit_id'], 'unit_name': p['conversion_unit_name'],
                         'price': actual_wholesale_price,
+                        'cost_price': actual_cost,  # Lưu giá vốn sỉ đã nhân ratio
                     }
 
                     self.ui.tbl_products_sales.setItem(row_index, 0, QTableWidgetItem(p['sku']))
@@ -171,7 +175,9 @@ class SalesManagementController(QWidget):
         sku_item = QTableWidgetItem(product_info['sku'])
         sku_item.setData(Qt.ItemDataRole.UserRole, product_info['product_id'])
         self.ui.tbl_cart.setItem(row_idx, 0, sku_item)
-        self.ui.tbl_cart.setItem(row_idx, 1, QTableWidgetItem(product_info['name']))
+        name_item = QTableWidgetItem(product_info['name'])
+        name_item.setData(Qt.ItemDataRole.UserRole, product_info.get('cost_price', 0))
+        self.ui.tbl_cart.setItem(row_idx, 1, name_item)
 
         unit_item = QTableWidgetItem(product_info['unit_name'])
         unit_item.setData(Qt.ItemDataRole.UserRole, product_info['unit_id'])
@@ -255,6 +261,8 @@ class SalesManagementController(QWidget):
             sku = self.ui.tbl_cart.item(r, 0).text()
             u_id = self.ui.tbl_cart.item(r, 2).data(Qt.ItemDataRole.UserRole)
 
+            cost_price = Decimal(str(self.ui.tbl_cart.item(r, 1).data(Qt.ItemDataRole.UserRole)))
+
             spin_qty = self.ui.tbl_cart.cellWidget(r, 3)
             qty = spin_qty.value() if spin_qty else 0
 
@@ -265,7 +273,8 @@ class SalesManagementController(QWidget):
             cart_items.append(CartItemDTO(
                 product_id=p_id, sku=sku, name=self.ui.tbl_cart.item(r, 1).text(),
                 unit_id=u_id, unit_name=self.ui.tbl_cart.item(r, 2).text(),
-                quantity=qty, price=price, total=line_total
+                quantity=qty, price=price, total=line_total,
+                cost_price=cost_price  # ĐÃ BỔ SUNG TRUYỀN VÀO DTO
             ))
 
         # Khởi tạo CheckoutDTO gửi sang Dialog
