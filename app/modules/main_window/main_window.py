@@ -1,3 +1,4 @@
+from datetime import datetime
 from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QGraphicsDropShadowEffect
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont, QColor
@@ -12,6 +13,8 @@ from app.modules.product.services.impl.product_service_impl import ProductServic
 from app.modules.inventory.services.impl.inventory_service_impl import InventoryServiceImpl
 from app.modules.sale.services.impl.sale_service_impl import SaleServiceImpl
 from app.modules.report.services.impl.report_service_impl import ReportServiceImpl
+
+from app.modules.tax.services.impl.tax_service_impl import TaxService
 
 from app.modules.inventory.ui.controllers.inventory_management_controller import InventoryManagementController
 from app.modules.product.ui.controllers.product_management_controller import ProductManagementController
@@ -33,6 +36,7 @@ class MainWindow(QMainWindow):
         self.inventory_service = InventoryServiceImpl(uow_factory=UnitOfWork)
         self.sale_service = SaleServiceImpl(uow_factory=UnitOfWork)
         self.report_service = ReportServiceImpl(uow_factory=UnitOfWork)
+        self.tax_service = TaxService(uow_factory=UnitOfWork)
 
         # Xử lý UI cho macOS và Hiệu ứng
         self.fix_macos_font_issue()
@@ -46,7 +50,6 @@ class MainWindow(QMainWindow):
         self.ui.sidebar_menu.setCurrentRow(0)
 
     def apply_sidebar_shadow(self):
-        """Thay thế cho box-shadow CSS không hoạt động trong PyQt"""
         shadow = QGraphicsDropShadowEffect(self)
         shadow.setBlurRadius(20)
         shadow.setXOffset(4)
@@ -55,16 +58,12 @@ class MainWindow(QMainWindow):
         self.ui.frame_sidebar.setGraphicsEffect(shadow)
 
     def fix_macos_font_issue(self):
-        """Ép in đậm font chữ cho Sidebar trên macOS"""
         mac_font = QFont()
         mac_font.setPointSize(16)
         mac_font.setBold(True)
         self.ui.sidebar_menu.setFont(mac_font)
 
     def init_pages(self):
-        """Khởi tạo các widget con và đẩy vào QStackedWidget"""
-
-        # Page 1: Quản lý sản phẩm
         self.page_product = ProductManagementController(
             product_service=self.product_service,
             category_service=self.category_service,
@@ -72,28 +71,27 @@ class MainWindow(QMainWindow):
             unit_service=self.unit_service
         )
 
-        # Page 2: Quản lý kho
         self.page_inventory = InventoryManagementController(
             inventory_service=self.inventory_service,
             supplier_service=self.supplier_service
         )
 
-        # Page 3: Quản lý Bán hàng
         self.page_sales = SalesManagementController(
             inventory_service=self.inventory_service,
             product_service=self.product_service,
             sale_service=self.sale_service
         )
 
-        # Page 4: Quản lý Báo cáo (BỔ SUNG TRUYỀN SERVICE VÀO)
         self.page_reports = ReportManagementController(
             report_service=self.report_service
         )
 
-        self.page_tax = TaxManagementController()
+        self.page_tax = TaxManagementController(
+            tax_service=self.tax_service
+        )
+
         self.page_settings = self.create_placeholder("⚙️ Cấu hình Hệ thống\n(Đang phát triển)")
 
-        # Thêm vào stack theo đúng thứ tự index của sidebar_menu
         self.ui.content_stack.addWidget(self.page_product)  # Index 0
         self.ui.content_stack.addWidget(self.page_inventory)  # Index 1
         self.ui.content_stack.addWidget(self.page_sales)  # Index 2
@@ -111,10 +109,8 @@ class MainWindow(QMainWindow):
         return widget
 
     def switch_module(self, index: int):
-        """Xử lý đổi tab và tự động refresh dữ liệu"""
         self.ui.content_stack.setCurrentIndex(index)
 
-        # Lazy Loading: Chỉ load dữ liệu khi người dùng nhấn vào tab đó
         if index == 0:
             self.page_product.load_products()
         elif index == 1:
@@ -122,9 +118,10 @@ class MainWindow(QMainWindow):
         elif index == 2:
             self.page_sales.handle_search()
         elif index == 3:
-            # Tự động refresh báo cáo "Hôm nay" mỗi khi mở tab Báo cáo
             self.page_reports.handle_filter_today()
+        elif index == 4:
+            current_year = datetime.now().year
+            self.page_tax.load_data_for_year(current_year)
 
     def closeEvent(self, event):
-        """Đóng ứng dụng an toàn"""
         event.accept()

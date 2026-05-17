@@ -146,9 +146,11 @@ CREATE TABLE invoice_logs (
 
 CREATE TABLE tax_config (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    apply_year INT UNIQUE NOT NULL,       -- năm áp dụng (để map với cbo_year trên UI)
+    threshold_amount DECIMAL(15,2),       -- mức miễn thuế (VD: 1,000,000,000)
     vat_percent DECIMAL(5,2),
     pit_percent DECIMAL(5,2),
-    updated_at DATETIME
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE settings (
@@ -156,6 +158,9 @@ CREATE TABLE settings (
     shop_name VARCHAR(255),
     address TEXT,
     phone VARCHAR(20)
+);
+
+
 
 
 
@@ -235,3 +240,11 @@ SELECT
 FROM inventory i
 JOIN products p ON i.product_id = p.id
 JOIN units u ON p.base_unit_id = u.id;
+
+
+
+
+
+
+
+

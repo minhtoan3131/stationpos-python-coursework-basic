@@ -44,7 +44,7 @@ def clean_db(db_test_connection):
     cursor.execute("TRUNCATE TABLE suppliers;")
     cursor.execute("TRUNCATE TABLE units;")
 
-    # Nhóm Cấu hình chung (Cứ clear cho chắc chắn)
+    # Nhóm Cấu hình chung
     cursor.execute("TRUNCATE TABLE tax_config;")
     cursor.execute("TRUNCATE TABLE settings;")
 
