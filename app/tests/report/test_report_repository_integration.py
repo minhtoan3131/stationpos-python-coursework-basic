@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import pytest
 from decimal import Decimal
 from app.modules.report.repositories.impl.report_repository_impl import ReportRepositoryImpl
@@ -61,3 +63,65 @@ def test_repository_sql_execution_with_real_db(db_test_connection):
     assert history[0]["invoice_code"] == "HD_OK"
     # Đảm bảo mệnh đề CASE WHEN dưới View DB đã dịch chính xác ngôn ngữ sang Tiếng Việt
     assert history[0]["payment_method"] == "Tiền mặt"
+
+
+# ==========================================
+# BÀI TEST TÍCH HỢP CHO HÀM MỚI (TRANG CHỦ)
+# ==========================================
+def test_sql_get_daily_purchase_orders_returns_completed_only(db_test_connection):
+    """
+    Test cho màn Home: Lấy danh sách phiếu nhập kho trong ngày.
+    Ràng buộc:
+    1. Chỉ lấy phiếu có status = 'COMPLETED' và khớp đúng ngày truyền vào.
+    2. SQL LEFT JOIN phải liên kết và lấy ra đúng tên nhà cung cấp.
+    """
+    seed_cursor = db_test_connection.cursor(dictionary=True)
+
+    # --- GIVEN: Seed dữ liệu mồi vào các bảng cơ sở ---
+    # Tạo Nhà cung cấp (Để test mệnh đề LEFT JOIN)
+    seed_cursor.execute(
+        "INSERT INTO suppliers (id, name, phone, address) VALUES (1, 'NCC Thiên Long', '0987654321', 'Hà Nội');"
+    )
+
+    # Tạo Phiếu số 1: HỢP LỆ (Đúng ngày, trạng thái COMPLETED)
+    seed_cursor.execute("""
+        INSERT INTO purchase_orders (id, code, supplier_id, total_amount, note, status, created_at) 
+        VALUES (1, 'PO-001', 1, 1500000.0000, 'Nhập hàng', 'COMPLETED', '2026-05-17 14:30:00');
+    """)
+
+    # Tạo Phiếu số 2: KHÔNG HỢP LỆ (Đúng ngày, nhưng trạng thái CANCELLED) -> View bắt buộc phải lọc bỏ
+    seed_cursor.execute("""
+        INSERT INTO purchase_orders (id, code, supplier_id, total_amount, note, status, created_at) 
+        VALUES (2, 'PO-002', 1, 2000000.0000, 'Nháp', 'CANCELLED', '2026-05-17 15:00:00');
+    """)
+
+    # Tạo Phiếu số 3: KHÔNG HỢP LỆ (Trạng thái COMPLETED, nhưng của ngày hôm qua) -> View bắt buộc phải lọc bỏ
+    seed_cursor.execute("""
+        INSERT INTO purchase_orders (id, code, supplier_id, total_amount, note, status, created_at) 
+        VALUES (3, 'PO-003', 1, 5000000.0000, 'Hàng hôm qua', 'COMPLETED', '2026-05-16 10:00:00');
+    """)
+
+    db_test_connection.commit()
+    seed_cursor.close()  # Đóng cursor seed sau khi hoàn thành nhiệm vụ chuẩn bị data
+
+    # --- ACT: Khởi tạo Repo thật bằng cách truyền vào connection thật ---
+    repo = ReportRepositoryImpl(db_test_connection)
+
+    # --- THEN: Thực thi kiểm thử hàm lấy Phiếu nhập kho trong ngày ---
+    target_date = "2026-05-17"
+    results = repo.get_daily_purchase_orders(target_date)
+
+    # Phải chỉ có duy nhất 1 phiếu (PO-001) lọt qua được bộ lọc WHERE
+    assert len(results) == 1, "Lỗi SQL: Không lọc đúng trạng thái 'COMPLETED' hoặc sai ngày lọc."
+
+    row = results[0]
+
+    # Kiểm tra cột mã code
+    assert row['code'] == 'PO-001'
+
+    # Kiểm tra SQL LEFT JOIN hoạt động chuẩn xác (Cột supplier_name không bị NULL)
+    assert row['supplier_name'] == 'NCC Thiên Long', "Lỗi SQL: LEFT JOIN bảng suppliers bị sai."
+
+    # Kiểm tra các trường dữ liệu số lượng/thời gian trả về đúng định dạng
+    assert row['total_amount'] == Decimal("1500000.0000")
+    assert isinstance(row['created_at'], datetime)

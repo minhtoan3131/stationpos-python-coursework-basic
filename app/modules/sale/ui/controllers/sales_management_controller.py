@@ -305,4 +305,3 @@ class SalesManagementController(QWidget):
             except Exception as e:
                 # Bắt lỗi Validation (ví dụ: Không đủ hàng) hoặc lỗi DB để báo cho Thu ngân
                 QMessageBox.critical(self, "Lỗi thanh toán", str(e))
-                traceback.print_exc()

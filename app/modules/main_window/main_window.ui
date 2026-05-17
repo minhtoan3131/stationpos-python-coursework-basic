@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
@@ -167,7 +167,7 @@
            <bold>true</bold>
           </font>
          </property>
-         <item>
+         <item><property name="text"><string>🏠  Trang chủ</string></property><property name="font"><font><pointsize>17</pointsize></font></property></item><item>
           <property name="text">
            <string>🏷️  Quản lý sản phẩm</string>
           </property>
@@ -242,6 +242,6 @@
    </layout>
   </widget>
  </widget>
- <resources/>
- <connections/>
+ <resources />
+ <connections />
 </ui>

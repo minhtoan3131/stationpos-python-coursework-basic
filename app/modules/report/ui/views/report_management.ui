@@ -11,7 +11,8 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Báo cáo &amp; Thống kê Hệ thống</string>
+   <string>Báo cáo &amp;
+Thống kê Hệ thống</string>
   </property>
   <property name="styleSheet">
    <string notr="true">
@@ -57,15 +58,22 @@
     }
 
     QLabel#val_revenue { color: #10b981; }
-    QLabel#val_profit { color: #3b82f6; }
+    QLabel#val_profit { color: #3b82f6;
+}
     QLabel#val_orders { color: #8b5cf6; }
-    QLabel#val_stock_value { color: #f59e0b; }
+    QLabel#val_stock_value { color: #f59e0b;
+}
 
-    /* Khu vực Biểu đồ &amp; Bảng */
-    QFrame#frame_charts, QFrame#frame_history, QFrame#frame_inventory, QFrame#frame_diagram {
+    /* Khu vực Biểu đồ &amp;
+Bảng */
+    QFrame#frame_revenue_trend, QFrame#frame_top_products, QFrame#frame_history, QFrame#frame_inventory, QFrame#frame_diagram {
         background-color: #ffffff;
         border-radius: 12px;
         margin-bottom: 5px;
+    }
+
+    QFrame#frame_revenue_trend, QFrame#frame_top_products {
+        padding: 15px;
     }
 
     QLabel.section-title {
@@ -96,6 +104,36 @@
         border-radius: 6px;
         padding: 8px 20px;
         font-weight: 700;
+    }
+
+    /* Ô chọn ngày tháng (Date Editors) */
+    QDateEdit {
+        background-color: #ffffff;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        padding: 6px 26px 6px 10px; /* Thêm khoảng trống bên phải để không đè chữ lên mũi tên */
+        font-weight: 600;
+        color: #475569;
+        max-width: 110px; /* Thu ngắn chiều ngang */
+    }
+    QDateEdit:hover {
+        border-color: #94a3b8;
+    }
+    QDateEdit:focus {
+        border-color: #3b82f6;
+    }
+    QDateEdit::drop-down {
+        subcontrol-origin: padding;
+        subcontrol-position: top right;
+        width: 20px;
+        border: none;
+    }
+    QDateEdit::down-arrow {
+        border-left: 4px solid transparent;
+        border-right: 4px solid transparent;
+        border-top: 5px solid #475569; /* Vẽ mũi tên tam giác cùng tone màu chữ */
+        width: 0;
+        height: 0;
     }
 
     QTableWidget {
@@ -140,7 +178,7 @@
         <x>0</x>
         <y>0</y>
         <width>1385</width>
-        <height>1409</height>
+        <height>1450</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="scrollLayout">

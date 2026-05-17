@@ -4,6 +4,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont, QColor
 
 from app.core.database.unit_of_work import UnitOfWork
+from app.modules.home_wellcome.ui.controllers.home_welcome_controller import HomeWelcomeController
 from app.modules.main_window.ui_main_window import Ui_MainWindow
 
 from app.modules.product.services.impl.category_service_impl import CategoryServiceImpl
@@ -13,8 +14,8 @@ from app.modules.product.services.impl.product_service_impl import ProductServic
 from app.modules.inventory.services.impl.inventory_service_impl import InventoryServiceImpl
 from app.modules.sale.services.impl.sale_service_impl import SaleServiceImpl
 from app.modules.report.services.impl.report_service_impl import ReportServiceImpl
-
 from app.modules.tax.services.impl.tax_service_impl import TaxService
+
 
 from app.modules.inventory.ui.controllers.inventory_management_controller import InventoryManagementController
 from app.modules.product.ui.controllers.product_management_controller import ProductManagementController
@@ -46,7 +47,7 @@ class MainWindow(QMainWindow):
 
         self.ui.sidebar_menu.currentRowChanged.connect(self.switch_module)
 
-        # Mặc định mở Dashboard (Index 0)
+        # Mặc định mở Trang chủ (Index 0) ngay khi khởi động ứng dụng
         self.ui.sidebar_menu.setCurrentRow(0)
 
     def apply_sidebar_shadow(self):
@@ -64,6 +65,15 @@ class MainWindow(QMainWindow):
         self.ui.sidebar_menu.setFont(mac_font)
 
     def init_pages(self):
+        # Khởi tạo trang Home điều phối hành động mới
+        self.page_home = HomeWelcomeController(
+            report_service=self.report_service,
+            inventory_service=self.inventory_service,
+            tax_service=self.tax_service
+        )
+        # Kết nối sự kiện liên kết sâu (Deep-linking Macro) bắn ra từ trang chủ
+        self.page_home.navigation_requested.connect(self.handle_home_deep_linking)
+
         self.page_product = ProductManagementController(
             product_service=self.product_service,
             category_service=self.category_service,
@@ -92,12 +102,14 @@ class MainWindow(QMainWindow):
 
         self.page_settings = self.create_placeholder("⚙️ Cấu hình Hệ thống\n(Đang phát triển)")
 
-        self.ui.content_stack.addWidget(self.page_product)  # Index 0
-        self.ui.content_stack.addWidget(self.page_inventory)  # Index 1
-        self.ui.content_stack.addWidget(self.page_sales)  # Index 2
-        self.ui.content_stack.addWidget(self.page_reports)  # Index 3
-        self.ui.content_stack.addWidget(self.page_tax)  # Index 4
-        self.ui.content_stack.addWidget(self.page_settings)  # Index 5
+        # Thêm các trang vào content_stack (Thứ tự khớp chính xác 100% với file .ui)
+        self.ui.content_stack.addWidget(self.page_home)  # Index 0
+        self.ui.content_stack.addWidget(self.page_product)  # Index 1
+        self.ui.content_stack.addWidget(self.page_inventory)  # Index 2
+        self.ui.content_stack.addWidget(self.page_sales)  # Index 3
+        self.ui.content_stack.addWidget(self.page_reports)  # Index 4
+        self.ui.content_stack.addWidget(self.page_tax)  # Index 5
+        self.ui.content_stack.addWidget(self.page_settings)  # Index 6
 
     def create_placeholder(self, text: str) -> QWidget:
         widget = QWidget()
@@ -112,16 +124,30 @@ class MainWindow(QMainWindow):
         self.ui.content_stack.setCurrentIndex(index)
 
         if index == 0:
-            self.page_product.load_products()
+            self.page_home.refresh_dashboard()
         elif index == 1:
-            self.page_inventory.handle_search()
+            self.page_product.load_products()
         elif index == 2:
-            self.page_sales.handle_search()
+            self.page_inventory.handle_search()
         elif index == 3:
-            self.page_reports.handle_filter_today()
+            self.page_sales.handle_search()
         elif index == 4:
+            self.page_reports.handle_filter_today()
+        elif index == 5:
             current_year = datetime.now().year
             self.page_tax.load_data_for_year(current_year)
+
+    def handle_home_deep_linking(self, target_index: int, search_keyword: str):
+        """Macro xử lý liên kết sâu nhận lệnh từ trang chủ để chuyển module và điền sẵn bộ lọc"""
+        # Đồng bộ trạng thái dòng chọn của menu bar trái và stack widget
+        self.ui.sidebar_menu.setCurrentRow(target_index)
+        self.switch_module(target_index)
+
+        # Nếu trang đích là Quản lý Kho (Index 2), tự điền SKU lỗi và chạy tìm kiếm lập tức
+        if target_index == 2 and search_keyword:
+            if hasattr(self.page_inventory, 'ui') and hasattr(self.page_inventory.ui, 'txt_search_inventory'):
+                self.page_inventory.ui.txt_search_inventory.setText(search_keyword)
+                self.page_inventory.handle_search()
 
     def closeEvent(self, event):
         event.accept()

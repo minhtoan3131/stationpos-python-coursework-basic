@@ -109,3 +109,13 @@ class ReportRepositoryImpl(BaseRepository, ReportRepository):
             }
             for row in rows
         ]
+
+    def get_daily_purchase_orders(self, date_str: str) -> List[Dict[str, Any]]:
+        sql = """
+            SELECT po.code, po.created_at, po.total_amount, s.name AS supplier_name
+            FROM purchase_orders po
+            LEFT JOIN suppliers s ON po.supplier_id = s.id
+            WHERE DATE(po.created_at) = %s AND po.status = 'COMPLETED'
+        """
+        self.cursor.execute(sql, (date_str,))
+        return self.cursor.fetchall()

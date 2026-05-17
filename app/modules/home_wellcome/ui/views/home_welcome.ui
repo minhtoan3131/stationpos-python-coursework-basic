@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>HomeWelcomeWidget</class>
+ <widget class="QWidget" name="HomeWelcomeWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1400</width>
+    <height>800</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Trung tâm Điều phối Hành động</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+    /* Thiết kế Enterprise hiện đại và đồng bộ toàn hệ thống */
+    QWidget#HomeWelcomeWidget {
+        background-color: #f8fafc;
+        font-family: 'Segoe UI', 'Roboto', sans-serif;
+        color: #334155;
+    }
+
+    /* Thẻ chỉ số động (Live Status Cards) */
+    QFrame.live-badge {
+        background-color: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding-left: 12px;
+    }
+    QLabel.badge-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: #64748b;
+        text-transform: uppercase;
+    }
+    QLabel.badge-value {
+        font-size: 26px;
+        font-weight: 800;
+    }
+
+    /* Màu sắc động cho từng loại chỉ số badge */
+    QLabel#val_badge_stock { color: #ef4444; }     /* Cảnh báo kho màu đỏ */
+    QLabel#val_badge_tax { color: #f59e0b; }       /* Tiến trình thuế màu cam */
+    QLabel#val_badge_orders { color: #10b981; }    /* Đơn hàng màu xanh lá */
+
+    /* Khung nội dung chính phía dưới */
+    QFrame.panel-container {
+        background-color: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+    }
+
+    QLabel.block-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #0f172a;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    /* Thiết kế danh sách cảnh báo hành động liên kết sâu (Left Panel) */
+    QListWidget#list_actionable_alerts {
+        border: none;
+        background-color: transparent;
+        font-size: 13px;
+        outline: none;
+    }
+    QListWidget#list_actionable_alerts::item {
+        background-color: #fff1f2;
+        border: 1px solid #ffe4e6;
+        border-left: 5px solid #ef4444; /* Vạch đỏ nhấn mạnh hành động */
+        border-radius: 6px;
+        padding: 14px 16px;
+        margin-bottom: 10px;
+        color: #1e293b;
+    }
+    QListWidget#list_actionable_alerts::item:hover {
+        background-color: #ffe4e6;
+    }
+
+    /* Thiết kế dòng thời gian hoạt động gần đây (Right Panel - Audit Feed) */
+    QListWidget#list_live_feed {
+        border: none;
+        background-color: transparent;
+        font-size: 13px;
+        outline: none;
+    }
+    QListWidget#list_live_feed::item {
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-left: 4px solid #3b82f6; /* Vạch xanh dương dòng thời gian */
+        border-radius: 6px;
+        padding: 12px 14px;
+        margin-bottom: 8px;
+        color: #475569;
+    }
+    QListWidget#list_live_feed::item:hover {
+        background-color: #f1f5f9;
+    }
+   </string>
+  </property>
+  <layout class="QVBoxLayout" name="main_layout">
+   <property name="spacing">
+    <number>20</number>
+   </property>
+   <property name="leftMargin">
+    <number>30</number>
+   </property>
+   <property name="topMargin">
+    <number>25</number>
+   </property>
+   <property name="rightMargin">
+    <number>30</number>
+   </property>
+   <property name="bottomMargin">
+    <number>30</number>
+   </property>
+   <item>
+    <layout class="QVBoxLayout" name="layout_header">
+     <property name="spacing">
+      <number>4</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="lbl_welcome_title">
+       <property name="styleSheet">
+        <string notr="true">font-size: 26px; font-weight: 800; color: #0f172a;</string>
+       </property>
+       <property name="text">
+        <string>Bảng Điều Phối Trung Tâm</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="lbl_welcome_sub">
+       <property name="styleSheet">
+        <string notr="true">font-size: 14px; color: #64748b;</string>
+       </property>
+       <property name="text">
+        <string>Giám sát vận hành thời gian thực &amp; Liên kết xử lý nhanh sự cố</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="layout_live_badges">
+     <property name="spacing">
+      <number>20</number>
+     </property>
+     <item>
+      <widget class="QFrame" name="badge_stock">
+       <property name="class" stdset="0">
+        <string>live-badge</string>
+       </property>
+       <layout class="QVBoxLayout" name="vbox_badge1">
+        <item>
+         <widget class="QLabel" name="lbl_badge_stock_title">
+          <property name="text">
+           <string>Hàng cần nhập (Dưới định mức)</string>
+          </property>
+          <property name="class" stdset="0">
+           <string>badge-title</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="val_badge_stock">
+          <property name="text">
+           <string>0 sản phẩm</string>
+          </property>
+          <property name="class" stdset="0">
+           <string>badge-value</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QFrame" name="badge_tax">
+       <property name="class" stdset="0">
+        <string>live-badge</string>
+       </property>
+       <layout class="QVBoxLayout" name="vbox_badge2">
+        <item>
+         <widget class="QLabel" name="lbl_badge_tax_title">
+          <property name="text">
+           <string>Tiến độ ngưỡng doanh thu miễn thuế</string>
+          </property>
+          <property name="class" stdset="0">
+           <string>badge-title</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="val_badge_tax">
+          <property name="text">
+           <string>0.0%</string>
+          </property>
+          <property name="class" stdset="0">
+           <string>badge-value</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QFrame" name="badge_orders">
+       <property name="class" stdset="0">
+        <string>live-badge</string>
+       </property>
+       <layout class="QVBoxLayout" name="vbox_badge3">
+        <item>
+         <widget class="QLabel" name="lbl_badge_orders_title">
+          <property name="text">
+           <string>Đơn hàng hoàn tất hôm nay</string>
+          </property>
+          <property name="class" stdset="0">
+           <string>badge-title</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="val_badge_orders">
+          <property name="text">
+           <string>0 hóa đơn</string>
+          </property>
+          <property name="class" stdset="0">
+           <string>badge-value</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="layout_body" stretch="6,4">
+     <property name="spacing">
+      <number>20</number>
+     </property>
+     <item>
+      <widget class="QFrame" name="frame_left_panel">
+       <property name="class" stdset="0">
+        <string>panel-container</string>
+       </property>
+       <layout class="QVBoxLayout" name="vbox_left">
+        <property name="spacing">
+         <number>15</number>
+        </property>
+        <property name="leftMargin">
+         <number>20</number>
+        </property>
+        <property name="topMargin">
+         <number>20</number>
+        </property>
+        <property name="rightMargin">
+         <number>20</number>
+        </property>
+        <property name="bottomMargin">
+         <number>20</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="lbl_title_alerts">
+          <property name="text">
+           <string>⚠️ Nhiệm vụ vận hành cần xử lý (Click để đi đến vị trí)</string>
+          </property>
+          <property name="class" stdset="0">
+           <string>block-title</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QListWidget" name="list_actionable_alerts">
+          <property name="verticalScrollBarPolicy">
+           <enum>Qt::ScrollBarAsNeeded</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QFrame" name="frame_right_panel">
+       <property name="class" stdset="0">
+        <string>panel-container</string>
+       </property>
+       <layout class="QVBoxLayout" name="vbox_right">
+        <property name="spacing">
+         <number>15</number>
+        </property>
+        <property name="leftMargin">
+         <number>20</number>
+        </property>
+        <property name="topMargin">
+         <number>20</number>
+        </property>
+        <property name="rightMargin">
+         <number>20</number>
+        </property>
+        <property name="bottomMargin">
+         <number>20</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="lbl_title_feed">
+          <property name="text">
+           <string>⚡ Nhật ký hoạt động vừa diễn ra</string>
+          </property>
+          <property name="class" stdset="0">
+           <string>block-title</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QListWidget" name="list_live_feed">
+          <property name="verticalScrollBarPolicy">
+           <enum>Qt::ScrollBarAsNeeded</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

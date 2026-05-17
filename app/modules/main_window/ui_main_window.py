@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'app/ui/main_window/main_window.ui'
+# Form implementation generated from reading ui file 'app/modules/main_window/main_window.ui'
 #
 # Created by: PyQt6 UI code generator 6.11.0
 #
@@ -164,6 +164,11 @@ class Ui_MainWindow(object):
         font.setPointSize(17)
         item.setFont(font)
         self.sidebar_menu.addItem(item)
+        item = QtWidgets.QListWidgetItem()
+        font = QtGui.QFont()
+        font.setPointSize(17)
+        item.setFont(font)
+        self.sidebar_menu.addItem(item)
         self.verticalLayout_sidebar.addWidget(self.sidebar_menu)
         self.horizontalLayout_main.addWidget(self.frame_sidebar)
         self.content_stack = QtWidgets.QStackedWidget(parent=self.centralwidget)
@@ -182,15 +187,17 @@ class Ui_MainWindow(object):
         __sortingEnabled = self.sidebar_menu.isSortingEnabled()
         self.sidebar_menu.setSortingEnabled(False)
         item = self.sidebar_menu.item(0)
-        item.setText(_translate("MainWindow", "🏷️  Quản lý sản phẩm"))
+        item.setText(_translate("MainWindow", "🏠  Trang chủ"))
         item = self.sidebar_menu.item(1)
-        item.setText(_translate("MainWindow", "📦  Quản lý kho"))
+        item.setText(_translate("MainWindow", "🏷️  Quản lý sản phẩm"))
         item = self.sidebar_menu.item(2)
-        item.setText(_translate("MainWindow", "🛒  Bán hàng"))
+        item.setText(_translate("MainWindow", "📦  Quản lý kho"))
         item = self.sidebar_menu.item(3)
-        item.setText(_translate("MainWindow", "📊  Báo cáo và thống kê"))
+        item.setText(_translate("MainWindow", "🛒  Bán hàng"))
         item = self.sidebar_menu.item(4)
-        item.setText(_translate("MainWindow", "🧾  Quản lý thuế"))
+        item.setText(_translate("MainWindow", "📊  Báo cáo và thống kê"))
         item = self.sidebar_menu.item(5)
+        item.setText(_translate("MainWindow", "🧾  Quản lý thuế"))
+        item = self.sidebar_menu.item(6)
         item.setText(_translate("MainWindow", "⚙️  Cấu hình hệ thống"))
         self.sidebar_menu.setSortingEnabled(__sortingEnabled)

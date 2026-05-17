@@ -36,3 +36,34 @@ class ReportServiceImpl(ReportService):
                 transactions=ReportMapper.map_transaction_history(raw_trans),
                 inventory_valuation=ReportMapper.map_inventory_valuation(raw_inventory)
             )
+
+    def get_daily_activity_feed(self, date_str: str) -> list:
+        with self.uow_factory() as uow:
+            # Gọi hàm cũ (Bán hàng)
+            raw_transactions = uow.report_repo.get_transaction_history(date_str, date_str)
+            # Gọi hàm mới (Nhập kho)
+            raw_purchase_orders = uow.report_repo.get_daily_purchase_orders(date_str)
+
+            combined = []
+            for trans in raw_transactions:
+                combined.append({
+                    'type': 'SALE',
+                    'code': trans.get('invoice_code', ''),
+                    'created_at': trans.get('created_at', ''),
+                    'amount': float(trans.get('final_amount', 0)),
+                    'detail': trans.get('payment_method', '')
+                })
+
+            for po in raw_purchase_orders:
+                dt_str = po['created_at'].strftime("%Y-%m-%d %H:%M") if po.get('created_at') else ""
+                combined.append({
+                    'type': 'IMPORT',
+                    'code': po.get('code', ''),
+                    'created_at': dt_str,
+                    'amount': float(po.get('total_amount') or 0),
+                    'detail': po.get('supplier_name') or "Không rõ"
+                })
+
+            # Xử lý Business Logic: Sắp xếp
+            combined.sort(key=lambda x: x['created_at'], reverse=True)
+            return combined

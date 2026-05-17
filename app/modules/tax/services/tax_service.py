@@ -16,3 +16,8 @@ class ITaxService(ABC):
     def generate_yearly_tax_report(self, year: int) -> YearlyTaxReportDTO:
         """Tổng hợp doanh thu, áp dụng luật thuế và xuất ra báo cáo đầy đủ cho UI"""
         pass
+
+    @abstractmethod
+    def get_tax_warning_status(self, year: int) -> dict:
+        """Tính toán trạng thái cảnh báo thuế chuyên biệt (Dành riêng cho Home)."""
+        pass

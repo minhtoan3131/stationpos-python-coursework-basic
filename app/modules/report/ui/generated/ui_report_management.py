@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'app/ui/report/views/report_management.ui'
+# Form implementation generated from reading ui file 'app/modules/report/ui/views/report_management.ui'
 #
 # Created by: PyQt6 UI code generator 6.11.0
 #
@@ -56,15 +56,22 @@ class Ui_ReportManagementWidget(object):
 "    }\n"
 "\n"
 "    QLabel#val_revenue { color: #10b981; }\n"
-"    QLabel#val_profit { color: #3b82f6; }\n"
+"    QLabel#val_profit { color: #3b82f6;\n"
+"}\n"
 "    QLabel#val_orders { color: #8b5cf6; }\n"
-"    QLabel#val_stock_value { color: #f59e0b; }\n"
+"    QLabel#val_stock_value { color: #f59e0b;\n"
+"}\n"
 "\n"
-"    /* Khu vực Biểu đồ & Bảng */\n"
-"    QFrame#frame_charts, QFrame#frame_history, QFrame#frame_inventory, QFrame#frame_diagram {\n"
+"    /* Khu vực Biểu đồ &\n"
+"Bảng */\n"
+"    QFrame#frame_revenue_trend, QFrame#frame_top_products, QFrame#frame_history, QFrame#frame_inventory, QFrame#frame_diagram {\n"
 "        background-color: #ffffff;\n"
 "        border-radius: 12px;\n"
 "        margin-bottom: 5px;\n"
+"    }\n"
+"\n"
+"    QFrame#frame_revenue_trend, QFrame#frame_top_products {\n"
+"        padding: 15px;\n"
 "    }\n"
 "\n"
 "    QLabel.section-title {\n"
@@ -97,6 +104,36 @@ class Ui_ReportManagementWidget(object):
 "        font-weight: 700;\n"
 "    }\n"
 "\n"
+"    /* Ô chọn ngày tháng (Date Editors) */\n"
+"    QDateEdit {\n"
+"        background-color: #ffffff;\n"
+"        border: 1px solid #cbd5e1;\n"
+"        border-radius: 6px;\n"
+"        padding: 6px 26px 6px 10px; /* Thêm khoảng trống bên phải để không đè chữ lên mũi tên */\n"
+"        font-weight: 600;\n"
+"        color: #475569;\n"
+"        max-width: 110px; /* Thu ngắn chiều ngang */\n"
+"    }\n"
+"    QDateEdit:hover {\n"
+"        border-color: #94a3b8;\n"
+"    }\n"
+"    QDateEdit:focus {\n"
+"        border-color: #3b82f6;\n"
+"    }\n"
+"    QDateEdit::drop-down {\n"
+"        subcontrol-origin: padding;\n"
+"        subcontrol-position: top right;\n"
+"        width: 20px;\n"
+"        border: none;\n"
+"    }\n"
+"    QDateEdit::down-arrow {\n"
+"        border-left: 4px solid transparent;\n"
+"        border-right: 4px solid transparent;\n"
+"        border-top: 5px solid #475569; /* Vẽ mũi tên tam giác cùng tone màu chữ */\n"
+"        width: 0;\n"
+"        height: 0;\n"
+"    }\n"
+"\n"
 "    QTableWidget {\n"
 "        border: none;\n"
 "        gridline-color: #f1f5f9;\n"
@@ -119,7 +156,7 @@ class Ui_ReportManagementWidget(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollContents = QtWidgets.QWidget()
-        self.scrollContents.setGeometry(QtCore.QRect(0, 0, 1385, 1409))
+        self.scrollContents.setGeometry(QtCore.QRect(0, 0, 1385, 1450))
         self.scrollContents.setObjectName("scrollContents")
         self.scrollLayout = QtWidgets.QVBoxLayout(self.scrollContents)
         self.scrollLayout.setContentsMargins(25, 25, 25, 25)
@@ -301,7 +338,8 @@ class Ui_ReportManagementWidget(object):
 
     def retranslateUi(self, ReportManagementWidget):
         _translate = QtCore.QCoreApplication.translate
-        ReportManagementWidget.setWindowTitle(_translate("ReportManagementWidget", "Báo cáo & Thống kê Hệ thống"))
+        ReportManagementWidget.setWindowTitle(_translate("ReportManagementWidget", "Báo cáo &\n"
+"Thống kê Hệ thống"))
         self.lbl_title_main.setText(_translate("ReportManagementWidget", "Báo cáo & Thống kê Tổng quan"))
         self.btn_filter_today.setText(_translate("ReportManagementWidget", "Hôm nay"))
         self.btn_filter_today.setProperty("class", _translate("ReportManagementWidget", "btn-filter"))

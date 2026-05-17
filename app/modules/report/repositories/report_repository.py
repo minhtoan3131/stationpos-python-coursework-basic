@@ -26,3 +26,8 @@ class ReportRepository(ABC):
     def get_inventory_valuation(self) -> List[Dict[str, Any]]:
         """Lấy báo cáo giá trị tồn kho hiện tại (không phụ thuộc ngày lọc)."""
         pass
+
+    @abstractmethod
+    def get_daily_purchase_orders(self, date_str: str) -> List[Dict[str, Any]]:
+        """Lấy danh sách các phiếu nhập kho đã hoàn tất trong một ngày cụ thể (Dành riêng cho Home)."""
+        pass

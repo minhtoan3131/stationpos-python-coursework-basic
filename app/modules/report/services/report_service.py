@@ -9,3 +9,8 @@ class ReportService(ABC):
         Trả về một đối tượng DashboardReportDTO duy nhất chứa đầy đủ KPI, Biểu đồ, và Bảng.
         """
         pass
+
+    @abstractmethod
+    def get_daily_activity_feed(self, date_str: str) -> list:
+        """Tổng hợp luồng hoạt động hỗn hợp (Bán hàng + Nhập kho) trong ngày (Dành riêng cho Home)."""
+        pass

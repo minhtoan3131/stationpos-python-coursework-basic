@@ -71,3 +71,25 @@ class TaxService(ITaxService):
             total_tax_amount=total_tax_amount,
             monthly_details=monthly_details
         )
+
+    def get_tax_warning_status(self, year: int) -> dict:
+        config = self.get_or_create_config(year)
+        with self.uow_factory() as uow:
+            revenue_dtos = uow.tax_report_repo.get_monthly_revenue_by_year(year)
+
+        total_revenue = sum(r.revenue for r in revenue_dtos)
+        threshold = config.threshold_amount
+
+        # Xử lý Business Logic: Ngưỡng & Cảnh báo 85%
+        percent = (total_revenue / threshold * Decimal('100')) if threshold > 0 else Decimal('0')
+        if percent > Decimal('100'):
+            percent = Decimal('100')
+
+        is_near = total_revenue >= (threshold * Decimal('0.85'))
+
+        return {
+            "revenue": float(total_revenue),
+            "threshold": float(threshold),
+            "percent": float(percent),
+            "is_near_threshold": is_near
+        }
