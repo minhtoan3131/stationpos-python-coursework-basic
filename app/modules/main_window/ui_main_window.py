@@ -170,6 +170,27 @@ class Ui_MainWindow(object):
         item.setFont(font)
         self.sidebar_menu.addItem(item)
         self.verticalLayout_sidebar.addWidget(self.sidebar_menu)
+        self.btn_lock_app = QtWidgets.QPushButton(parent=self.frame_sidebar)
+        font = QtGui.QFont()
+        font.setPointSize(14)
+        font.setBold(True)
+        font.setWeight(75)
+        self.btn_lock_app.setFont(font)
+        self.btn_lock_app.setStyleSheet("\n"
+"           QPushButton#btn_lock_app {\n"
+"               background-color: #1a57ad;\n"
+"               color: #f8fafc;\n"
+"               border: none;\n"
+"               border-radius: 8px;\n"
+"               min-height: 45px;\n"
+"               margin: 15px;\n"
+"           }\n"
+"           QPushButton#btn_lock_app:hover {\n"
+"               background-color: #991b1b; /* Đổi sang sắc đỏ khi hover cảnh báo bảo mật */\n"
+"           }\n"
+"          ")
+        self.btn_lock_app.setObjectName("btn_lock_app")
+        self.verticalLayout_sidebar.addWidget(self.btn_lock_app)
         self.horizontalLayout_main.addWidget(self.frame_sidebar)
         self.content_stack = QtWidgets.QStackedWidget(parent=self.centralwidget)
         self.content_stack.setObjectName("content_stack")
@@ -201,3 +222,4 @@ class Ui_MainWindow(object):
         item = self.sidebar_menu.item(6)
         item.setText(_translate("MainWindow", "⚙️  Cấu hình hệ thống"))
         self.sidebar_menu.setSortingEnabled(__sortingEnabled)
+        self.btn_lock_app.setText(_translate("MainWindow", "🔒Khóa ứng dụng"))

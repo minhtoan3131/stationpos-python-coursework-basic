@@ -1,6 +1,6 @@
 from datetime import datetime
-from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QGraphicsDropShadowEffect
-from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QGraphicsDropShadowEffect, QDialog, QApplication
+from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QFont, QColor
 
 from app.core.database.unit_of_work import UnitOfWork
@@ -14,6 +14,9 @@ from app.modules.product.services.impl.product_service_impl import ProductServic
 from app.modules.inventory.services.impl.inventory_service_impl import InventoryServiceImpl
 from app.modules.sale.services.impl.sale_service_impl import SaleServiceImpl
 from app.modules.report.services.impl.report_service_impl import ReportServiceImpl
+from app.modules.setting.services.impl.setting_service_impl import SettingServiceImpl
+from app.modules.setting.ui.controllers.lock_screen_dialog import LockScreenDialog
+from app.modules.setting.ui.controllers.setting_management_controller import SettingManagementController
 from app.modules.tax.services.impl.tax_service_impl import TaxService
 
 
@@ -38,6 +41,7 @@ class MainWindow(QMainWindow):
         self.sale_service = SaleServiceImpl(uow_factory=UnitOfWork)
         self.report_service = ReportServiceImpl(uow_factory=UnitOfWork)
         self.tax_service = TaxService(uow_factory=UnitOfWork)
+        self.setting_service = SettingServiceImpl(uow_factory=UnitOfWork)
 
         # Xử lý UI cho macOS và Hiệu ứng
         self.fix_macos_font_issue()
@@ -46,9 +50,12 @@ class MainWindow(QMainWindow):
         self.init_pages()
 
         self.ui.sidebar_menu.currentRowChanged.connect(self.switch_module)
+        self.ui.btn_lock_app.clicked.connect(self.handle_lock_application)
 
         # Mặc định mở Trang chủ (Index 0) ngay khi khởi động ứng dụng
         self.ui.sidebar_menu.setCurrentRow(0)
+
+        self._is_first_launch = True
 
     def apply_sidebar_shadow(self):
         shadow = QGraphicsDropShadowEffect(self)
@@ -100,8 +107,9 @@ class MainWindow(QMainWindow):
             tax_service=self.tax_service
         )
 
-        self.page_settings = self.create_placeholder("⚙️ Cấu hình Hệ thống\n(Đang phát triển)")
-
+        self.page_settings = SettingManagementController(
+            setting_service=self.setting_service
+        )
         # Thêm các trang vào content_stack (Thứ tự khớp chính xác 100% với file .ui)
         self.ui.content_stack.addWidget(self.page_home)  # Index 0
         self.ui.content_stack.addWidget(self.page_product)  # Index 1
@@ -136,6 +144,10 @@ class MainWindow(QMainWindow):
         elif index == 5:
             current_year = datetime.now().year
             self.page_tax.load_data_for_year(current_year)
+        elif index == 6:
+            # Sẽ gọi hàm kéo dữ liệu Database lên đây (hiện tại ta cứ gọi sẵn)
+            if hasattr(self.page_settings, 'load_current_settings'):
+                self.page_settings.load_current_settings()
 
     def handle_home_deep_linking(self, target_index: int, search_keyword: str):
         """Macro xử lý liên kết sâu nhận lệnh từ trang chủ để chuyển module và điền sẵn bộ lọc"""
@@ -151,3 +163,37 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, event):
         event.accept()
+
+    def setVisible(self, visible):
+        """
+        Ghi đè hàm cốt lõi của Qt.
+        Khi bên ngoài gọi lệnh show(), showMaximized()... luồng xử lý sẽ đi qua đây.
+        """
+        # Nếu đang có lệnh yêu cầu hiển thị (visible = True) VÀ là lần bật app đầu tiên
+        if visible and getattr(self, '_is_first_launch', False):
+            self._is_first_launch = False
+
+            # Gọi màn hình khóa ngay lập tức
+            QTimer.singleShot(0, self.handle_startup_lock)
+
+            # CỰC KỲ QUAN TRỌNG: Lệnh return này chém đứt luồng chạy,
+            # không cho cửa sổ chính (MainWindow) kịp vẽ ra màn hình, loại bỏ 100% hiện tượng chớp nháy!
+            return
+
+            # Các lần sau (hoặc khi visible = False) thì cho phép ẩn/hiện bình thường
+        super().setVisible(visible)
+
+    def handle_startup_lock(self):
+        """Xử lý màn hình khóa khi vừa mở phần mềm"""
+        # Không cần lệnh self.hide() ở đây vì cửa sổ chính vốn dĩ chưa hề hiện lên
+        dialog = LockScreenDialog(setting_service=self.setting_service)
+
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            self.showMaximized()  # Đăng nhập đúng mới thực sự vẽ cửa sổ chính ra
+        else:
+            QApplication.instance().quit()
+
+    def handle_lock_application(self):
+        """Xử lý khi người dùng bấm nút 'Khóa màn hình' ở thanh Menu bên trái"""
+        self.hide()  # Lúc này app đang mở, nên phải ẩn đi
+        self.handle_startup_lock()  # Tái sử dụng lại logic xác thực ở trên

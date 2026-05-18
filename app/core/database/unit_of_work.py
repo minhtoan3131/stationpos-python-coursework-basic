@@ -5,6 +5,7 @@ from app.modules.product.repositories.impl.product_repository_impl import Produc
 from app.modules.product.repositories.impl.supplier_repository_impl import SupplierRepositoryImpl
 from app.modules.report.repositories.impl.report_repository_impl import ReportRepositoryImpl
 from app.modules.sale.repositories.impl.sale_repository_impl import SaleRepositoryImpl
+from app.modules.setting.repositories.impl.setting_repository_impl import SettingRepositoryImpl
 from app.modules.tax.repositories.impl.tax_repository_impl import TaxConfigRepository, TaxReportRepository
 
 
@@ -31,6 +32,7 @@ class UnitOfWork:
         self.report_repo = ReportRepositoryImpl(self.connection)
         self.tax_config_repo = TaxConfigRepository(self.connection)
         self.tax_report_repo = TaxReportRepository(self.connection)
+        self.setting_repo = SettingRepositoryImpl(self.connection)
 
         return self
 

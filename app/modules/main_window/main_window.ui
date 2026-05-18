@@ -229,6 +229,35 @@
          </item>
         </widget>
        </item>
+       <item>
+        <widget class="QPushButton" name="btn_lock_app">
+         <property name="text">
+          <string>🔒Khóa ứng dụng</string>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>14</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">
+           QPushButton#btn_lock_app {
+               background-color: #1a57ad;
+               color: #f8fafc;
+               border: none;
+               border-radius: 8px;
+               min-height: 45px;
+               margin: 15px;
+           }
+           QPushButton#btn_lock_app:hover {
+               background-color: #991b1b; /* Đổi sang sắc đỏ khi hover cảnh báo bảo mật */
+           }
+          </string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </item>

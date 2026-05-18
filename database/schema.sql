@@ -160,6 +160,12 @@ CREATE TABLE settings (
     phone VARCHAR(20)
 );
 
+CREATE TABLE IF NOT EXISTS system_settings (
+    setting_key VARCHAR(50) PRIMARY KEY,
+    setting_value TEXT,
+    description VARCHAR(255)
+);
+
 
 
 
