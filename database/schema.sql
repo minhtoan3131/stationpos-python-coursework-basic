@@ -71,6 +71,7 @@ CREATE TABLE purchase_orders (
     total_amount DECIMAL(12,2),             -- Tổng giá trị phiếu nhập
     note TEXT,                              -- Ghi chú (Lý do, số hóa đơn gốc...)
     status ENUM('COMPLETED','CANCELLED') DEFAULT 'COMPLETED',
+    cancel_reason TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (supplier_id) REFERENCES suppliers(id)

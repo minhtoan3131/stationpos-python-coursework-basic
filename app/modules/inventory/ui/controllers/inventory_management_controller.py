@@ -5,6 +5,10 @@ from PyQt6.QtWidgets import QWidget, QHeaderView, QTableWidgetItem, QComboBox, Q
     QAbstractItemView, QFileDialog, QSpinBox, QInputDialog, QDialog
 from PyQt6.QtCore import Qt
 
+from app.core.database.unit_of_work import UnitOfWork
+from app.modules.inventory.services.impl.po_history_service_impl import PurchaseOrderHistoryServiceImpl
+from app.modules.inventory.services.po_history_service import PurchaseOrderHistoryService
+from app.modules.inventory.ui.controllers.inventory_history_controller import InventoryHistoryController
 from app.modules.inventory.ui.controllers.purchase_order_confirm_controller import PurchaseOrderConfirmController
 from app.modules.inventory.ui.generated.ui_inventory_management import Ui_InventoryManagementWidget
 from app.modules.inventory.services.inventory_service import InventoryService
@@ -15,7 +19,10 @@ from app.modules.inventory.ui.models.purchase_cart import PurchaseCart
 
 
 class InventoryManagementController(QWidget):
-    def __init__(self, inventory_service: InventoryService, supplier_service: SupplierService):
+    def __init__(self,
+                 inventory_service: InventoryService,
+                 supplier_service: SupplierService,
+                 po_history_service: PurchaseOrderHistoryService):
         super().__init__()
         self.cart = PurchaseCart()
         self.ui = Ui_InventoryManagementWidget()
@@ -23,6 +30,7 @@ class InventoryManagementController(QWidget):
 
         self.inventory_service = inventory_service
         self.supplier_service = supplier_service
+        self.po_history_service = po_history_service
 
         # Lưu trữ dữ liệu thô của danh sách tồn kho để dùng khi "Thêm vào phiếu"
         self.raw_inventory_data = {}
@@ -30,6 +38,9 @@ class InventoryManagementController(QWidget):
         self.setup_ui_custom()
         self.load_initial_data()
         self.bind_events()
+
+        # Khởi tạo Sub-Controller quản lý Tab Lịch sử
+        self.history_controller = InventoryHistoryController(self.ui, self.po_history_service)
 
         # Load dữ liệu bảng bên trái ngay khi mở
         self.refresh_inventory_list()
@@ -72,6 +83,8 @@ class InventoryManagementController(QWidget):
         self.ui.btn_clear_all.clicked.connect(self.clear_purchase_cart)
         # Lắng nghe thay đổi giá trị trên bảng giỏ hàng để tính tiền
         self.ui.tbl_items.cellChanged.connect(self.calculate_cart_total)
+
+        self.ui.tabWidget_inventory.currentChanged.connect(self.handle_tab_changed)
 
     # ==========================================
     # LOGIC BÊN TRÁI: DANH SÁCH TỒN KHO
@@ -366,3 +379,25 @@ class InventoryManagementController(QWidget):
         self.load_initial_data()
         # Làm mới luôn danh sách tồn kho (để cập nhật nếu có SP mới vừa thêm)
         self.refresh_inventory_list()
+
+    def handle_tab_changed(self, index):
+        """
+        Xử lý sự kiện khi người dùng click chuyển đổi giữa các Tab.
+        Tự động xóa trắng thanh tìm kiếm và làm mới dữ liệu mới nhất.
+        """
+        try:
+            if index == 0:  # Người dùng click vào Tab Nhập kho & Tồn kho
+                self.ui.txt_search_inventory.clear()
+                self.refresh_inventory_list()
+
+            elif index == 1:  # Người dùng click vào Tab Lịch sử Phiếu nhập
+                self.ui.txt_search_po.clear()
+
+                # Gọi thẳng hàm load dữ liệu của Sub-Controller để kéo dữ liệu mới nhất
+                # Hàm này sẽ đọc trực tiếp ô txt_search_po vừa được xóa trống, trả về toàn bộ phiếu
+                self.history_controller.load_master_data()
+
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            QMessageBox.critical(self, "Lỗi chuyển Tab", f"Không thể làm mới dữ liệu: {str(e)}")

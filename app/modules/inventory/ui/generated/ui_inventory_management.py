@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'app/ui/inventory/views/inventory_management.ui'
+# Form implementation generated from reading ui file 'app/modules/inventory/ui/views/inventory_management.ui'
 #
 # Created by: PyQt6 UI code generator 6.11.0
 #
@@ -35,7 +35,7 @@ class Ui_InventoryManagementWidget(object):
 "        padding-bottom: 5px;\n"
 "    }\n"
 "\n"
-"    QLabel#lbl_sub_left, QLabel#lbl_sub_right {\n"
+"    QLabel#lbl_sub_left, QLabel#lbl_sub_right, QLabel#lbl_sub_history {\n"
 "        font-size: 15px;\n"
 "        font-weight: 700;\n"
 "        color: #475569;\n"
@@ -44,13 +44,13 @@ class Ui_InventoryManagementWidget(object):
 "        padding-bottom: 4px;\n"
 "    }\n"
 "\n"
-"    QLineEdit, QComboBox {\n"
+"    QLineEdit, QComboBox, QDateEdit {\n"
 "        padding: 8px 12px;\n"
 "        border: 1px solid #cbd5e1;\n"
 "        border-radius: 6px;\n"
 "        background-color: #ffffff;\n"
 "    }\n"
-"    QLineEdit:focus {\n"
+"    QLineEdit:focus, QComboBox:focus, QDateEdit:focus {\n"
 "        border: 2px solid #3b82f6;\n"
 "        background-color: #f0f9ff;\n"
 "    }\n"
@@ -78,19 +78,52 @@ class Ui_InventoryManagementWidget(object):
 "        font-weight: bold;\n"
 "    }\n"
 "\n"
-"    QPushButton#btn_search { background-color: #64748b; color: white; }\n"
+"    QPushButton#btn_search, QPushButton#btn_filter_po { background-color: #64748b; color: white; border: none; }\n"
+"    QPushButton#btn_search:hover, QPushButton#btn_filter_po:hover { background-color: #475569; }\n"
+"\n"
+"    QPushButton#btn_reset_filter_po { background-color: #e2e8f0; color: #475569; border: 1px solid #cbd5e1; }\n"
+"    QPushButton#btn_reset_filter_po:hover { background-color: #cbd5e1; }\n"
+"\n"
 "    QPushButton#btn_import_action { background-color: #3b82f6; color: white; border: none; }\n"
 "    QPushButton#btn_import_action:hover { background-color: #2563eb; }\n"
-"    QPushButton#btn_clear_all { background-color: #ef4444; color: white; border: none; }\n"
-"    QPushButton#btn_clear_all:hover { background-color: #dc2626; }\n"
+"\n"
+"    QPushButton#btn_clear_all, QPushButton#btn_cancel_po { background-color: #ef4444; color: white; border: none; }\n"
+"    QPushButton#btn_clear_all:hover, QPushButton#btn_cancel_po:hover { background-color: #dc2626; }\n"
+"\n"
 "    QPushButton#btn_save_all { background-color: #10b981; color: white; border: none; }\n"
 "    QPushButton#btn_save_all:hover { background-color: #059669; }\n"
-"    QPushButton#btn_add_supplier { padding: 8px; }\n"
 "\n"
-"    QLabel#lbl_total_value {\n"
+"    QPushButton#btn_export_po_excel { background-color: #0f766e; color: white; border: none; }\n"
+"    QPushButton#btn_export_po_excel:hover { background-color: #115e59; }\n"
+"\n"
+"    QLabel#lbl_total_value, QLabel#lbl_detail_total_value {\n"
 "        font-size: 26px;\n"
 "        font-weight: 900;\n"
 "        color: #ef4444;\n"
+"    }\n"
+"\n"
+"    /* Giao diện Tab Widget hiện đại */\n"
+"    QTabWidget::tab-bar {\n"
+"        alignment: left;\n"
+"    }\n"
+"    QTabWidget::pane {\n"
+"        border: 1px solid #e2e8f0;\n"
+"        background: #ffffff;\n"
+"        border-radius: 8px;\n"
+"    }\n"
+"    QTabBar::tab {\n"
+"        background: #e2e8f0;\n"
+"        color: #475569;\n"
+"        padding: 10px 20px;\n"
+"        font-weight: bold;\n"
+"        border-top-left-radius: 6px;\n"
+"        border-top-right-radius: 6px;\n"
+"        margin-right: 4px;\n"
+"    }\n"
+"    QTabBar::tab:selected {\n"
+"        background: #ffffff;\n"
+"        color: #3b82f6;\n"
+"        border-bottom: 3px solid #3b82f6;\n"
 "    }\n"
 "   ")
         self.verticalLayout_main = QtWidgets.QVBoxLayout(InventoryManagementWidget)
@@ -100,10 +133,14 @@ class Ui_InventoryManagementWidget(object):
         self.lbl_title = QtWidgets.QLabel(parent=InventoryManagementWidget)
         self.lbl_title.setObjectName("lbl_title")
         self.verticalLayout_main.addWidget(self.lbl_title)
-        self.horizontalLayout_content = QtWidgets.QHBoxLayout()
+        self.tabWidget_inventory = QtWidgets.QTabWidget(parent=InventoryManagementWidget)
+        self.tabWidget_inventory.setObjectName("tabWidget_inventory")
+        self.tab_import = QtWidgets.QWidget()
+        self.tab_import.setObjectName("tab_import")
+        self.horizontalLayout_content = QtWidgets.QHBoxLayout(self.tab_import)
         self.horizontalLayout_content.setSpacing(20)
         self.horizontalLayout_content.setObjectName("horizontalLayout_content")
-        self.frame_left = QtWidgets.QFrame(parent=InventoryManagementWidget)
+        self.frame_left = QtWidgets.QFrame(parent=self.tab_import)
         self.frame_left.setObjectName("frame_left")
         self.verticalLayout_left = QtWidgets.QVBoxLayout(self.frame_left)
         self.verticalLayout_left.setProperty("contentsMargins", 15)
@@ -152,7 +189,7 @@ class Ui_InventoryManagementWidget(object):
         self.layout_left_btns.addWidget(self.btn_import_action)
         self.verticalLayout_left.addLayout(self.layout_left_btns)
         self.horizontalLayout_content.addWidget(self.frame_left)
-        self.frame_right = QtWidgets.QFrame(parent=InventoryManagementWidget)
+        self.frame_right = QtWidgets.QFrame(parent=self.tab_import)
         self.frame_right.setObjectName("frame_right")
         self.verticalLayout_right = QtWidgets.QVBoxLayout(self.frame_right)
         self.verticalLayout_right.setProperty("contentsMargins", 15)
@@ -208,8 +245,6 @@ class Ui_InventoryManagementWidget(object):
         self.tbl_items.setHorizontalHeaderItem(4, item)
         item = QtWidgets.QTableWidgetItem()
         self.tbl_items.setHorizontalHeaderItem(5, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tbl_items.setHorizontalHeaderItem(6, item)
         self.verticalLayout_right.addWidget(self.tbl_items)
         self.layout_total = QtWidgets.QVBoxLayout()
         self.layout_total.setContentsMargins(-1, -1, -1, 10)
@@ -240,9 +275,142 @@ class Ui_InventoryManagementWidget(object):
         self.horizontalLayout_content.addWidget(self.frame_right)
         self.horizontalLayout_content.setStretch(0, 1)
         self.horizontalLayout_content.setStretch(1, 1)
-        self.verticalLayout_main.addLayout(self.horizontalLayout_content)
+        self.tabWidget_inventory.addTab(self.tab_import, "")
+        self.tab_history = QtWidgets.QWidget()
+        self.tab_history.setObjectName("tab_history")
+        self.verticalLayout_tab_history = QtWidgets.QVBoxLayout(self.tab_history)
+        self.verticalLayout_tab_history.setContentsMargins(15, 15, 15, 15)
+        self.verticalLayout_tab_history.setSpacing(15)
+        self.verticalLayout_tab_history.setObjectName("verticalLayout_tab_history")
+        self.layout_filters_po = QtWidgets.QHBoxLayout()
+        self.layout_filters_po.setSpacing(10)
+        self.layout_filters_po.setObjectName("layout_filters_po")
+        self.txt_search_po = QtWidgets.QLineEdit(parent=self.tab_history)
+        self.txt_search_po.setMinimumSize(QtCore.QSize(250, 0))
+        self.txt_search_po.setObjectName("txt_search_po")
+        self.layout_filters_po.addWidget(self.txt_search_po)
+        self.lbl_date_from = QtWidgets.QLabel(parent=self.tab_history)
+        self.lbl_date_from.setObjectName("lbl_date_from")
+        self.layout_filters_po.addWidget(self.lbl_date_from)
+        self.date_po_from = QtWidgets.QDateEdit(parent=self.tab_history)
+        self.date_po_from.setCalendarPopup(True)
+        self.date_po_from.setObjectName("date_po_from")
+        self.layout_filters_po.addWidget(self.date_po_from)
+        self.lbl_date_to = QtWidgets.QLabel(parent=self.tab_history)
+        self.lbl_date_to.setObjectName("lbl_date_to")
+        self.layout_filters_po.addWidget(self.lbl_date_to)
+        self.date_po_to = QtWidgets.QDateEdit(parent=self.tab_history)
+        self.date_po_to.setCalendarPopup(True)
+        self.date_po_to.setObjectName("date_po_to")
+        self.layout_filters_po.addWidget(self.date_po_to)
+        self.cbo_status_po = QtWidgets.QComboBox(parent=self.tab_history)
+        self.cbo_status_po.setMinimumSize(QtCore.QSize(150, 0))
+        self.cbo_status_po.setObjectName("cbo_status_po")
+        self.layout_filters_po.addWidget(self.cbo_status_po)
+        self.btn_filter_po = QtWidgets.QPushButton(parent=self.tab_history)
+        self.btn_filter_po.setObjectName("btn_filter_po")
+        self.layout_filters_po.addWidget(self.btn_filter_po)
+        spacerItem2 = QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
+        self.layout_filters_po.addItem(spacerItem2)
+        self.btn_reset_filter_po = QtWidgets.QPushButton(parent=self.tab_history)
+        self.btn_reset_filter_po.setObjectName("btn_reset_filter_po")
+        self.layout_filters_po.addWidget(self.btn_reset_filter_po)
+        self.verticalLayout_tab_history.addLayout(self.layout_filters_po)
+        self.splitter_po_history = QtWidgets.QSplitter(parent=self.tab_history)
+        self.splitter_po_history.setOrientation(QtCore.Qt.Orientation.Horizontal)
+        self.splitter_po_history.setObjectName("splitter_po_history")
+        self.tbl_po_master = QtWidgets.QTableWidget(parent=self.splitter_po_history)
+        self.tbl_po_master.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.tbl_po_master.setObjectName("tbl_po_master")
+        self.tbl_po_master.setColumnCount(5)
+        self.tbl_po_master.setRowCount(0)
+        item = QtWidgets.QTableWidgetItem()
+        self.tbl_po_master.setHorizontalHeaderItem(0, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tbl_po_master.setHorizontalHeaderItem(1, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tbl_po_master.setHorizontalHeaderItem(2, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tbl_po_master.setHorizontalHeaderItem(3, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tbl_po_master.setHorizontalHeaderItem(4, item)
+        self.frame_po_detail = QtWidgets.QFrame(parent=self.splitter_po_history)
+        self.frame_po_detail.setStyleSheet("\n"
+"            QFrame#frame_po_detail {\n"
+"                background-color: #ffffff;\n"
+"                border: 1px solid #e2e8f0;\n"
+"                border-radius: 10px;\n"
+"            }\n"
+"           ")
+        self.frame_po_detail.setObjectName("frame_po_detail")
+        self.verticalLayout_po_detail = QtWidgets.QVBoxLayout(self.frame_po_detail)
+        self.verticalLayout_po_detail.setProperty("contentsMargins", 15)
+        self.verticalLayout_po_detail.setObjectName("verticalLayout_po_detail")
+        self.lbl_sub_history = QtWidgets.QLabel(parent=self.frame_po_detail)
+        self.lbl_sub_history.setObjectName("lbl_sub_history")
+        self.verticalLayout_po_detail.addWidget(self.lbl_sub_history)
+        self.layout_po_meta = QtWidgets.QGridLayout()
+        self.layout_po_meta.setObjectName("layout_po_meta")
+        self.lbl_md_po_id = QtWidgets.QLabel(parent=self.frame_po_detail)
+        self.lbl_md_po_id.setObjectName("lbl_md_po_id")
+        self.layout_po_meta.addWidget(self.lbl_md_po_id, 0, 0, 1, 1)
+        self.lbl_md_date = QtWidgets.QLabel(parent=self.frame_po_detail)
+        self.lbl_md_date.setObjectName("lbl_md_date")
+        self.layout_po_meta.addWidget(self.lbl_md_date, 0, 1, 1, 1)
+        self.lbl_md_note = QtWidgets.QLabel(parent=self.frame_po_detail)
+        self.lbl_md_note.setObjectName("lbl_md_note")
+        self.layout_po_meta.addWidget(self.lbl_md_note, 1, 0, 1, 2)
+        self.verticalLayout_po_detail.addLayout(self.layout_po_meta)
+        self.tbl_po_details = QtWidgets.QTableWidget(parent=self.frame_po_detail)
+        self.tbl_po_details.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.tbl_po_details.setObjectName("tbl_po_details")
+        self.tbl_po_details.setColumnCount(6)
+        self.tbl_po_details.setRowCount(0)
+        item = QtWidgets.QTableWidgetItem()
+        self.tbl_po_details.setHorizontalHeaderItem(0, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tbl_po_details.setHorizontalHeaderItem(1, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tbl_po_details.setHorizontalHeaderItem(2, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tbl_po_details.setHorizontalHeaderItem(3, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tbl_po_details.setHorizontalHeaderItem(4, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tbl_po_details.setHorizontalHeaderItem(5, item)
+        self.verticalLayout_po_detail.addWidget(self.tbl_po_details)
+        self.layout_detail_total = QtWidgets.QVBoxLayout()
+        self.layout_detail_total.setSpacing(2)
+        self.layout_detail_total.setObjectName("layout_detail_total")
+        self.lbl_detail_total_text = QtWidgets.QLabel(parent=self.frame_po_detail)
+        self.lbl_detail_total_text.setStyleSheet("font-weight: bold; color: #64748b;")
+        self.lbl_detail_total_text.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight|QtCore.Qt.AlignmentFlag.AlignTrailing|QtCore.Qt.AlignmentFlag.AlignVCenter)
+        self.lbl_detail_total_text.setObjectName("lbl_detail_total_text")
+        self.layout_detail_total.addWidget(self.lbl_detail_total_text)
+        self.lbl_detail_total_value = QtWidgets.QLabel(parent=self.frame_po_detail)
+        self.lbl_detail_total_value.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight|QtCore.Qt.AlignmentFlag.AlignTrailing|QtCore.Qt.AlignmentFlag.AlignVCenter)
+        self.lbl_detail_total_value.setObjectName("lbl_detail_total_value")
+        self.layout_detail_total.addWidget(self.lbl_detail_total_value)
+        self.verticalLayout_po_detail.addLayout(self.layout_detail_total)
+        self.layout_detail_actions = QtWidgets.QHBoxLayout()
+        self.layout_detail_actions.setObjectName("layout_detail_actions")
+        self.btn_cancel_po = QtWidgets.QPushButton(parent=self.frame_po_detail)
+        self.btn_cancel_po.setMinimumSize(QtCore.QSize(120, 35))
+        self.btn_cancel_po.setObjectName("btn_cancel_po")
+        self.layout_detail_actions.addWidget(self.btn_cancel_po)
+        spacerItem3 = QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
+        self.layout_detail_actions.addItem(spacerItem3)
+        self.btn_export_po_excel = QtWidgets.QPushButton(parent=self.frame_po_detail)
+        self.btn_export_po_excel.setMinimumSize(QtCore.QSize(140, 35))
+        self.btn_export_po_excel.setObjectName("btn_export_po_excel")
+        self.layout_detail_actions.addWidget(self.btn_export_po_excel)
+        self.verticalLayout_po_detail.addLayout(self.layout_detail_actions)
+        self.verticalLayout_tab_history.addWidget(self.splitter_po_history)
+        self.tabWidget_inventory.addTab(self.tab_history, "")
+        self.verticalLayout_main.addWidget(self.tabWidget_inventory)
 
         self.retranslateUi(InventoryManagementWidget)
+        self.tabWidget_inventory.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(InventoryManagementWidget)
 
     def retranslateUi(self, InventoryManagementWidget):
@@ -288,3 +456,40 @@ class Ui_InventoryManagementWidget(object):
         self.lbl_total_value.setText(_translate("InventoryManagementWidget", "0 VND"))
         self.btn_clear_all.setText(_translate("InventoryManagementWidget", "Hủy phiếu"))
         self.btn_save_all.setText(_translate("InventoryManagementWidget", "XÁC NHẬN NHẬP KHO (F9)"))
+        self.tabWidget_inventory.setTabText(self.tabWidget_inventory.indexOf(self.tab_import), _translate("InventoryManagementWidget", "📦 Nhập kho && Tồn kho"))
+        self.txt_search_po.setPlaceholderText(_translate("InventoryManagementWidget", "Tìm mã phiếu, nhà cung cấp..."))
+        self.lbl_date_from.setText(_translate("InventoryManagementWidget", "Từ ngày:"))
+        self.lbl_date_to.setText(_translate("InventoryManagementWidget", "Đến ngày:"))
+        self.btn_filter_po.setText(_translate("InventoryManagementWidget", "Lọc Dữ Liệu"))
+        self.btn_reset_filter_po.setText(_translate("InventoryManagementWidget", "Làm Mới"))
+        item = self.tbl_po_master.horizontalHeaderItem(0)
+        item.setText(_translate("InventoryManagementWidget", "Mã Phiếu"))
+        item = self.tbl_po_master.horizontalHeaderItem(1)
+        item.setText(_translate("InventoryManagementWidget", "Ngày Nhập"))
+        item = self.tbl_po_master.horizontalHeaderItem(2)
+        item.setText(_translate("InventoryManagementWidget", "Nhà Cung Cấp"))
+        item = self.tbl_po_master.horizontalHeaderItem(3)
+        item.setText(_translate("InventoryManagementWidget", "Tổng Tiền"))
+        item = self.tbl_po_master.horizontalHeaderItem(4)
+        item.setText(_translate("InventoryManagementWidget", "Trạng Thái"))
+        self.lbl_sub_history.setText(_translate("InventoryManagementWidget", "Chi tiết ấn phẩm trong phiếu"))
+        self.lbl_md_po_id.setText(_translate("InventoryManagementWidget", "<b>Mã phiếu:</b> --"))
+        self.lbl_md_date.setText(_translate("InventoryManagementWidget", "<b>Ngày lập:</b> --"))
+        self.lbl_md_note.setText(_translate("InventoryManagementWidget", "<b>Ghi chú:</b> --"))
+        item = self.tbl_po_details.horizontalHeaderItem(0)
+        item.setText(_translate("InventoryManagementWidget", "SKU"))
+        item = self.tbl_po_details.horizontalHeaderItem(1)
+        item.setText(_translate("InventoryManagementWidget", "Tên Mặt Hàng"))
+        item = self.tbl_po_details.horizontalHeaderItem(2)
+        item.setText(_translate("InventoryManagementWidget", "ĐVT"))
+        item = self.tbl_po_details.horizontalHeaderItem(3)
+        item.setText(_translate("InventoryManagementWidget", "Số Lượng"))
+        item = self.tbl_po_details.horizontalHeaderItem(4)
+        item.setText(_translate("InventoryManagementWidget", "Giá Nhập"))
+        item = self.tbl_po_details.horizontalHeaderItem(5)
+        item.setText(_translate("InventoryManagementWidget", "Thành Tiền"))
+        self.lbl_detail_total_text.setText(_translate("InventoryManagementWidget", "TỔNG TIỀN PHIẾU GIÁ TRỊ:"))
+        self.lbl_detail_total_value.setText(_translate("InventoryManagementWidget", "0 VND"))
+        self.btn_cancel_po.setText(_translate("InventoryManagementWidget", "Hủy Phiếu Nhập"))
+        self.btn_export_po_excel.setText(_translate("InventoryManagementWidget", "Xuất File Excel"))
+        self.tabWidget_inventory.setTabText(self.tabWidget_inventory.indexOf(self.tab_history), _translate("InventoryManagementWidget", "📜 Lịch sử Phiếu nhập"))

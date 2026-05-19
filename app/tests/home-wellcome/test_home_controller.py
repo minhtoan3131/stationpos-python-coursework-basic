@@ -132,3 +132,5 @@ def test_handle_alert_click_emits_deep_link_signal(qtbot, home_controller):
 
     # THEN: Signal `navigation_requested` PHẢI ĐƯỢC BẮN RA với đúng 2 tham số (2, 'SKU-999')
     assert blocker.args == [2, 'SKU-999']
+
+

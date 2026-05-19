@@ -1,6 +1,7 @@
 # app/core/database/unit_of_work.py
 from app.core.database.connection import DatabaseConnection
 from app.modules.inventory.repositories.impl.inventory_repository_impl import InventoryRepositoryImpl
+from app.modules.inventory.repositories.impl.po_history_repository_impl import PurchaseOrderHistoryRepositoryImpl
 from app.modules.product.repositories.impl.product_repository_impl import ProductRepositoryImpl
 from app.modules.product.repositories.impl.supplier_repository_impl import SupplierRepositoryImpl
 from app.modules.report.repositories.impl.report_repository_impl import ReportRepositoryImpl
@@ -33,6 +34,7 @@ class UnitOfWork:
         self.tax_config_repo = TaxConfigRepository(self.connection)
         self.tax_report_repo = TaxReportRepository(self.connection)
         self.setting_repo = SettingRepositoryImpl(self.connection)
+        self.po_history_repo = PurchaseOrderHistoryRepositoryImpl(self.connection)
 
         return self
 

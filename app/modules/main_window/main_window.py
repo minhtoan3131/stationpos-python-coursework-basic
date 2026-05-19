@@ -5,6 +5,7 @@ from PyQt6.QtGui import QFont, QColor
 
 from app.core.database.unit_of_work import UnitOfWork
 from app.modules.home_wellcome.ui.controllers.home_welcome_controller import HomeWelcomeController
+from app.modules.inventory.services.impl.po_history_service_impl import PurchaseOrderHistoryServiceImpl
 from app.modules.main_window.ui_main_window import Ui_MainWindow
 
 from app.modules.product.services.impl.category_service_impl import CategoryServiceImpl
@@ -42,6 +43,7 @@ class MainWindow(QMainWindow):
         self.report_service = ReportServiceImpl(uow_factory=UnitOfWork)
         self.tax_service = TaxService(uow_factory=UnitOfWork)
         self.setting_service = SettingServiceImpl(uow_factory=UnitOfWork)
+        self.po_history_service = PurchaseOrderHistoryServiceImpl(uow_factory=UnitOfWork)
 
         # Xử lý UI cho macOS và Hiệu ứng
         self.fix_macos_font_issue()
@@ -90,7 +92,8 @@ class MainWindow(QMainWindow):
 
         self.page_inventory = InventoryManagementController(
             inventory_service=self.inventory_service,
-            supplier_service=self.supplier_service
+            supplier_service=self.supplier_service,
+            po_history_service=self.po_history_service
         )
 
         self.page_sales = SalesManagementController(

@@ -94,6 +94,9 @@ class ProductFormController(QDialog):
         self.ui.lbl_main_title.setText("CẬP NHẬT SẢN PHẨM")
         # Khóa SKU (Không cho phép đổi mã SP khi update)
         self.ui.txt_sku.setEnabled(False)
+        self.ui.spn_cost_price.setEnabled(False)
+        self.ui.spn_cost_price.setToolTip(
+            "Giá vốn được hệ thống tự động tính toán (MAC). Không thể sửa thủ công khi cập nhật.")
         self.load_product_detail()
 
     def load_product_detail(self):

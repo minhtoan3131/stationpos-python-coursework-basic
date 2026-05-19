@@ -14,14 +14,21 @@ from app.core.exceptions.validation_exception import ValidationException
 def inventory_window(qtbot, mocker):
     mock_inventory_service = mocker.Mock()
     mock_supplier_service = mocker.Mock()
+    mock_po_history_service = mocker.Mock()
 
-    # Mồi sẵn dữ liệu cơ bản để Controller không bị lỗi khi khởi tạo
+    # Mồi sẵn dữ liệu cơ bản
     mock_supplier_service.get_all_suppliers.return_value = [{'id': 1, 'name': 'Thiên Long'}]
     mock_inventory_service.get_inventory_list.return_value = []
 
-    window = InventoryManagementController(mock_inventory_service, mock_supplier_service)
+    window = InventoryManagementController(
+        mock_inventory_service,
+        mock_supplier_service,
+        mock_po_history_service
+    )
+
     qtbot.addWidget(window)
     window.mock_inventory_service = mock_inventory_service
+    window.mock_po_history_service = mock_po_history_service  # <--- THÊM DÒNG NÀY
     return window
 
 
