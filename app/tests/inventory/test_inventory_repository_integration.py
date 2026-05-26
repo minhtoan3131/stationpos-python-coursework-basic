@@ -99,6 +99,7 @@ def test_add_stock_transaction_for_sale(inv_repo, seed_inventory_data, db_test_c
         'qty': -5,
         'type': 'SALE',
         'ref_id': 888
+        # Ở đây không truyền variance_amount và note, repo sẽ tự động dùng giá trị mặc định là 0.0 và None
     }
 
     # ACT
@@ -113,3 +114,24 @@ def test_add_stock_transaction_for_sale(inv_repo, seed_inventory_data, db_test_c
     assert len(logs) == 1
     assert logs[0]['change_quantity'] == -5
     assert logs[0]['reference_id'] == 888
+    # Đã bổ sung kiểm tra: Đảm bảo DB thật ghi nhận đúng giá trị mặc định khi không truyền vào
+    assert Decimal(str(logs[0]['variance_amount'])) == Decimal('0.0000')
+    assert logs[0]['note'] is None
+
+def test_get_conversion_info_returns_correct_ratio(inv_repo, seed_inventory_data):
+    """Kiểm tra việc kết nối DB thật truy vấn chính xác tỉ lệ quy đổi của sản phẩm"""
+    # ACT: Truy vấn tỉ lệ quy đổi từ Cây -> Hộp (Đơn vị cơ bản 10, quy đổi 11) của SP 100
+    conv_info = inv_repo.get_conversion_info(product_id=100, unit_id=11)
+
+    # ASSERT
+    assert conv_info is not None
+    # Dựa trên dữ liệu mồi ở fixture seed_inventory_data (ratio = 20)
+    assert conv_info['ratio'] == Decimal('20.00')
+
+
+def test_get_conversion_info_returns_none_when_not_found(inv_repo, seed_inventory_data):
+    """Kiểm tra nếu truyền sai đơn vị tính hoặc sản phẩm không có cấu hình quy đổi"""
+    # Đơn vị tính ID 999 không hề tồn tại cấu hình quy đổi cho sản phẩm 100
+    conv_info = inv_repo.get_conversion_info(product_id=100, unit_id=999)
+
+    assert conv_info is None

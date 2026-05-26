@@ -3,6 +3,7 @@ import copy
 from decimal import Decimal
 from app.modules.inventory.dtos.inventory_dto import PurchaseOrderCreateDTO, PurchaseOrderItemDTO
 from app.modules.inventory.services.impl.inventory_service_impl import InventoryServiceImpl
+from app.core.exceptions.validation_exception import ValidationException
 
 
 # ==========================================
@@ -50,6 +51,10 @@ class FakeInventoryRepo:
 
     def add_stock_transaction(self, trans): self.stock_transactions.append(trans)
 
+    def get_conversion_info(self, product_id, unit_id):
+        # Service sẽ gọi hàm này để check tỷ lệ quy đổi
+        return None
+
 
 class FakeUnitOfWork:
     """Fake UOW có khả năng Snapshot để Rollback như DB thật"""
@@ -61,26 +66,37 @@ class FakeUnitOfWork:
         self._snapshot = None
 
     def __enter__(self):
-        # SNAPSHOT: Chụp ảnh toàn bộ dữ liệu của InventoryRepo trước khi giao dịch
-        self._snapshot = copy.deepcopy(self.inventory_repo.__dict__)
+        # SNAPSHOT: Chụp ảnh toàn bộ dữ liệu của các bảng repo trước khi giao dịch
+        self._snapshot = {
+            'inventory': copy.deepcopy(self.inventory_repo.inventory),
+            'purchase_orders': copy.deepcopy(self.inventory_repo.purchase_orders),
+            'purchase_order_items': copy.deepcopy(self.inventory_repo.purchase_order_items),
+            'stock_transactions': copy.deepcopy(self.inventory_repo.stock_transactions)
+        }
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        # Nếu có Exception bay ra (exc_type != None) -> ROLLBACK
+        # Nếu có Exception bay ra (exc_type != None) -> ROLLBACK hoàn tác sạch sẽ số liệu về snapshot cũ
         if exc_type is not None:
-            self.inventory_repo.__dict__ = self._snapshot
+            self.inventory_repo.inventory = self._snapshot['inventory']
+            self.inventory_repo.purchase_orders = self._snapshot['purchase_orders']
+            self.inventory_repo.purchase_order_items = self._snapshot['purchase_order_items']
+            self.inventory_repo.stock_transactions = self._snapshot['stock_transactions']
 
 
 # ==========================================
-# EST CASE: TÍNH TOÀN VẸN TRANSACTION (ROLLBACK)
+# TEST CASE: TÍNH TOÀN VẸN TRANSACTION (ROLLBACK)
 # ==========================================
 def test_transaction_rollback_when_db_fails():
-    """TC_Inv_01: Nếu đang lưu dở mà bị lỗi mạng/DB -> Phải Rollback sạch sẽ"""
+    """TC_Inv_01: Nếu đang lưu dở mà bị lỗi mạng/DB -> Phải Rollback sạch sẽ số liệu về ban đầu"""
 
-    # 1. Tạo một Repo Đột biến (Buggy) để giả lập lỗi đứt cáp mạng ở bước cuối cùng
+    # 1. Tạo một Repo Đột biến (Buggy) để giả lập lỗi rớt kết nối Database ở bước cuối cùng khi ghi log dịch chuyển
     class BuggyInventoryRepo(FakeInventoryRepo):
         def add_stock_transaction(self, trans_data):
-            raise ConnectionError("Đứt cáp mạng, rớt Database đột ngột!")
+            # Nếu là dòng log dịch chuyển IMPORT vật lý thông thường thì ép crash hệ thống
+            if trans_data.get('type') == 'IMPORT':
+                raise ConnectionError("Đứt cáp mạng, rớt Database đột ngột!")
+            super().add_stock_transaction(trans_data)
 
     buggy_repo = BuggyInventoryRepo()
     uow_factory = lambda: FakeUnitOfWork(override_inventory_repo=buggy_repo)
@@ -92,31 +108,30 @@ def test_transaction_rollback_when_db_fails():
     )
 
     # 2. WHEN: Thực hiện gọi hàm nhập kho
-    with pytest.raises(Exception) as exc_info:
+    with pytest.raises(ConnectionError) as exc_info:
         service.create_purchase_order(dto)
 
-    # Đảm bảo Service đã bọc lỗi lại thành "Lỗi hệ thống..."
-    assert "Lỗi hệ thống" in str(exc_info.value)
     assert "Đứt cáp mạng" in str(exc_info.value)
 
     # 3. THEN: KIỂM CHỨNG BẤT BIẾN (ROLLBACK THÀNH CÔNG)
-    # Tồn kho phải giữ nguyên 50 cây, KHÔNG ĐƯỢC cộng thêm 10 cây
+    # Tồn kho phải giữ nguyên trạng thái ban đầu là 50 cây, KHÔNG ĐƯỢC phép lưu 60 cây lẻ lẻ
     assert buggy_repo.inventory[100]['quantity'] == 50
-    # Tổng tiền kho phải giữ nguyên 200k, KHÔNG ĐƯỢC cộng thêm 50k
+    # Tổng tiền kho phải giữ nguyên 200k, KHÔNG ĐƯỢC phép cộng thêm 50k
     assert buggy_repo.inventory[100]['total_value'] == Decimal('200000')
-    # Không có bất kỳ phiếu nhập nào được sinh ra (Rác)
+    # Không có bất kỳ một dòng dữ liệu rác nào được lưu lại trong bảng Master hay bảng Detail
     assert len(buggy_repo.purchase_orders) == 0
     assert len(buggy_repo.purchase_order_items) == 0
+    assert len(buggy_repo.stock_transactions) == 0
 
 
 # ==========================================
-# TEST CASE: GIỚI HẠN TOÁN HỌC (MAC CALCULATOR)
+# TEST CASE: GIỚI HẠN TOÁN HỌC (CHẶN BÁN KHỐNG / KHO ÂM)
 # ==========================================
 def test_mathematical_limits_prevent_negative_inventory():
-    """TC_Inv_02: Chặn đứng mọi nỗ lực nhập hàng khi phát hiện kho đang bị âm"""
+    """TC_Inv_02: Chặn đứng mọi nỗ lực nhập hàng khi phát hiện kho đang bị âm trái phép"""
 
     repo = FakeInventoryRepo()
-    # GIVEN: Cố tình set tồn kho hiện tại đang bị Âm (ví dụ do lỗi xuất khống trước đó)
+    # GIVEN: Cố tình tạo trạng thái lỗi hệ thống từ trước: Kho bị âm -5 cây
     repo.inventory[100] = {"quantity": -5, "total_value": Decimal('-20000')}
 
     uow_factory = lambda: FakeUnitOfWork(override_inventory_repo=repo)
@@ -127,13 +142,14 @@ def test_mathematical_limits_prevent_negative_inventory():
         items=[PurchaseOrderItemDTO(product_id=100, unit_id=10, quantity=10, unit_price=5000)]
     )
 
-    # WHEN: Gọi hàm lưu phiếu nhập
-    with pytest.raises(Exception) as exc_info:
+    # WHEN: Gọi hàm lưu phiếu nhập, Service phải đóng gói thành ValidationException để UI bắn thông báo
+    with pytest.raises(ValidationException) as exc_info:
         service.create_purchase_order(dto)
 
-    # THEN: Kiểm chứng
-    # Lỗi phải được bắn ra từ MACCalculator
-    assert "Hàm này không dùng cho kho âm" in str(exc_info.value)
+    # THEN: Kiểm chứng chốt chặn an toàn nghiệp vụ
+     Xác minh đúng câu thông báo tiếng Việt nghiệp vụ hiển thị cho user
+    assert "Phát hiện trạng thái kho âm bất hợp lệ (Mô hình bán khống chưa được kích hoạt)." in str(exc_info.value)
 
-    # Tồn kho vẫn bị đóng băng ở -5, không được phép cộng lên thành +5
+    # Tồn kho vật lý bắt buộc phải bị đóng băng hoàn toàn ở con số -5, tuyệt đối không được xử lý tiếp
     assert repo.inventory[100]['quantity'] == -5
+    assert repo.inventory[100]['total_value'] == Decimal('-20000')

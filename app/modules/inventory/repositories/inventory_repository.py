@@ -27,3 +27,8 @@ class InventoryRepository(ABC):
         để phục vụ việc xuất báo cáo Excel.
         """
         pass
+
+    @abstractmethod
+    def get_conversion_info(self, product_id: int, unit_id: int) -> Optional[dict]:
+        """Lấy thông tin tỷ lệ quy đổi của một sản phẩm theo đơn vị tính"""
+        pass

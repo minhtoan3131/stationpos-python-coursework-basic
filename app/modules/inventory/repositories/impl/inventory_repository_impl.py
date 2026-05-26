@@ -27,20 +27,29 @@ class InventoryRepositoryImpl(BaseRepository, InventoryRepository):
     def create_purchase_order_item(self, item_data):
         sql = """INSERT INTO purchase_order_items (purchase_order_id, product_id, unit_id, quantity, unit_price, total_price)
                  VALUES (%s, %s, %s, %s, %s, %s)"""
-        # Đã đổi thành self.cursor
-        self.cursor.execute(sql, (item_data['po_id'], item_data['product_id'], item_data['unit_id'],
-                             item_data['qty'], item_data['price'], item_data['total']))
+
+         Thay đổi toàn bộ tên các Key truy cập dict cho khớp 100% với tầng Service gửi xuống
+        self.cursor.execute(sql, (
+            item_data['purchase_order_id'],  # Thay cho 'po_id'
+            item_data['product_id'],
+            item_data['unit_id'],
+            item_data['quantity'],  # Thay cho 'qty'
+            item_data['unit_price'],  # Thay cho 'price'
+            item_data['total_price']  # Thay cho 'total'
+        ))
 
     def add_stock_transaction(self, trans_data):
         sql = """
-            INSERT INTO stock_transactions (product_id, change_quantity, type, reference_id) 
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO stock_transactions (product_id, change_quantity, type, variance_amount, note, reference_id) 
+            VALUES (%s, %s, %s, %s, %s, %s)
         """
         self.cursor.execute(sql, (
             trans_data['product_id'],
-            trans_data['qty'],     # Đọc key 'qty'
-            trans_data['type'],    # Đọc key 'type' (VD: 'IMPORT' hoặc 'SALE')
-            trans_data['ref_id']   # Đọc key 'ref_id'
+            trans_data['qty'],
+            trans_data['type'],
+            trans_data.get('variance_amount', 0.0000),  # Đọc khoản tiền bù trừ rác tài chính
+            trans_data.get('note', None),               # Đọc ghi chú giải trình dữ liệu
+            trans_data['ref_id']
         ))
 
     def update_inventory_status(self, product_id: int, new_qty: int, new_total_value):
@@ -98,3 +107,19 @@ class InventoryRepositoryImpl(BaseRepository, InventoryRepository):
         """
         self.cursor.execute(query)
         return self.cursor.fetchall()
+
+    def get_conversion_info(self, product_id: int, unit_id: int) -> Optional[dict]:
+        """Truy vấn lấy tỷ lệ quy đổi từ bảng unit_conversions"""
+        query = """
+            SELECT ratio 
+            FROM unit_conversions 
+            WHERE product_id = %s AND to_unit_id = %s
+        """
+        self.cursor.execute(query, (product_id, unit_id))
+        row = self.cursor.fetchone()
+
+        if row:
+            return {
+                "ratio": row["ratio"]  # Trả về dạng dict chứa key 'ratio'
+            }
+        return None

@@ -53,79 +53,108 @@ class InventoryServiceImpl(InventoryService):
             return result
 
     # ==========================================
-    # LƯU PHIẾU NHẬP KHO (TRANSACTION PHỨC TẠP)
+    # LƯU PHIẾU NHẬP KHO
     # ==========================================
     def create_purchase_order(self, dto: PurchaseOrderCreateDTO) -> int:
-        try:
-            # Khởi tạo UnitOfWork. Nếu code trong 'with' chạy thành công, tự động Commit.
-            # Nếu có lỗi (Exception), tự động Rollback.
-            with self.uow_factory() as db:
 
-                # 1. Validate
-                validator = InventoryValidator(db.product_repo, db.supplier_repo)
-                validator.validate_purchase_order(dto)
 
-                # 2. Tạo phiếu nhập cha
-                total_amount = sum(item.quantity * item.unit_price for item in dto.items)
-                po_code = f"PN-{int(time.time())}"
+        with self.uow_factory() as db:
+            # KHỞI TẠO VALIDATOR VÀ TRUYỀN REPO TỪ BIẾN DB XUỐNG
+            validator = InventoryValidator(
+                product_repo=db.product_repo,
+                supplier_repo=db.supplier_repo
+            )
+            # Tiến hành Validate trước khi chạy logic nghiệp vụ chính
+            validator.validate_purchase_order(dto)
+            # Tạo mã hóa đơn dựa trên timestamp
+            po_code = f"PO-{int(time.time())}"
 
-                po_id = db.inventory_repo.create_purchase_order({
-                    'code': po_code,
-                    'supplier_id': dto.supplier_id,
-                    'total_amount': total_amount,
-                    'note': dto.note
-                })
+            # Tính toán tổng giá trị hóa đơn (Line Total) để lưu Master Header
+            total_amount = 0
+            calculated_items = []
 
-                # 3. Duyệt từng mặt hàng nhập
-                for item in dto.items:
-                    product_data = db.product_repo.get_product_detail_for_import(item.product_id)
-                    inv_status = db.inventory_repo.get_inventory_status(item.product_id)
+            for item in dto.items:
+                # Tìm kiếm thông tin chuyển đổi đơn vị tính từ DB
+                conv = db.inventory_repo.get_conversion_info(item.product_id, item.unit_id)
+                ratio = Decimal(str(conv['ratio'])) if conv else Decimal('1')
 
-                    current_qty = inv_status['quantity']
-                    current_total_val = Decimal(str(inv_status['total_value']))
+                # Tính quy đổi số lượng về đơn vị cơ bản và tổng tiền thực trả của dòng
+                base_qty = item.quantity * int(ratio)
+                import_total_val = Decimal(str(item.quantity)) * Decimal(str(item.unit_price))
+                total_amount += float(import_total_val)
 
-                    # Biến đổi quy đổi
-                    base_qty = item.quantity
-                    conv_unit_id = product_data.get('conversion_unit_id')
-                    conv_ratio = product_data.get('conversion_ratio')
+                calculated_items.append((item, base_qty, import_total_val))
 
-                    # Triết lý "Chỉ nhìn Tổng": Nếu đơn vị chọn nhập là ĐVT Quy đổi (VD: Thùng) -> Quy đổi số lượng
-                    if conv_unit_id and item.unit_id == conv_unit_id and conv_ratio:
-                        base_qty = item.quantity * int(float(conv_ratio))
+            # Bước 2: Tạo bản ghi Master Phiếu Nhập
+            po_id = db.inventory_repo.create_purchase_order({
+                'code': po_code,
+                'supplier_id': dto.supplier_id,
+                'total_amount': total_amount,
+                'note': dto.note
+            })
 
-                    # Tổng tiền thực trả của dòng hàng này (Không phụ thuộc vào giá sỉ hay lẻ, dùng tổng tiền thanh toán sau cùng)
-                    import_total_val = Decimal(str(item.quantity)) * Decimal(str(item.unit_price))
+            # Bước 3 & 4: Vòng lặp xử lý chi tiết kho và định giá thông minh
+            for item, base_qty, import_total_val in calculated_items:
+                # Truy vấn trạng thái kho hiện tại và Khóa dòng (FOR UPDATE)
+                current_stock = db.inventory_repo.get_inventory_status(item.product_id)
+                current_qty = current_stock['quantity']
+                current_total_val = Decimal(str(current_stock['total_value']))
 
-                    # 4. Đẩy vào bộ tính toán MAC chuẩn (Gom tổng tiền và tổng lượng cơ bản)
-                    new_qty, new_total_val, new_mac = MACCalculator.calculate_standard_mac(
+                try:
+                    # Đẩy vào bộ máy tính toán MAC thông minh
+                    new_qty, new_total_val, new_mac, garbage_value = MACCalculator.calculate_standard_mac(
                         current_qty=current_qty,
                         current_total_value=current_total_val,
                         import_qty=base_qty,
                         import_total_value=import_total_val
                     )
 
-                    # 5. Cập nhật trạng thái xuống Database trong khối ACID Transaction
+                    # TRƯỜNG HỢP A: Nếu phát hiện có rác tài chính (Lệch làm tròn trước đó), ghi nhận log điều chỉnh dữ liệu ngoại vi
+                    if garbage_value is not None:
+                        db.inventory_repo.add_stock_transaction({
+                            'product_id': item.product_id,
+                            'qty': 0,  # Biến động vật lý bằng 0 vì chỉ xử lý rác tiền
+                            'type': 'DATA_CORRECTION',  # Ghi nhận log dọn rác kế toán
+                            'variance_amount': -garbage_value,  # Số tiền âm để triệt tiêu rác
+                            'note': "Điều chỉnh dọn rác giá trị tồn đọng khi kho trống",  # Văn bản bắt buộc
+                            'ref_id': po_id
+                        })
+
+                    # Cập nhật thông số giá vốn mới vào danh mục sản phẩm
                     db.product_repo.update_cost_price(item.product_id, new_mac)
+
+                    # Cập nhật số lượng và tổng giá trị tồn kho mới vào két sắt hệ thống
                     db.inventory_repo.update_inventory_status(item.product_id, new_qty, new_total_val)
 
-                    # Lưu thông tin hóa đơn lịch sử chi tiết
+                    # Lưu lịch sử chi tiết mặt hàng thuộc Phiếu nhập
                     db.inventory_repo.create_purchase_order_item({
-                        'po_id': po_id, 'product_id': item.product_id, 'unit_id': item.unit_id,
-                        'qty': item.quantity, 'price': item.unit_price, 'total': float(import_total_val)
+                        'purchase_order_id': po_id,
+                        'product_id': item.product_id,
+                        'unit_id': item.unit_id,
+                        'quantity': item.quantity,
+                        'unit_price': item.unit_price,
+                        'total_price': float(import_total_val)
                     })
 
-                    # Log dòng dịch chuyển kho mang giá trị dương
+                    # Log dòng dịch chuyển vật lý thông thường (IMPORT)
                     db.inventory_repo.add_stock_transaction({
-                        'product_id': item.product_id, 'qty': base_qty, 'type': 'IMPORT', 'ref_id': po_id
+                        'product_id': item.product_id,
+                        'qty': base_qty,
+                        'type': 'IMPORT',
+                        'ref_id': po_id
                     })
 
-                return po_id
+                except ValueError as ve:
+                    # Bắt lỗi từ chốt chặn kho âm của MACCalculator để đẩy lên UI cảnh báo
+                    error_key = str(ve)
+                    if error_key in ["KHO_AM_CHAN_NGHIEP_VU", "NHAP_KHO_VAN_AM_CHAN_NGHIEP_VU"]:
+                        raise ValidationException(
+                            f"Hệ thống đã dừng nghiệp vụ nhập kho cho Sản phẩm ID {item.product_id}. "
+                            f"Phát hiện trạng thái kho âm bất hợp lệ (Mô hình bán khống chưa được kích hoạt)."
+                        )
+                    raise ve
 
-        except ValidationException:
-            raise  # Bắn lỗi Validation lên UI trực tiếp
-        except Exception as e:
-            raise Exception(f"Lỗi hệ thống khi lưu phiếu nhập: {str(e)}")
-
+            return po_id
     # ==========================================
     # CÁC HÀM KHÁC
     # ==========================================
