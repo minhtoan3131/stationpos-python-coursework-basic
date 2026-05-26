@@ -22,3 +22,8 @@ class PurchaseOrderHistoryRepository(ABC):
     def update_purchase_order_status(self, po_id: int, new_status: str, cancel_reason: str = None) -> None:
         """Cập nhật trạng thái phiếu và lưu lý do hủy"""
         pass
+
+    @abstractmethod
+    def has_subsequent_delivery_transactions(self, product_id: int, po_created_at) -> bool:
+        """Kiểm tra xem có bất kỳ giao dịch XUẤT KHO nào phát sinh SAU thời điểm (timestamp) của phiếu nhập này không."""
+        pass

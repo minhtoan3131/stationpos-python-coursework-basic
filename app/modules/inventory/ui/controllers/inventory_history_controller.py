@@ -6,6 +6,7 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt
 
+from app.core.exceptions.validation_exception import ValidationException
 from app.modules.inventory.dtos.po_history_dto import PurchaseOrderHistoryFilterDTO
 from app.modules.inventory.services.po_history_service import PurchaseOrderHistoryService
 from app.modules.inventory.utils.po_history_excel_exporter import PoHistoryExcelExporter
@@ -208,11 +209,14 @@ class InventoryHistoryController:
             try:
                 self.po_history_service.cancel_purchase_order(self.selected_po_master.id, reason.strip())
                 QMessageBox.information(None, "Thành công",
-                                        f"Đã hủy phiếu nhập {self.selected_po_master.code} thành công và trừ lại tồn kho!")
-                # Refresh lại danh sách
+                                        f"Đã hủy phiếu nhập {self.selected_po_master.code} thành công!")
                 self.load_master_data()
+            except ValidationException as ve:
+                # Chặn lỗi vi phạm chính sách kho (Kho âm hoặc Hàng đã bán) để hiện cảnh báo nghiệp vụ rõ ràng
+                QMessageBox.warning(None, "Chặn Nghiệp Vụ", str(ve))
             except Exception as e:
-                QMessageBox.warning(None, "Lỗi khi hủy", str(e))
+                # Các lỗi nghiêm trọng liên quan đến hạ tầng CSDL
+                QMessageBox.critical(None, "Lỗi Hệ Thống", f"Hủy phiếu thất bại: {str(e)}")
 
     def handle_export_excel(self):
         if not self.selected_po_master or not self.current_po_details:

@@ -1,6 +1,7 @@
 from app.core.database.base_repository import BaseRepository
 from app.modules.inventory.repositories.po_history_repository import PurchaseOrderHistoryRepository
 
+
 class PurchaseOrderHistoryRepositoryImpl(BaseRepository, PurchaseOrderHistoryRepository):
 
     def search_purchase_orders(self, from_date: str, to_date: str, keyword: str = None, status: str = 'ALL') -> list:
@@ -61,3 +62,18 @@ class PurchaseOrderHistoryRepositoryImpl(BaseRepository, PurchaseOrderHistoryRep
             WHERE id = %s
         """
         self.cursor.execute(query, (new_status, cancel_reason, po_id))
+
+    def has_subsequent_delivery_transactions(self, product_id: int, po_created_at) -> bool:
+        """
+        Kiểm tra xem có bất kỳ giao dịch XUẤT KHO nào
+        phát sinh SAU thời điểm (timestamp) của phiếu nhập này không.
+        """
+        query = """
+            SELECT 1 FROM stock_transactions 
+            WHERE product_id = %s 
+              AND created_at > %s 
+              AND type = 'SALE'
+            LIMIT 1
+        """
+        self.cursor.execute(query, (product_id, po_created_at))
+        return self.cursor.fetchone() is not None

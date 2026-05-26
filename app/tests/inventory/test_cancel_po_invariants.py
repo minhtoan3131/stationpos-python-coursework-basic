@@ -5,7 +5,7 @@ from app.modules.inventory.services.impl.po_history_service_impl import Purchase
 
 
 # ==========================================
-# 1. SETUP FAKE REPOSITORIES & FAKE TRANSACTION
+# SETUP FAKE REPOSITORIES & FAKE TRANSACTION
 # ==========================================
 class FakeProductRepo:
     def __init__(self):
@@ -35,7 +35,8 @@ class FakeInventoryRepo:
 
 class FakePOHistoryRepo:
     def __init__(self):
-        self.po_master_table = {1: {'id': 1, 'status': 'COMPLETED', 'cancel_reason': None}}
+        self.po_master_table = {1: {'id': 1, 'code': 'PO-001', 'status': 'COMPLETED', 'cancel_reason': None,
+                                    'created_at': '2023-10-01 10:00:00'}}
         self.po_items_table = {
             1: [{'product_id': 100, 'sku': 'SP01', 'quantity': 50, 'unit_id': 1, 'total_price': Decimal('250000.0000')}]
         }
@@ -48,6 +49,8 @@ class FakePOHistoryRepo:
         self.po_master_table[po_id]['status'] = new_status
         self.po_master_table[po_id]['cancel_reason'] = cancel_reason
 
+    def has_subsequent_delivery_transactions(self, product_id, po_created_at): return False
+
 
 class FakeUnitOfWork:
     def __init__(self):
@@ -57,7 +60,6 @@ class FakeUnitOfWork:
         self._snapshot = None
 
     def __enter__(self):
-        # 1. BẮT ĐẦU TRANSACTION: Chụp ảnh toàn bộ trạng thái dữ liệu hiện tại
         self._snapshot = {
             'products': copy.deepcopy(self.product_repo.products),
             'inventory': copy.deepcopy(self.inventory_repo.inventory),
@@ -67,18 +69,13 @@ class FakeUnitOfWork:
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        # 2. KẾT THÚC TRANSACTION: Nếu có bất kỳ lỗi nào văng ra (exc_type is not None)
         if exc_type is not None:
-            # ROLLBACK: Phục hồi toàn bộ con trỏ dữ liệu về bản sao lúc mới vào
             self.product_repo.products = self._snapshot['products']
             self.inventory_repo.inventory = self._snapshot['inventory']
             self.inventory_repo.stock_transactions = self._snapshot['transactions']
             self.po_history_repo.po_master_table = self._snapshot['po_master']
 
 
-# ==========================================
-# 2. FIXTURE BƠM DỮ LIỆU
-# ==========================================
 @pytest.fixture
 def uow(): return FakeUnitOfWork()
 
@@ -88,54 +85,52 @@ def po_service(uow): return PurchaseOrderHistoryServiceImpl(lambda: uow)
 
 
 # ==========================================
-# 3. TEST CASES CHO BẤT BIẾN (INVARIANTS)
+# TEST CASES
 # ==========================================
-
 def test_cancel_po_transaction_rollback_on_unexpected_error(po_service, uow):
-    """TC_Inv_01: Mô phỏng đứt cáp mạng giữa chừng, đảm bảo Dữ liệu được Rollback 100%"""
+    """TC_Inv_01: Đảm bảo tính ACID - Hủy dở gặp lỗi hệ thống phải hoàn tác sạch 100% các bảng"""
 
-    # 1. GIVEN: Trạng thái ban đầu hợp lệ.
-    # Nhưng ta "cài cắm" một quả bom vào hàm cuối cùng (update_purchase_order_status)
     def mock_db_crash(*args, **kwargs):
         raise RuntimeError("Đứt kết nối tới cơ sở dữ liệu đột ngột!")
 
     uow.po_history_repo.update_purchase_order_status = mock_db_crash
 
-    # 2. WHEN: Thực hiện hủy phiếu
     with pytest.raises(Exception, match="Đứt kết nối tới cơ sở dữ liệu đột ngột"):
         po_service.cancel_purchase_order(1, "Hủy do nhập sai")
 
-    # 3. THEN: Kiểm chứng tính Bất biến.
-    # Mặc dù các hàm trừ kho, tính MAC đã chạy qua trong Service, nhưng UOW đã tóm được lỗi và Rollback.
     db_inv = uow.inventory_repo
     db_po = uow.po_history_repo
 
-    # Tồn kho PHẢI CÒN NGUYÊN 50 cây, KHÔNG BỊ TRỪ
     assert db_inv.inventory[100]['quantity'] == 50
-    # Phiếu nhập PHẢI CÒN NGUYÊN trạng thái COMPLETED
     assert db_po.po_master_table[1]['status'] == 'COMPLETED'
-    # Không có log giao dịch nào được ghi nhầm
     assert len(db_inv.stock_transactions) == 0
 
 
-def test_cancel_po_forces_absolute_zero_when_inventory_depleted(po_service, uow):
-    """TC_Inv_02: Trừ sạch kho về 0 -> Ép tổng tiền và MAC về chuẩn 0 VNĐ"""
-
-    # 1. GIVEN: Thiết lập sai số thập phân (Giả lập lỗi Float)
-    # Lô hàng nhập 50 cây giá 250.000đ.
-    # Nhưng trong kho hiện tại (do một lỗi làm tròn nào đó trong lịch sử), tổng giá trị đang là 250.000.0001đ
+def test_cancel_po_forces_absolute_zero_and_logs_variance_clearance(po_service, uow):
+    """
+    TC_Inv_02: Chốt chặn Minh bạch khi kho cạn sạch (new_qty == 0).
+    Kiểm chứng: Ép giá trị tiền về 0 và hạch toán dòng ADJUST_VARIANCE mang số tiền rác.
+    """
+    # GIVEN: Số lượng 50 cây ứng với tiền nhập là 250k, nhưng kho đọng sai số float lịch sử thành 250.000,0001đ
     uow.inventory_repo.inventory[100]['total_value'] = Decimal('250000.0001')
 
-    # 2. WHEN: Hủy chính lô hàng 50 cây đó (Cạn sạch kho)
+    # WHEN: Thực thi hủy trọn vẹn lô hàng 50 cây
     po_service.cancel_purchase_order(1, "Hủy sạch kho")
 
-    # 3. THEN: Kiểm chứng chốt chặn 0
     db_inv = uow.inventory_repo
     db_prod = uow.product_repo
 
-    # Số lượng kho vè 0
+    # THEN: 1. Số lượng vật lý và tài chính bắt buộc ép chết về 0 tuyệt đối
     assert db_inv.inventory[100]['quantity'] == 0
-
-    # Bất biến: Tổng tiền kho và Giá vốn MAC PHẢI BỊ ÉP VỀ 0 TUYỆT ĐỐI (Triệt tiêu sai số 0.0001)
     assert db_inv.inventory[100]['total_value'] == Decimal('0')
     assert db_prod.products[100]['cost_price'] == Decimal('0')
+
+    # 2. Hệ thống phải ghi nhận 2 giao dịch: Log dọn rác ADJUST_VARIANCE và log CANCEL hàng vật lý
+    assert len(db_inv.stock_transactions) == 2
+
+    # Giao dịch hạch toán triệt tiêu rác tiền lẻ
+    variance_log = db_inv.stock_transactions[0]
+    assert variance_log['type'] == 'ADJUST_VARIANCE'
+    assert variance_log['qty'] == 0  # Không biến động lượng vật lý
+    assert variance_log['variance_amount'] == Decimal('0.0001')  # Truy tìm ra đúng lượng rác dư thừa
+    assert "Điều chỉnh dọn rác giá trị tồn đọng khi kho trống" in variance_log['note']

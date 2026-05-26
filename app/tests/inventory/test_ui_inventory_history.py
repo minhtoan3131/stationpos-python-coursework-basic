@@ -3,6 +3,7 @@ from datetime import datetime
 from PyQt6.QtWidgets import QWidget, QTableWidgetItem
 from PyQt6.QtCore import Qt
 
+from app.core.exceptions.validation_exception import ValidationException
 # Import DTOs và Controller
 from app.modules.inventory.dtos.po_history_dto import PurchaseOrderMasterDTO, PurchaseOrderDetailDTO
 from app.modules.inventory.ui.controllers.inventory_history_controller import InventoryHistoryController
@@ -20,24 +21,14 @@ def mock_po_service(mocker):
 
 @pytest.fixture
 def history_ui(qtbot, mock_po_service):
-    """Khởi tạo giao diện và đảm bảo widget cha tồn tại trong suốt test"""
-    # 1. Tạo widget cha
     widget = QWidget()
-
-    # 2. Khởi tạo UI và gán cho widget cha
     ui = Ui_InventoryManagementWidget()
     ui.setupUi(widget)
-
-    # 3. QUAN TRỌNG: Hiển thị widget để PyQt khởi tạo các sub-widget
     widget.show()
-
-    # 4. Đăng ký với qtbot để quản lý vòng đời bộ nhớ
     qtbot.addWidget(widget)
-
-    # 5. Chuyển Tab
     ui.tabWidget_inventory.setCurrentIndex(1)
-
     controller = InventoryHistoryController(ui, mock_po_service)
+    return controller, ui, mock_po_service, widget
 
     # Trả về cả widget để đảm bảo nó không bị hủy khi fixture thoát
     return controller, ui, mock_po_service, widget
@@ -232,3 +223,38 @@ def test_uc4_export_excel_cancelled(history_ui, mocker):
 
     # THEN: Exporter không được gọi
     mock_exporter.assert_not_called()
+
+
+def test_ui_cancel_action_shows_warning_box_on_validation_exception(history_ui, mocker):
+    """
+    TC_UI_01: Đánh chặn vi phạm chính sách kho (Kho âm / Đã bán).
+    Kiểm chứng: Khi Service ném ValidationException, UI phải dùng QMessageBox.warning để cảnh báo kế toán.
+    """
+    controller, ui, mock_service, _ = history_ui
+
+    # Giả lập đã chọn 1 phiếu nhập COMPLETED trên bảng giao diện
+    controller.selected_po_master = PurchaseOrderMasterDTO(
+        id=1, code="PO-999", created_at=datetime.now(), supplier_name="NCC A", total_amount=50000, status="COMPLETED"
+    )
+
+    # 1. MOCKING THAO TÁC NGƯỜI DÙNG:
+    # Giả lập kế toán gõ lý do: "Nhập trùng đơn" và nhấn OK
+    mocker.patch("app.modules.inventory.ui.controllers.inventory_history_controller.QInputDialog.getText",
+                 return_value=("Nhập trùng đơn", True))
+
+    # Gây lỗi chặn nghiệp vụ từ tầng Service đẩy lên
+    mock_service.cancel_purchase_order.side_effect = ValidationException(
+        "Hủy phiếu nhập sẽ làm kho bị âm, vi phạm chính sách!")
+
+    # Khống chế QMessageBox để không bật giao diện thật khi test chạy tự động
+    mock_warning_box = mocker.patch(
+        "app.modules.inventory.ui.controllers.inventory_history_controller.QMessageBox.warning")
+
+    # 2. WHEN: Kích hoạt sự kiện bấm nút Hủy phiếu trên UI
+    controller.handle_cancel_po()
+
+    # 3. THEN: Kiểm chứng giao diện phản hồi chuẩn xác
+    mock_service.cancel_purchase_order.assert_called_once_with(1, "Nhập trùng đơn")
+    # Đảm bảo hiển thị dạng Cảnh báo (warning) chứ không hiển thị dạng Lỗi hệ thống (critical)
+    mock_warning_box.assert_called_once_with(None, "Chặn Nghiệp Vụ",
+                                             "Hủy phiếu nhập sẽ làm kho bị âm, vi phạm chính sách!")
