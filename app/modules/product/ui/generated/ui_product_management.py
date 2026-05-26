@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'app/ui/product/views/product_management.ui'
+# Form implementation generated from reading ui file 'app/modules/product/ui/views/product_management.ui'
 #
 # Created by: PyQt6 UI code generator 6.11.0
 #
@@ -28,8 +28,8 @@ class Ui_ProductManagementWidget(object):
 "\n"
 "QLabel#lbl_title {\n"
 "    font-size: 26px;\n"
-"    font-weight: 700;\n"
-"    color: #1a1a1a;\n"
+"    font-weight: 800;\n"
+"    color: #0f172a;\n"
 "    margin-bottom: 10px;\n"
 "}\n"
 "\n"
@@ -173,7 +173,7 @@ class Ui_ProductManagementWidget(object):
     def retranslateUi(self, ProductManagementWidget):
         _translate = QtCore.QCoreApplication.translate
         ProductManagementWidget.setWindowTitle(_translate("ProductManagementWidget", "Quản lý Sản phẩm"))
-        self.lbl_title.setText(_translate("ProductManagementWidget", "QUẢN LÝ SẢN PHẨM"))
+        self.lbl_title.setText(_translate("ProductManagementWidget", "Quản lý sản phẩm"))
         self.txt_search_keyword.setPlaceholderText(_translate("ProductManagementWidget", "Tìm nhanh theo SKU, Tên hoặc Barcode..."))
         self.btn_search_products.setText(_translate("ProductManagementWidget", "Tìm kiếm"))
         self.btn_refresh_products.setText(_translate("ProductManagementWidget", "Làm mới"))

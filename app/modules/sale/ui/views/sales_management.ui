@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1400</width>
-    <height>800</height>
+    <height>850</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,7 +15,7 @@
   </property>
   <property name="styleSheet">
    <string notr="true">
-    /* Cấu trúc nền tảng Enterprise POS */
+    /* Nền tảng Enterprise POS */
     QWidget {
         background-color: #f8fafc;
         font-family: 'Segoe UI', 'Roboto', sans-serif;
@@ -36,7 +36,8 @@
         padding-bottom: 5px;
     }
 
-    QLabel#lbl_sub_left, QLabel#lbl_sub_right {
+    /* Tiêu đề các cột/khung */
+    QLabel#lbl_sub_left, QLabel#lbl_sub_right, QLabel#lbl_sub_history_sales {
         font-size: 15px;
         font-weight: 700;
         color: #475569;
@@ -45,13 +46,18 @@
         padding-bottom: 4px;
     }
 
-    QLineEdit {
+    /* Riêng tab Lịch sử dùng màu xanh dương để phân biệt với POS */
+    QLabel#lbl_sub_history_sales {
+        border-bottom: 2px solid #3b82f6;
+    }
+
+    QLineEdit, QComboBox, QDateEdit {
         padding: 8px 12px;
         border: 1px solid #cbd5e1;
         border-radius: 6px;
         background-color: #ffffff;
     }
-    QLineEdit:focus {
+    QLineEdit:focus, QComboBox:focus, QDateEdit:focus {
         border: 2px solid #10b981;
         background-color: #f0fdf4;
     }
@@ -74,46 +80,41 @@
         border-bottom: 1px solid #e2e8f0;
     }
 
-    /* Styling cho QSpinBox khi chèn vào bảng giỏ hàng */
-    QSpinBox {
-        border: 1px solid #cbd5e1;
-        border-radius: 4px;
-        padding: 2px;
-        background-color: #ffffff;
-        min-width: 50px;
-    }
-    QSpinBox:focus {
-        border: 1px solid #10b981;
-        background-color: #f0fdf4;
-    }
-
     QPushButton {
         padding: 10px 20px;
         border-radius: 6px;
         font-weight: bold;
     }
 
+    /* Buttons cho POS (Màu xanh lá) */
     QPushButton#btn_search { background-color: #64748b; color: white; }
     QPushButton#btn_add_to_cart { background-color: #10b981; color: white; border: none; }
-    QPushButton#btn_add_to_cart:hover { background-color: #059669; }
-
-    QPushButton#btn_cancel_bill { background-color: #ef4444; color: white; border: none; }
-    QPushButton#btn_cancel_bill:hover { background-color: #dc2626; }
-
     QPushButton#btn_checkout { background-color: #059669; color: white; border: none; font-size: 16px; }
-    QPushButton#btn_checkout:hover { background-color: #047857; }
 
-    QLabel#lbl_total_bill {
+    /* Buttons cho Lịch sử (Màu xanh dương) */
+    QPushButton#btn_filter_invoice { background-color: #3b82f6; color: white; border: none; }
+    QPushButton#btn_reprint_invoice { background-color: #0ea5e9; color: white; border: none; }
+    QPushButton#btn_export_invoice_excel { background-color: #0f766e; color: white; border: none; }
+
+    /* Button Hủy (Màu đỏ) */
+    QPushButton#btn_cancel_bill, QPushButton#btn_cancel_invoice { background-color: #ef4444; color: white; border: none; }
+
+    QLabel#lbl_total_bill, QLabel#lbl_detail_total_value {
         font-size: 32px;
         font-weight: 900;
         color: #ef4444;
     }
 
-    QLabel#lbl_total_text {
-        font-size: 14px;
-        font-weight: bold;
-        color: #64748b;
+    /* Giao diện Tab Widget hiện đại */
+    QTabWidget::tab-bar { alignment: left; }
+    QTabWidget::pane { border: 1px solid #e2e8f0; background: #ffffff; border-radius: 8px; }
+    QTabBar::tab {
+        background: #e2e8f0; color: #475569; padding: 10px 20px; font-weight: bold;
+        border-top-left-radius: 6px; border-top-right-radius: 6px; margin-right: 4px;
     }
+    QTabBar::tab:selected { background: #ffffff; color: #10b981; border-bottom: 3px solid #10b981; }
+
+    /* Tab Lịch sử có thể đổi màu indicator sang xanh dương nếu muốn bằng code, ở đây mặc định theo POS */
    </string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_main">
@@ -135,243 +136,529 @@
    <item>
     <widget class="QLabel" name="lbl_title">
      <property name="text">
-      <string>Bán hàng</string>
+      <string>Bán hàng &amp; Quản lý hóa đơn</string>
      </property>
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_content" stretch="1,1">
-     <property name="spacing">
-      <number>20</number>
+    <widget class="QTabWidget" name="tabWidget_sales">
+     <property name="currentIndex">
+      <number>0</number>
      </property>
-     <item>
-      <widget class="QFrame" name="frame_left">
-       <layout class="QVBoxLayout" name="verticalLayout_left">
-        <property name="contentsMargins" stdset="0">
-         <number>15</number>
-        </property>
-        <item>
-         <widget class="QLabel" name="lbl_sub_left">
-          <property name="text">
-           <string>Danh sách Sản phẩm</string>
+
+     <widget class="QWidget" name="tab_pos">
+      <attribute name="title">
+       <string>🛒 Bán lẻ POS</string>
+      </attribute>
+      <layout class="QHBoxLayout" name="horizontalLayout_content" stretch="1,1">
+       <property name="spacing">
+        <number>20</number>
+       </property>
+       <item>
+        <widget class="QFrame" name="frame_left">
+         <layout class="QVBoxLayout" name="verticalLayout_left">
+          <property name="contentsMargins" stdset="0">
+           <number>15</number>
           </property>
-         </widget>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="layout_search">
           <item>
-           <widget class="QLineEdit" name="txt_search_sales">
-            <property name="placeholderText">
-             <string>Tìm theo SKU, tên sản phẩm hoặc barcode...</string>
+           <widget class="QLabel" name="lbl_sub_left">
+            <property name="text">
+             <string>Danh sách Sản phẩm</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="btn_search">
-            <property name="text">
-             <string>Tìm kiếm</string>
+           <layout class="QHBoxLayout" name="layout_search">
+            <item>
+             <widget class="QLineEdit" name="txt_search_sales">
+              <property name="placeholderText">
+               <string>Tìm theo SKU, tên sản phẩm hoặc barcode...</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_search">
+              <property name="text">
+               <string>Tìm kiếm</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QTableWidget" name="tbl_products_sales">
+            <property name="selectionBehavior">
+             <enum>QAbstractItemView::SelectRows</enum>
             </property>
+            <attribute name="verticalHeaderVisible">
+             <bool>false</bool>
+            </attribute>
+            <column>
+             <property name="text">
+              <string>SKU</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Tên SP</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>ĐVT</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Giá bán</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Tồn kho</string>
+             </property>
+            </column>
            </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="layout_left_btns">
+            <item>
+             <spacer name="spacer1">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_add_to_cart">
+              <property name="minimumSize">
+               <size>
+                <width>180</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>THÊM VÀO GIỎ (Enter) ➔</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
-        </item>
-        <item>
-         <widget class="QTableWidget" name="tbl_products_sales">
+        </widget>
+       </item>
+       <item>
+        <widget class="QFrame" name="frame_right">
+         <layout class="QVBoxLayout" name="verticalLayout_right">
+          <property name="contentsMargins" stdset="0">
+           <number>15</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="lbl_sub_right">
+            <property name="text">
+             <string>Chi tiết Hóa đơn</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTableWidget" name="tbl_cart">
+            <attribute name="verticalHeaderVisible">
+             <bool>false</bool>
+            </attribute>
+            <column>
+             <property name="text">
+              <string>SKU</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Tên SP</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>ĐVT</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>SL</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Đơn giá</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Thành tiền</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string/>
+             </property>
+            </column>
+           </widget>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="layout_total">
+            <property name="spacing">
+             <number>5</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="lbl_total_text">
+              <property name="text">
+               <string>KHÁCH CẦN TRẢ:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="lbl_total_bill">
+              <property name="text">
+               <string>0 VND</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="layout_right_btns">
+            <item>
+             <widget class="QPushButton" name="btn_cancel_bill">
+              <property name="minimumSize">
+               <size>
+                <width>120</width>
+                <height>45</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Hủy hóa đơn</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="spacer2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_checkout">
+              <property name="minimumSize">
+               <size>
+                <width>220</width>
+                <height>45</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>THANH TOÁN (F9)</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+
+     <widget class="QWidget" name="tab_invoice_history">
+      <attribute name="title">
+       <string>📜 Nhật ký Hóa đơn</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_history">
+       <property name="spacing">
+        <number>15</number>
+       </property>
+       <item>
+        <layout class="QHBoxLayout" name="layout_filters_invoice">
+         <property name="spacing">
+          <number>10</number>
+         </property>
+         <item>
+          <widget class="QLineEdit" name="txt_search_invoice">
+           <property name="minimumSize">
+            <size>
+             <width>250</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="placeholderText">
+            <string>Tìm mã hóa đơn...</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lbl_date_from">
+           <property name="text">
+            <string>Từ ngày:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDateEdit" name="date_invoice_from">
+           <property name="calendarPopup">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lbl_date_to">
+           <property name="text">
+            <string>Đến ngày:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDateEdit" name="date_invoice_to">
+           <property name="calendarPopup">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="cbo_payment_method_filter">
+           <property name="minimumSize">
+            <size>
+             <width>150</width>
+             <height>0</height>
+            </size>
+           </property>
+           <item>
+            <property name="text">
+             <string>-- Hình thức --</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Tiền mặt</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Chuyển khoản</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="cbo_status_invoice">
+           <property name="minimumSize">
+            <size>
+             <width>150</width>
+             <height>0</height>
+            </size>
+           </property>
+           <item>
+            <property name="text">
+             <string>-- Trạng thái --</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Hoàn thành</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Đã hủy</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btn_filter_invoice">
+           <property name="text">
+            <string>Lọc Dữ Liệu</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="spacer_filter_invoice">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btn_reset_filter_invoice">
+           <property name="styleSheet">
+            <string notr="true">background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;</string>
+           </property>
+           <property name="text">
+            <string>Làm Mới</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+
+       <item>
+        <widget class="QSplitter" name="splitter_invoice">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+
+         <widget class="QTableWidget" name="tbl_invoice_master">
           <property name="selectionBehavior">
            <enum>QAbstractItemView::SelectRows</enum>
           </property>
-          <attribute name="verticalHeaderVisible">
-           <bool>false</bool>
-          </attribute>
-          <column>
-           <property name="text">
-            <string>SKU</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Tên SP</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>ĐVT</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Giá bán</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Tồn kho</string>
-           </property>
-          </column>
+          <column><property name="text"><string>Mã HĐ</string></property></column>
+          <column><property name="text"><string>Thời gian</string></property></column>
+          <column><property name="text"><string>Tổng tiền</string></property></column>
+          <column><property name="text"><string>Thanh toán</string></property></column>
+          <column><property name="text"><string>Trạng thái</string></property></column>
          </widget>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="layout_left_btns">
-          <item>
-           <spacer name="spacer1">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>0</width>
-              <height>0</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="QPushButton" name="btn_add_to_cart">
-            <property name="minimumSize">
-             <size>
-              <width>180</width>
-              <height>40</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>THÊM VÀO GIỎ (Enter) ➔</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item>
-      <widget class="QFrame" name="frame_right">
-       <layout class="QVBoxLayout" name="verticalLayout_right">
-        <property name="contentsMargins" stdset="0">
-         <number>15</number>
-        </property>
-        <item>
-         <widget class="QLabel" name="lbl_sub_right">
-          <property name="text">
-           <string>Chi tiết Hóa đơn</string>
+
+         <widget class="QFrame" name="frame_invoice_detail">
+          <property name="styleSheet">
+           <string notr="true">
+            QFrame#frame_invoice_detail {
+                background-color: #ffffff;
+                border: 1px solid #e2e8f0;
+                border-radius: 10px;
+            }
+           </string>
           </property>
+          <layout class="QVBoxLayout" name="verticalLayout_invoice_detail">
+           <property name="contentsMargins" stdset="0"><number>15</number></property>
+           <item>
+            <widget class="QLabel" name="lbl_sub_history_sales">
+             <property name="text">
+              <string>Chi tiết ấn phẩm hóa đơn</string>
+             </property>
+            </widget>
+           </item>
+
+           <item>
+            <layout class="QGridLayout" name="layout_invoice_meta">
+             <item row="0" column="0">
+              <widget class="QLabel" name="lbl_md_invoice_id">
+               <property name="text"><string>&lt;b&gt;Mã HĐ:&lt;/b&gt; --</string></property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QLabel" name="lbl_md_invoice_date">
+               <property name="text"><string>&lt;b&gt;Ngày bán:&lt;/b&gt; --</string></property>
+              </widget>
+             </item>
+             <item row="1" column="0" colspan="2">
+              <widget class="QLabel" name="lbl_md_invoice_status">
+               <property name="text"><string>&lt;b&gt;Trạng thái:&lt;/b&gt; --</string></property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+
+           <item>
+            <widget class="QTableWidget" name="tbl_invoice_details">
+             <property name="selectionBehavior">
+              <enum>QAbstractItemView::SelectRows</enum>
+             </property>
+             <column><property name="text"><string>Tên Sản Phẩm</string></property></column>
+             <column><property name="text"><string>ĐVT</string></property></column>
+             <column><property name="text"><string>SL</string></property></column>
+             <column><property name="text"><string>Đơn giá</string></property></column>
+             <column><property name="text"><string>Thành Tiền</string></property></column>
+            </widget>
+           </item>
+
+           <item>
+            <layout class="QVBoxLayout" name="layout_detail_total_invoice">
+             <property name="spacing"><number>2</number></property>
+             <item>
+              <widget class="QLabel" name="lbl_detail_total_label">
+               <property name="styleSheet"><string notr="true">font-weight: bold; color: #64748b;</string></property>
+               <property name="text"><string>TỔNG CỘNG KHÁCH TRẢ:</string></property>
+               <property name="alignment"><set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set></property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="lbl_detail_total_value">
+               <property name="text"><string>0 VND</string></property>
+               <property name="alignment"><set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set></property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="lbl_detail_cash_received_label">
+               <property name="styleSheet"><string notr="true">font-weight: bold; color: #94a3b8; font-size: 13px;</string></property>
+               <property name="text"><string>Tiền khách đưa: --</string></property>
+               <property name="alignment"><set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set></property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+
+           <item>
+            <layout class="QHBoxLayout" name="layout_detail_actions_invoice">
+             <item>
+              <widget class="QPushButton" name="btn_cancel_invoice">
+               <property name="minimumSize"><size><width>110</width><height>35</height></size></property>
+               <property name="text"><string>Hủy Hóa Đơn</string></property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="spacer_history_btns">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btn_reprint_invoice">
+               <property name="minimumSize"><size><width>120</width><height>35</height></size></property>
+               <property name="text"><string>🖨️ In lại hóa đơn</string></property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btn_export_invoice_excel">
+               <property name="minimumSize"><size><width>120</width><height>35</height></size></property>
+               <property name="text"><string>Xuất File Excel</string></property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
          </widget>
-        </item>
-        <item>
-         <widget class="QTableWidget" name="tbl_cart">
-          <attribute name="verticalHeaderVisible">
-           <bool>false</bool>
-          </attribute>
-          <column>
-           <property name="text">
-            <string>SKU</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Tên SP</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>ĐVT</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>SL</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Đơn giá</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Thành tiền</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string/>
-           </property>
-          </column>
-         </widget>
-        </item>
-        <item>
-         <layout class="QVBoxLayout" name="layout_total">
-          <property name="spacing">
-           <number>5</number>
-          </property>
-          <item>
-           <widget class="QLabel" name="lbl_total_text">
-            <property name="text">
-             <string>KHÁCH CẦN TRẢ:</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="lbl_total_bill">
-            <property name="text">
-             <string>0 VND</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="layout_right_btns">
-          <item>
-           <widget class="QPushButton" name="btn_cancel_bill">
-            <property name="minimumSize">
-             <size>
-              <width>120</width>
-              <height>45</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Hủy hóa đơn</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="spacer2">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>0</width>
-              <height>0</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="QPushButton" name="btn_checkout">
-            <property name="minimumSize">
-             <size>
-              <width>220</width>
-              <height>45</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>THANH TOÁN (F9)</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </widget>
-     </item>
-    </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
    </item>
   </layout>
  </widget>

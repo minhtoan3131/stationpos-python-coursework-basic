@@ -15,45 +15,95 @@
   </property>
   <property name="styleSheet">
    <string notr="true">
+    /* Lớp nền mờ phủ toàn màn hình */
     QDialog {
-        background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 rgba(241, 245, 249, 0.85), stop:1 rgba(226, 232, 240, 0.95));
+        background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 rgba(241, 245, 249, 0.90), stop:1 rgba(226, 232, 240, 0.95));
     }
+
+    /* Cấu trúc Khung trung tâm (Card) được chia đôi */
     QFrame#center_card {
-        background-color: #ffffff;
+        background-color: transparent;
         border: 1px solid #cbd5e1;
         border-radius: 16px;
     }
-    QLabel#lbl_title {
-        color: #1e293b;
-        font-size: 22px;
-        font-weight: bold;
+
+    /* Khung Thương hiệu bên trái */
+    QFrame#frame_brand_left {
+        background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 #10b981, stop:1 #064e3b);
+        border-top-left-radius: 15px;
+        border-bottom-left-radius: 15px;
         border: none;
     }
+
+    /* Khung Nhập liệu bên phải */
+    QFrame#frame_login_right {
+        background-color: #ffffff;
+        border-top-right-radius: 15px;
+        border-bottom-right-radius: 15px;
+        border: none;
+    }
+
+    QLabel#lbl_brand_station_pos {
+        font-size: 42px;
+        font-weight: bold;
+        color: #ffffff;
+        letter-spacing: 1px;
+        background-color: transparent;
+    }
+
+    QLabel#lbl_title {
+        color: #1e293b;
+        font-size: 24px;
+        font-weight: bold;
+        border: none;
+        background-color: transparent;
+    }
+
     QLineEdit#txt_pin {
         background-color: #f8fafc;
         border: 2px solid #e2e8f0;
         border-radius: 8px;
-        color: #0ea5e9;
-        font-size: 28px;
-        font-weight: bold;
+        padding: 0px 15px;
+        font-size: 20px;
+        color: #0f172a;
     }
     QLineEdit#txt_pin:focus {
-        border: 2px solid #38bdf8;
+        border: 2px solid #0284c7;
         background-color: #ffffff;
     }
-    QPushButton#btn_forgot {
-        color: #64748b;
+
+    QPushButton#btn_unlock {
+        background-color: #0284c7;
+        color: white;
         border: none;
-        background: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: bold;
+    }
+    QPushButton#btn_unlock:hover {
+        background-color: #0369a1;
+    }
+    QPushButton#btn_unlock:pressed {
+        background-color: #075985;
+    }
+
+    QPushButton#btn_forgot {
+        background-color: transparent;
+        border: none;
+        color: #64748b;
         font-size: 13px;
-        text-decoration: underline;
+        font-weight: 500;
     }
     QPushButton#btn_forgot:hover {
-        color: #3b82f6;
+        color: #0284c7;
+        text-decoration: underline;
     }
    </string>
   </property>
   <layout class="QVBoxLayout" name="main_layout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -70,82 +120,209 @@
     <widget class="QFrame" name="center_card">
      <property name="minimumSize">
       <size>
-       <width>560</width>
-       <height>400</height>
+       <width>800</width>
+       <height>480</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>560</width>
-       <height>400</height>
+       <width>800</width>
+       <height>420</height>
       </size>
      </property>
-     <layout class="QVBoxLayout" name="card_layout">
+     <layout class="QHBoxLayout" name="horizontalLayout_card_split" stretch="1,1">
       <property name="spacing">
-       <number>40</number>
+       <number>0</number>
       </property>
       <property name="leftMargin">
-       <number>60</number>
+       <number>0</number>
       </property>
       <property name="topMargin">
-       <number>60</number>
+       <number>0</number>
       </property>
       <property name="rightMargin">
-       <number>60</number>
+       <number>0</number>
       </property>
       <property name="bottomMargin">
-       <number>60</number>
+       <number>0</number>
       </property>
       <item>
-       <widget class="QLabel" name="lbl_title">
-        <property name="text">
-         <string>🔒 NHẬP MÃ PIN ĐỂ MỞ KHÓA</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
+       <widget class="QFrame" name="frame_brand_left">
+        <layout class="QVBoxLayout" name="verticalLayout_brand">
+         <property name="leftMargin">
+          <number>12</number>
+         </property>
+         <property name="rightMargin">
+          <number>12</number>
+         </property>
+         <item>
+          <spacer name="verticalSpacer_b1">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="lbl_brand_station_pos">
+           <property name="text">
+            <string>StationPOS</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_b2">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
        </widget>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <property name="spacing">
-         <number>0</number>
+       <widget class="QFrame" name="frame_login_right">
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
         </property>
-        <item>
-         <widget class="QLineEdit" name="txt_pin">
-          <property name="minimumSize">
-           <size>
-            <width>400</width>
-            <height>50</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>400</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="echoMode">
-           <enum>QLineEdit::Password</enum>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-          <property name="placeholderText">
-           <string/>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btn_forgot">
-        <property name="cursor">
-         <cursorShape>PointingHandCursor</cursorShape>
-        </property>
-        <property name="text">
-         <string>Quên mã PIN?</string>
-        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_login">
+         <property name="spacing">
+          <number>34</number>
+         </property>
+         <property name="leftMargin">
+          <number>12</number>
+         </property>
+         <property name="topMargin">
+          <number>40</number>
+         </property>
+         <property name="rightMargin">
+          <number>12</number>
+         </property>
+         <property name="bottomMargin">
+          <number>40</number>
+         </property>
+         <item>
+          <spacer name="verticalSpacer_l1">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="lbl_title">
+           <property name="text">
+            <string>🔒 NHẬP MÃ PIN ĐỂ MỞ KHÓA</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <widget class="QLineEdit" name="txt_pin">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>48</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>320</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="layoutDirection">
+              <enum>Qt::LeftToRight</enum>
+             </property>
+             <property name="echoMode">
+              <enum>QLineEdit::Password</enum>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <item>
+            <widget class="QPushButton" name="btn_unlock">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>45</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>320</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="cursor">
+              <cursorShape>PointingHandCursor</cursorShape>
+             </property>
+             <property name="text">
+              <string>🔓 MỞ KHÓA</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btn_forgot">
+           <property name="cursor">
+            <cursorShape>PointingHandCursor</cursorShape>
+           </property>
+           <property name="text">
+            <string>Quên mã PIN?</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_l2">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>

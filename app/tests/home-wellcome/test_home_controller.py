@@ -3,7 +3,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QListWidgetItem
 
 # Import các DTO hoặc tạo class giả để làm data mồi
-from app.modules.home_wellcome.ui.controllers.home_welcome_controller import HomeWelcomeController
+from app.modules.dashboard.ui.controllers.home_welcome_controller import HomeWelcomeController
 
 
 # =========================================================================

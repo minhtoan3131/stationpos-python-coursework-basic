@@ -137,18 +137,18 @@ class InventoryManagementController(QWidget):
     # ==========================================
 
     def add_selected_to_cart(self):
-        """Xử lý thêm vào phiếu và hiển thị SpinBox Số lượng"""
+        """Xử lý thêm vào phiếu - Chỉnh sửa: BỎ tự động điền giá MAC lịch sử"""
         selected_row = self.ui.tbl_inventory.currentRow()
         if selected_row < 0: return
 
         product_info = self.raw_inventory_data[selected_row]
 
-        # 1. KIỂM TRA TRÙNG LẶP: Tăng giá trị SpinBox thay vì đổi text
-        for r in range(self.ui.tbl_items.rowCount()):
-            if self.ui.tbl_items.item(r, 0).text() == product_info.sku:
-                spn = self.ui.tbl_items.cellWidget(r, 3)  # Lấy widget SpinBox ra
-                spn.setValue(spn.value() + 1)  # Tăng thêm 1
-                return
+        # KIỂM TRA TRÙNG LẶP:
+        # for r in range(self.ui.tbl_items.rowCount()):
+        #     if self.ui.tbl_items.item(r, 0).text() == product_info.sku:
+        #         spn = self.ui.tbl_items.cellWidget(r, 3)
+        #         spn.setValue(spn.value() + 1)
+        #         return
 
         # 2. THÊM DÒNG MỚI
         full_product_list = self.inventory_service.search_products_for_import(product_info.sku)
@@ -169,30 +169,31 @@ class InventoryManagementController(QWidget):
         cbo_unit.addItem(p.base_unit_name, p.base_unit_id)
         if p.conversion_unit_id and p.conversion_unit_id != p.base_unit_id:
             cbo_unit.addItem(p.conversion_unit_name, p.conversion_unit_id)
+
+        # Đồng bộ tính lại tiền khi thay đổi ĐVT (đơn giá giữ nguyên theo thói quen gõ của user)
         cbo_unit.currentIndexChanged.connect(lambda: self.calculate_cart_total())
         self.ui.tbl_items.setCellWidget(row_idx, 2, cbo_unit)
 
-        # === TẠO SPINBOX SỐ LƯỢNG ===
+        # SpinBox Số lượng
         spn_qty = QSpinBox()
-        spn_qty.setMinimum(1)  # Ít nhất là nhập 1
-        spn_qty.setMaximum(999999)  # Giới hạn số lượng nhập tối đa
-        spn_qty.setValue(1)  # Mặc định là 1
+        spn_qty.setMinimum(1)
+        spn_qty.setMaximum(999999)
+        spn_qty.setValue(1)
         spn_qty.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        # Sửa lỗi UX cuộn chuột (Giống bên Form Sản phẩm)
         spn_qty.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         spn_qty.wheelEvent = lambda event: event.ignore()
-
-        # Bắt sự kiện: Cứ hễ người dùng bấm mũi tên tăng/giảm hoặc gõ phím -> Tính lại tiền
         spn_qty.valueChanged.connect(self.calculate_cart_total)
         self.ui.tbl_items.setCellWidget(row_idx, 3, spn_qty)
-        # ======================================
 
-        # Giá nhập
-        cost_val = float(p.cost_price) if p.cost_price else 0
-        self.ui.tbl_items.setItem(row_idx, 4, QTableWidgetItem(f"{cost_val:,.0f}"))
+        # === ĐỂ TRỐNG GIÁ NHẬP KHÔNG TỰ ĐIỀN ===
+        # Thay vì điền cost_val lịch sử, ta để chuỗi rỗng bắt buộc người dùng tự gõ giá thực tế
+        price_item = QTableWidgetItem("")
+        self.ui.tbl_items.setItem(row_idx, 4, price_item)
 
-        # Nút xóa
+        # Thành tiền tạm thời để trống/0
+        self.ui.tbl_items.setItem(row_idx, 5, QTableWidgetItem("0"))
+
+        # Nút xóa dòng
         btn_del = QPushButton("Xóa")
         btn_del.setStyleSheet("color: #ef4444; font-weight: bold; border: none;")
         btn_del.clicked.connect(lambda checked, b=btn_del: self.handle_delete_row(b))
@@ -211,43 +212,58 @@ class InventoryManagementController(QWidget):
         self.calculate_cart_total()
 
     def calculate_cart_total(self, *args):
+        """
+        Tính toán tổng tiền dòng và tổng tiền giỏ hàng.
+        ĐÃ SỬA LỖI: Hỗ trợ tính cộng dồn lũy tiến khi một sản phẩm xuất hiện trên nhiều dòng (Sỉ & Lẻ).
+        """
         self.ui.tbl_items.blockSignals(True)
         self.cart.clear()
+
+        # 2. Tạo biến tạm để tích lũy tổng tiền toàn bộ giỏ hàng
+        running_total_cart_amount = 0.0
 
         for r in range(self.ui.tbl_items.rowCount()):
             sku_item = self.ui.tbl_items.item(r, 0)
             spn_qty = self.ui.tbl_items.cellWidget(r, 3)
             price_item = self.ui.tbl_items.item(r, 4)
 
-            # Nếu dòng chưa được vẽ đầy đủ UI -> Bỏ qua an toàn
             if not sku_item or not spn_qty or not price_item:
                 continue
 
-            product_id = sku_item.data(Qt.ItemDataRole.UserRole)
             qty_val = spn_qty.value()
-            price_text = price_item.text().replace(",", "")
+            price_text = price_item.text().strip().replace(",", "")
+
+            # Nếu ô giá nhập trống, coi như thành tiền dòng này là 0đ để gõ tiếp
+            if not price_text:
+                self.ui.tbl_items.setItem(r, 5, QTableWidgetItem("0"))
+                continue
 
             try:
                 price_val = float(price_text)
-                self.cart.update_item(product_id, qty_val, price_val)
-                line_total = self.cart.items[product_id].line_total
+                if price_val < 0:
+                    self.ui.tbl_items.setItem(r, 5, QTableWidgetItem("0"))
+                    continue
+
+                # 3. Tính toán thành tiền trực tiếp của dòng hiện tại (Không qua object cart)
+                line_total = qty_val * price_val
                 self.ui.tbl_items.setItem(r, 5, QTableWidgetItem(f"{line_total:,.0f}"))
 
+                # 4. Cộng dồn trực tiếp vào tổng tiền chung của cả giỏ hàng
+                running_total_cart_amount += line_total
+
             except ValueError:
-                # Lỗi 1: Do dữ liệu sai định dạng (Expected Error) -> Bỏ qua nhẹ nhàng
-                print(f"Cảnh báo: Dữ liệu giá không hợp lệ ở dòng {r}. Đang bỏ qua...")
+                self.ui.tbl_items.setItem(r, 5, QTableWidgetItem("0"))
                 continue
-
             except Exception as e:
-                # Lỗi 2: Vét các lỗi không lường trước (Unexpected Error) -> Ghi Log để dev sửa, không làm sập app
                 print(f"Lỗi hệ thống không xác định tại dòng {r}: {str(e)}")
-                traceback.print_exc()  # In chi tiết dòng code gây lỗi ra console/file log
                 continue
 
-        # CẬP NHẬT TỔNG TIỀN CUỐI CÙNG
-        self.ui.lbl_total_value.setText(f"{self.cart.total_amount:,.0f} VND")
+        # 5. Cập nhật con số tổng tiền chuẩn xác sau khi đã cộng dồn toàn bộ các dòng
+        self.ui.lbl_total_value.setText(f"{running_total_cart_amount:,.0f} VND")
 
         self.ui.tbl_items.blockSignals(False)
+
+
     def clear_purchase_cart(self):
         self.ui.tbl_items.setRowCount(0)
         self.ui.txt_notes.clear()
@@ -257,66 +273,124 @@ class InventoryManagementController(QWidget):
         self.calculate_cart_total()
 
     def handle_save_purchase(self):
+        """Xác nhận nhập kho - Gom dữ liệu In-Memory trước khi gọi Service"""
         supplier_id = self.ui.cbo_supplier.currentData()
         if supplier_id == 0:
-            QMessageBox.warning(self, "Lỗi", "Vui lòng chọn Nhà cung cấp!")
+            QMessageBox.warning(self, "Cảnh báo", "Vui lòng chọn Nhà cung cấp!")
             return
 
-        items = []
-        raw_details_for_confirm = []  # Mảng lưu thông tin chữ để hiển thị lên bảng Confirm
+        # Nếu ngay cả trên bảng hiển thị còn không có dòng nào -> Báo trống luôn tại đây
+        if self.ui.tbl_items.rowCount() == 0:
+            QMessageBox.warning(self, "Cảnh báo", "Giỏ hàng nhập hiện đang trống!")
+            return
 
+        aggregated_items = {}
+        raw_details_for_confirm = []
+
+        # Quét qua từng dòng vật lý trên UI
         for r in range(self.ui.tbl_items.rowCount()):
+            sku_item = self.ui.tbl_items.item(r, 0)
+            prod_name = self.ui.tbl_items.item(r, 1).text()
             cbo_unit = self.ui.tbl_items.cellWidget(r, 2)
             spn_qty = self.ui.tbl_items.cellWidget(r, 3)
+            price_item = self.ui.tbl_items.item(r, 4)
 
+            if not sku_item or not spn_qty:
+                continue
+
+            product_id = sku_item.data(Qt.ItemDataRole.UserRole)
+            sku_text = sku_item.text()
             qty_val = spn_qty.value()
-            price_val = float(self.ui.tbl_items.item(r, 4).text().replace(",", ""))
 
-            # Build DTO cho Service
-            items.append(PurchaseOrderItemDTO(
-                product_id=self.ui.tbl_items.item(r, 0).data(Qt.ItemDataRole.UserRole),
-                unit_id=cbo_unit.currentData(),
-                quantity=qty_val,
-                unit_price=price_val
-            ))
+            # Đọc chuỗi text trong ô giá gõ tay
+            price_text = price_item.text().strip().replace(",", "") if price_item else ""
 
-            # Build dữ liệu hiển thị cho Dialog Confirm
+            # --- CHỐT CHẶN 2: BẮT LỖI GIÁ TRỐNG (ƯU TIÊN CAO) ---
+            # Chạy qua đây, dòng test UI có price_text == "" sẽ kích hoạt khối này ngay lập tức!
+            if not price_text:
+                QMessageBox.warning(
+                    self,
+                    "Dữ liệu không hợp lệ",
+                    f"Mặt hàng [{sku_text}] - {prod_name} đang để trống giá!"
+                )
+                return
+
+            try:
+                price_val = float(price_text)
+                if price_val <= 0:
+                    raise ValueError
+            except ValueError:
+                QMessageBox.warning(
+                    self,
+                    "Dữ liệu không hợp lệ",
+                    f"Giá nhập mặt hàng [{sku_text}] phải > 0!"
+                )
+                return
+
+            # Logic gom nhóm tính toán tiền dòng (Giữ nguyên)
+            line_total_amount = qty_val * price_val
+
+            full_product_list = self.inventory_service.search_products_for_import(sku_text)
+            if not full_product_list:
+                continue
+            p = full_product_list[0]
+
+            base_qty_line = qty_val
+            if p.conversion_unit_id and cbo_unit.currentData() == p.conversion_unit_id and p.conversion_ratio:
+                base_qty_line = qty_val * int(float(p.conversion_ratio))
+
+            if product_id not in aggregated_items:
+                aggregated_items[product_id] = {
+                    'product_id': product_id,
+                    'sku': sku_text,
+                    'name': prod_name,
+                    'base_unit_id': p.base_unit_id,
+                    'total_base_qty': 0,
+                    'total_amount': 0.0
+                }
+
+            aggregated_items[product_id]['total_base_qty'] += base_qty_line
+            aggregated_items[product_id]['total_amount'] += line_total_amount
+
             raw_details_for_confirm.append({
-                'sku': self.ui.tbl_items.item(r, 0).text(),
-                'name': self.ui.tbl_items.item(r, 1).text(),
-                'unit_name': cbo_unit.currentText(),
-                'qty': qty_val,
-                'price': price_val
+                'sku': sku_text, 'name': prod_name, 'unit_name': cbo_unit.currentText(),
+                'qty': qty_val, 'price': price_val
             })
 
-        if not items:
-            QMessageBox.warning(self, "Lỗi", "Giỏ hàng nhập đang trống!")
+        # --- CHỐT CHẶN 3: AN TOÀN CUỐI CÙNG ---
+        if not aggregated_items:
+            QMessageBox.warning(self, "Cảnh báo", "Giỏ hàng nhập hiện đang trống!")
             return
+
+        # Chuyển đổi dict đã gom nhóm thành mảng DTO gửi xuống Service
+        items_dto = []
+        for pid, info in aggregated_items.items():
+            # Vì đã nhân quy đổi trên App nên đơn giá mới = Tổng tiền / Tổng lượng cơ bản
+            calculated_unit_price = info['total_amount'] / info['total_base_qty']
+
+            items_dto.append(PurchaseOrderItemDTO(
+                product_id=pid,
+                unit_id=info['base_unit_id'],  # Đã đưa về đơn vị cơ bản
+                quantity=info['total_base_qty'],  # Tổng lượng cơ bản (Ví dụ: 57)
+                unit_price=calculated_unit_price  # Tổng giá trị chia đều (Ví dụ: 520k / 57)
+            ))
 
         try:
             dto = PurchaseOrderCreateDTO(
                 supplier_id=supplier_id,
                 note=self.ui.txt_notes.text(),
-                items=items
+                items=items_dto
             )
 
-            # ==========================================
-            # BƯỚC MỚI: HIỆN HỘP THOẠI XÁC NHẬN (CONFIRM)
-            # ==========================================
+            # Hiện hộp thoại xác nhận tổng thể (Hiển thị chi tiết sỉ/lẻ gốc trực quan cho user)
             supplier_name = self.ui.cbo_supplier.currentText()
             confirm_dialog = PurchaseOrderConfirmController(dto, supplier_name, raw_details_for_confirm)
+            if confirm_dialog.exec() != QDialog.DialogCode.Accepted: return
 
-            # Nếu người dùng bấm "Quay lại" (Reject) -> Dừng tiến trình lưu
-            if confirm_dialog.exec() != QDialog.DialogCode.Accepted:
-                return
-
-                # ==========================================
-            # NẾU ĐỒNG Ý: GỌI SERVICE ĐỂ LƯU VÀO DATABASE
-            # ==========================================
+            # Gọi Service xử lý - Lúc này mỗi SKU chỉ xuất hiện đúng 1 lần duy nhất!
             po_id = self.inventory_service.create_purchase_order(dto)
             QMessageBox.information(self, "Thành công", f"Đã nhập kho thành công! (Mã phiếu: {po_id})")
 
-            # Dọn sạch giỏ hàng và làm mới bảng tồn kho
             self.clear_purchase_cart()
             self.handle_search()
 

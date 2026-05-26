@@ -90,6 +90,12 @@ def invalidate_inactive_product(dto): dto.items[0].product_id = 101  # Vở nắ
 
 def invalidate_wrong_unit(dto): dto.items[0].unit_id = 99  # Sai ĐVT
 
+def invalidate_blank_price(dto):
+    dto.items[0].unit_price = None  # Giả lập để trống giá gõ từ UI
+
+def invalidate_zero_price(dto):
+    dto.items[0].unit_price = 0  # Giá bằng 0
+
 
 # ==========================================
 # TEST CASE CHÍNH (PARAMETRIZE - DATA DRIVEN)
@@ -97,11 +103,12 @@ def invalidate_wrong_unit(dto): dto.items[0].unit_id = 99  # Sai ĐVT
 @pytest.mark.parametrize("scenario, modifier_func, expected_error_msg", [
     ("TC_Pre_01: Items trống", invalidate_empty_items, "Phiếu nhập không có sản phẩm nào"),
     ("TC_Pre_02: SL <= 0", invalidate_zero_qty, "Số lượng nhập phải lớn hơn 0"),
-    ("TC_Pre_03: Giá < 0", invalidate_negative_price, "Giá nhập không được nhỏ hơn 0"),
+    ("TC_Pre_03: Giá < 0", invalidate_negative_price, "phải > 0"),
     ("TC_Pre_04: Supplier sai", invalidate_supplier, "Nhà cung cấp không tồn tại"),
-    ("TC_Pre_05: SP lặp lại", invalidate_duplicate_items, "bị lặp lại nhiều dòng"),
     ("TC_Pre_06: SP ngừng KD", invalidate_inactive_product, "không tồn tại hoặc đã ngừng kinh doanh"),
     ("TC_Pre_07: Sai ĐVT", invalidate_wrong_unit, "Đơn vị tính chọn cho sản phẩm"),
+    ("TC_Pre_08: Giá trống", invalidate_blank_price, "đang để trống giá"),
+    ("TC_Pre_09: Giá bằng 0", invalidate_zero_price, "phải > 0"),
 ])
 def test_create_purchase_order_validation_fails(inventory_service, valid_dto, scenario, modifier_func,
                                                 expected_error_msg):

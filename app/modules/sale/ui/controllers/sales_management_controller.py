@@ -6,6 +6,8 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt
 
+from app.modules.sale.services.invoice_history_service import InvoiceHistoryService
+from app.modules.sale.ui.controllers.invoice_history_controller import InvoiceHistoryController
 from app.modules.sale.ui.generated.ui_sales_management import Ui_SalesManagementWidget
 from app.modules.sale.ui.controllers.checkout_dialog_controller import CheckoutDialogController
 
@@ -20,7 +22,8 @@ class SalesManagementController(QWidget):
     def __init__(self,
                  inventory_service: InventoryService,
                  product_service: ProductService,
-                 sale_service: SaleService):
+                 sale_service: SaleService,
+                 invoice_history_service: InvoiceHistoryService):
         super().__init__()
         self.ui = Ui_SalesManagementWidget()
         self.ui.setupUi(self)
@@ -28,12 +31,18 @@ class SalesManagementController(QWidget):
         self.inventory_service = inventory_service
         self.product_service = product_service
         self.sale_service = sale_service
+        self.invoice_history_service = invoice_history_service
 
         # Dictionary lưu trữ dữ liệu ngầm cho mỗi dòng trên bảng Danh sách sản phẩm
         self.raw_sales_data = {}
 
         self.setup_ui_custom()
         self.bind_events()
+
+        self.invoice_history_controller = InvoiceHistoryController(
+            self.ui,
+            self.invoice_history_service
+        )
 
         # Load dữ liệu bảng bên trái ngay khi mở
         self.refresh_product_list()
@@ -62,6 +71,16 @@ class SalesManagementController(QWidget):
 
         self.ui.btn_checkout.clicked.connect(self.handle_checkout)
         self.ui.btn_cancel_bill.clicked.connect(self.clear_cart)
+
+        self.ui.tabWidget_sales.currentChanged.connect(self.handle_tab_changed)
+
+    def handle_tab_changed(self, index):
+        if index == 0:  # Trở về Tab Bán hàng
+            self.ui.txt_search_sales.clear()
+            self.refresh_product_list()  # Cập nhật tồn kho mới nhất
+        elif index == 1:  # Chuyển sang Tab Lịch sử hóa đơn
+            self.ui.txt_search_invoice.clear()
+            self.invoice_history_controller.initial_load()
 
     # ==========================================
     # LOGIC BÊN TRÁI: DANH SÁCH SẢN PHẨM

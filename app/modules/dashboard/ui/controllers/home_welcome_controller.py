@@ -3,7 +3,7 @@ import traceback
 from PyQt6.QtWidgets import QWidget, QListWidgetItem
 from PyQt6.QtCore import Qt, pyqtSignal
 
-from app.modules.home_wellcome.ui.generated.ui_home_wellcome import Ui_HomeWelcomeWidget
+from app.modules.dashboard.ui.generated.ui_home_wellcome import Ui_HomeWelcomeWidget
 
 
 class HomeWelcomeController(QWidget):

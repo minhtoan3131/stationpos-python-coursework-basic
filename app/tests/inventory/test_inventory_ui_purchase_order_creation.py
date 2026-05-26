@@ -1,7 +1,7 @@
 import pytest
 import types
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QDialog
+from PyQt6.QtWidgets import QDialog, QTableWidgetItem
 
 from app.modules.inventory.ui.controllers.inventory_management_controller import InventoryManagementController
 from app.core.exceptions.validation_exception import ValidationException
@@ -33,23 +33,25 @@ def inventory_window(qtbot, mocker):
 
 
 def seed_cart_data(window, qtbot):
-    """Mồi data chuẩn: Trỏ vào nhà cung cấp và giả lập thao tác click đưa SP vào giỏ"""
-    # 1. Trỏ vào Nhà cung cấp hợp lệ
+    """Mồi data chuẩn: Đã sửa đổi để điền thủ công giá nhập vào ô QTableWidget"""
     window.ui.cbo_supplier.setCurrentIndex(1)
 
-    # 2. Tạo 1 sản phẩm giả trên bảng Tồn Kho (trái)
     mock_product = types.SimpleNamespace(
         id=100, sku='SP01', name='Bút', base_unit_id=1, base_unit_name='Cây',
-        conversion_unit_id=None, cost_price=5000
+        conversion_unit_id=2, conversion_unit_name='Hộp', conversion_ratio=10, cost_price=5000
     )
     window.raw_inventory_data = {0: mock_product}
     window.ui.tbl_inventory.insertRow(0)
     window.ui.tbl_inventory.setCurrentCell(0, 0)
     window.mock_inventory_service.search_products_for_import.return_value = [mock_product]
 
-    # 3. Bấm nút "Thêm vào phiếu" (Hành động này sẽ bắn data từ bảng trái sang bảng phải)
+    # Bấm nút đưa vào giỏ
     qtbot.mouseClick(window.ui.btn_import_action, Qt.MouseButton.LeftButton)
 
+    # === Giả lập người dùng gõ đơn giá nhập vào cột số 4 vì mặc định đang để trống ===
+    window.ui.tbl_items.item(0, 4).setText("5000")
+    # Kích hoạt sự kiện thay đổi để UI tính toán lại tiền dòng và tiền tổng
+    window.calculate_cart_total()
 
 # ==========================================
 # CÁC KỊCH BẢN TỪ CHỐI NGAY TẠI GIAO DIỆN (PRE-CONDITIONS)
@@ -143,3 +145,37 @@ def test_should_show_critical_error_and_preserve_cart_data_when_backend_crashes(
 
     mock_critical.assert_called_once()
     assert inventory_window.ui.tbl_items.rowCount() == 1  # Giỏ hàng nguyên vẹn
+
+
+def test_should_show_warning_and_prevent_save_when_item_price_is_blank_on_ui(qtbot, inventory_window, mocker):
+    """UI Test: Khi có mặt hàng để trống giá nhập, bấm lưu phải hiện thông báo cảnh báo"""
+    mock_warning = mocker.patch(
+        'app.modules.inventory.ui.controllers.inventory_management_controller.QMessageBox.warning')
+
+    # 1. GIVEN: Sử dụng hàm seed_cart_data gốc để giỏ hàng được đổ ĐẦY ĐỦ dữ liệu nền chuẩn mực (SKU, Tên, SL)
+    # Hàm này mặc định điền giá "5000" vào ô giá
+    seed_cart_data(inventory_window, qtbot)
+
+    # 2. Thực hiện hành động phá dữ liệu: Lấy ô giá hiện tại (chắc chắn không bị None nhờ seed_cart_data)
+    # Ghi đè chuỗi rỗng "" để giả lập người dùng xóa trắng giá nhập đi
+    price_cell = inventory_window.ui.tbl_items.item(0, 4)
+    assert price_cell is not None, "Ô giá nhập phải được khởi tạo từ seed_cart_data"
+    price_cell.setText("")
+
+    # Ép giỏ hàng tính toán lại tổng tiền theo giá trống vừa sửa
+    inventory_window.calculate_cart_total()
+
+    # 3. WHEN: Hành động bấm nút xác nhận lưu toàn bộ phiếu nhập
+    qtbot.mouseClick(inventory_window.ui.btn_save_all, Qt.MouseButton.LeftButton)
+
+    # 4. THEN: Kiểm chứng kết quả hệ thống bắt lỗi giá trống
+    mock_warning.assert_called_once()
+
+    # Gom toàn bộ chuỗi text từ tham số QMessageBox truyền ra
+    actual_warning_message = " ".join([str(arg) for arg in mock_warning.call_args[0]])
+
+    # Lúc này giỏ hàng đã có 1 mặt hàng thực sự (rowCount = 1), hệ thống bắt buộc phải ném lỗi giá trống
+    assert "đang để trống giá" in actual_warning_message
+
+    # Đảm bảo Service tầng dưới tuyệt đối không được gọi khi dữ liệu lỗi
+    inventory_window.mock_inventory_service.create_purchase_order.assert_not_called()

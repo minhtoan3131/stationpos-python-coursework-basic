@@ -140,3 +140,43 @@ def test_create_purchase_order_happy_path_state_changes(inventory_service, uow):
     assert db_inv.stock_transactions[1]['product_id'] == 200
     assert db_inv.stock_transactions[1]['qty'] == 10
     assert db_inv.stock_transactions[1]['ref_id'] == saved_po_id
+
+
+def test_create_purchase_order_with_mixed_uom_same_product(inventory_service, uow):
+    """
+    TC_Post_04: Kiểm thử path đặc thù nhập VỪA SỈ VỪA LẺ trên cùng một mặt hàng.
+    UI gộp dữ liệu In-Memory: 5 Hộp (Quy đổi 10 = 50 Cái) giá 90,000/hộp + 7 Cái giá 10,000/cái.
+    Tổng số lượng cơ bản = 57. Tổng số tiền thực trả = 450,000 + 70,000 = 520,000.
+    """
+    db_inv = uow.inventory_repo
+    db_prod = uow.product_repo
+
+    # Trạng thái ban đầu trong Fake DB: Bút bi (ID 100) đang có 0 cây, giá trị 0đ
+    db_inv.inventory[100] = {"quantity": 0, "total_value": Decimal('0')}
+
+    # Giả lập mảng DTO đã được Controller gom nhóm In-Memory gửi xuống Service:
+    # Lượng cơ bản = 57, Đơn giá quy đổi bình quân trên App = 520,000 / 57
+    calculated_unit_price = 520000 / 57
+    item_aggregated = PurchaseOrderItemDTO(
+        product_id=100,
+        unit_id=10,  # Ép về đơn vị cơ bản (Cái)
+        quantity=57,
+        unit_price=calculated_unit_price
+    )
+
+    dto = PurchaseOrderCreateDTO(supplier_id=1, note="Nhập vừa sỉ vừa lẻ", items=[item_aggregated])
+
+    # WHEN: Thực thi lưu phiếu
+    saved_po_id = inventory_service.create_purchase_order(dto)
+
+    # THEN: Kiểm chứng số liệu tồn kho cuối cùng
+    # Kho phải tăng chuẩn xác lên 57 cái
+    assert db_inv.inventory[100]['quantity'] == 57
+    # Tổng tiền kho phải gánh trọn vẹn 520,000đ (cho cả 2 lô sỉ lẻ)
+    assert db_inv.inventory[100]['total_value'] == Decimal('520000.0000')
+    # Giá MAC mới = 520,000 / 57 = 9122.8070
+    assert db_prod.products[100]['cost_price'] == Decimal('9122.8070')
+
+    # Audit Trail: Phải có log dịch chuyển kho IMPORT với số lượng là 57
+    assert len(db_inv.stock_transactions) == 1
+    assert db_inv.stock_transactions[0]['qty'] == 57

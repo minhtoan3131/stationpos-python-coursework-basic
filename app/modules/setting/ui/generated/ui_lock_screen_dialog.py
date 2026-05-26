@@ -14,74 +14,163 @@ class Ui_LockScreenDialog(object):
         LockScreenDialog.setObjectName("LockScreenDialog")
         LockScreenDialog.resize(800, 600)
         LockScreenDialog.setStyleSheet("\n"
+"    /* Lớp nền mờ phủ toàn màn hình */\n"
 "    QDialog {\n"
-"        background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 rgba(241, 245, 249, 0.85), stop:1 rgba(226, 232, 240, 0.95));\n"
+"        background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 rgba(241, 245, 249, 0.90), stop:1 rgba(226, 232, 240, 0.95));\n"
 "    }\n"
+"\n"
+"    /* Cấu trúc Khung trung tâm (Card) được chia đôi */\n"
 "    QFrame#center_card {\n"
-"        background-color: #ffffff;\n"
+"        background-color: transparent;\n"
 "        border: 1px solid #cbd5e1;\n"
 "        border-radius: 16px;\n"
 "    }\n"
-"    QLabel#lbl_title {\n"
-"        color: #1e293b;\n"
-"        font-size: 22px;\n"
-"        font-weight: bold;\n"
+"\n"
+"    /* Khung Thương hiệu bên trái */\n"
+"    QFrame#frame_brand_left {\n"
+"        background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 #10b981, stop:1 #064e3b);\n"
+"        border-top-left-radius: 15px;\n"
+"        border-bottom-left-radius: 15px;\n"
 "        border: none;\n"
 "    }\n"
+"\n"
+"    /* Khung Nhập liệu bên phải */\n"
+"    QFrame#frame_login_right {\n"
+"        background-color: #ffffff;\n"
+"        border-top-right-radius: 15px;\n"
+"        border-bottom-right-radius: 15px;\n"
+"        border: none;\n"
+"    }\n"
+"\n"
+"    QLabel#lbl_brand_station_pos {\n"
+"        font-size: 42px;\n"
+"        font-weight: bold;\n"
+"        color: #ffffff;\n"
+"        letter-spacing: 1px;\n"
+"        background-color: transparent;\n"
+"    }\n"
+"\n"
+"    QLabel#lbl_title {\n"
+"        color: #1e293b;\n"
+"        font-size: 24px;\n"
+"        font-weight: bold;\n"
+"        border: none;\n"
+"        background-color: transparent;\n"
+"    }\n"
+"\n"
 "    QLineEdit#txt_pin {\n"
 "        background-color: #f8fafc;\n"
 "        border: 2px solid #e2e8f0;\n"
 "        border-radius: 8px;\n"
-"        color: #0ea5e9;\n"
-"        font-size: 28px;\n"
-"        font-weight: bold;\n"
+"        padding: 0px 15px;\n"
+"        font-size: 20px;\n"
+"        color: #0f172a;\n"
 "    }\n"
 "    QLineEdit#txt_pin:focus {\n"
-"        border: 2px solid #38bdf8;\n"
+"        border: 2px solid #0284c7;\n"
 "        background-color: #ffffff;\n"
 "    }\n"
-"    QPushButton#btn_forgot {\n"
-"        color: #64748b;\n"
+"\n"
+"    QPushButton#btn_unlock {\n"
+"        background-color: #0284c7;\n"
+"        color: white;\n"
 "        border: none;\n"
-"        background: none;\n"
+"        border-radius: 8px;\n"
+"        font-size: 14px;\n"
+"        font-weight: bold;\n"
+"    }\n"
+"    QPushButton#btn_unlock:hover {\n"
+"        background-color: #0369a1;\n"
+"    }\n"
+"    QPushButton#btn_unlock:pressed {\n"
+"        background-color: #075985;\n"
+"    }\n"
+"\n"
+"    QPushButton#btn_forgot {\n"
+"        background-color: transparent;\n"
+"        border: none;\n"
+"        color: #64748b;\n"
 "        font-size: 13px;\n"
-"        text-decoration: underline;\n"
+"        font-weight: 500;\n"
 "    }\n"
 "    QPushButton#btn_forgot:hover {\n"
-"        color: #3b82f6;\n"
+"        color: #0284c7;\n"
+"        text-decoration: underline;\n"
 "    }\n"
 "   ")
         self.main_layout = QtWidgets.QVBoxLayout(LockScreenDialog)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
+        self.main_layout.setSpacing(0)
         self.main_layout.setObjectName("main_layout")
         self.center_card = QtWidgets.QFrame(parent=LockScreenDialog)
-        self.center_card.setMinimumSize(QtCore.QSize(560, 400))
-        self.center_card.setMaximumSize(QtCore.QSize(560, 400))
+        self.center_card.setMinimumSize(QtCore.QSize(800, 480))
+        self.center_card.setMaximumSize(QtCore.QSize(800, 420))
         self.center_card.setObjectName("center_card")
-        self.card_layout = QtWidgets.QVBoxLayout(self.center_card)
-        self.card_layout.setContentsMargins(60, 60, 60, 60)
-        self.card_layout.setSpacing(40)
-        self.card_layout.setObjectName("card_layout")
-        self.lbl_title = QtWidgets.QLabel(parent=self.center_card)
+        self.horizontalLayout_card_split = QtWidgets.QHBoxLayout(self.center_card)
+        self.horizontalLayout_card_split.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_card_split.setSpacing(0)
+        self.horizontalLayout_card_split.setObjectName("horizontalLayout_card_split")
+        self.frame_brand_left = QtWidgets.QFrame(parent=self.center_card)
+        self.frame_brand_left.setObjectName("frame_brand_left")
+        self.verticalLayout_brand = QtWidgets.QVBoxLayout(self.frame_brand_left)
+        self.verticalLayout_brand.setContentsMargins(12, -1, 12, -1)
+        self.verticalLayout_brand.setObjectName("verticalLayout_brand")
+        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
+        self.verticalLayout_brand.addItem(spacerItem)
+        self.lbl_brand_station_pos = QtWidgets.QLabel(parent=self.frame_brand_left)
+        self.lbl_brand_station_pos.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.lbl_brand_station_pos.setObjectName("lbl_brand_station_pos")
+        self.verticalLayout_brand.addWidget(self.lbl_brand_station_pos)
+        spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
+        self.verticalLayout_brand.addItem(spacerItem1)
+        self.horizontalLayout_card_split.addWidget(self.frame_brand_left)
+        self.frame_login_right = QtWidgets.QFrame(parent=self.center_card)
+        self.frame_login_right.setLayoutDirection(QtCore.Qt.LayoutDirection.LeftToRight)
+        self.frame_login_right.setObjectName("frame_login_right")
+        self.verticalLayout_login = QtWidgets.QVBoxLayout(self.frame_login_right)
+        self.verticalLayout_login.setContentsMargins(12, 40, 12, 40)
+        self.verticalLayout_login.setSpacing(34)
+        self.verticalLayout_login.setObjectName("verticalLayout_login")
+        spacerItem2 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
+        self.verticalLayout_login.addItem(spacerItem2)
+        self.lbl_title = QtWidgets.QLabel(parent=self.frame_login_right)
         self.lbl_title.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.lbl_title.setObjectName("lbl_title")
-        self.card_layout.addWidget(self.lbl_title)
+        self.verticalLayout_login.addWidget(self.lbl_title)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
-        self.horizontalLayout.setSpacing(0)
         self.horizontalLayout.setObjectName("horizontalLayout")
-        self.txt_pin = QtWidgets.QLineEdit(parent=self.center_card)
-        self.txt_pin.setMinimumSize(QtCore.QSize(400, 50))
-        self.txt_pin.setMaximumSize(QtCore.QSize(400, 16777215))
+        self.txt_pin = QtWidgets.QLineEdit(parent=self.frame_login_right)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.txt_pin.sizePolicy().hasHeightForWidth())
+        self.txt_pin.setSizePolicy(sizePolicy)
+        self.txt_pin.setMinimumSize(QtCore.QSize(0, 48))
+        self.txt_pin.setMaximumSize(QtCore.QSize(320, 16777215))
+        self.txt_pin.setLayoutDirection(QtCore.Qt.LayoutDirection.LeftToRight)
         self.txt_pin.setEchoMode(QtWidgets.QLineEdit.EchoMode.Password)
         self.txt_pin.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        self.txt_pin.setPlaceholderText("")
         self.txt_pin.setObjectName("txt_pin")
         self.horizontalLayout.addWidget(self.txt_pin)
-        self.card_layout.addLayout(self.horizontalLayout)
-        self.btn_forgot = QtWidgets.QPushButton(parent=self.center_card)
+        self.verticalLayout_login.addLayout(self.horizontalLayout)
+        self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+        self.btn_unlock = QtWidgets.QPushButton(parent=self.frame_login_right)
+        self.btn_unlock.setMinimumSize(QtCore.QSize(0, 45))
+        self.btn_unlock.setMaximumSize(QtCore.QSize(320, 16777215))
+        self.btn_unlock.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
+        self.btn_unlock.setObjectName("btn_unlock")
+        self.horizontalLayout_2.addWidget(self.btn_unlock)
+        self.verticalLayout_login.addLayout(self.horizontalLayout_2)
+        self.btn_forgot = QtWidgets.QPushButton(parent=self.frame_login_right)
         self.btn_forgot.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
         self.btn_forgot.setObjectName("btn_forgot")
-        self.card_layout.addWidget(self.btn_forgot)
+        self.verticalLayout_login.addWidget(self.btn_forgot)
+        spacerItem3 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
+        self.verticalLayout_login.addItem(spacerItem3)
+        self.horizontalLayout_card_split.addWidget(self.frame_login_right)
+        self.horizontalLayout_card_split.setStretch(0, 1)
+        self.horizontalLayout_card_split.setStretch(1, 1)
         self.main_layout.addWidget(self.center_card)
 
         self.retranslateUi(LockScreenDialog)
@@ -90,5 +179,7 @@ class Ui_LockScreenDialog(object):
     def retranslateUi(self, LockScreenDialog):
         _translate = QtCore.QCoreApplication.translate
         LockScreenDialog.setWindowTitle(_translate("LockScreenDialog", "Màn hình khóa bảo vệ"))
+        self.lbl_brand_station_pos.setText(_translate("LockScreenDialog", "StationPOS"))
         self.lbl_title.setText(_translate("LockScreenDialog", "🔒 NHẬP MÃ PIN ĐỂ MỞ KHÓA"))
+        self.btn_unlock.setText(_translate("LockScreenDialog", "🔓 MỞ KHÓA"))
         self.btn_forgot.setText(_translate("LockScreenDialog", "Quên mã PIN?"))

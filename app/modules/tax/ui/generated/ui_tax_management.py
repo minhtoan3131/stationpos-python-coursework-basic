@@ -241,7 +241,7 @@ class Ui_TaxManagementWidget(object):
         _translate = QtCore.QCoreApplication.translate
         TaxManagementWidget.setWindowTitle(_translate("TaxManagementWidget", "Quản lý Thuế Hộ Kinh Doanh"))
         self.lbl_title.setStyleSheet(_translate("TaxManagementWidget", "font-size: 24px; font-weight: 900;"))
-        self.lbl_title.setText(_translate("TaxManagementWidget", "CẤU HÌNH & DỰ TOÁN THUẾ HKD"))
+        self.lbl_title.setText(_translate("TaxManagementWidget", "Cấu hình & Dự toán thuế HKD"))
         self.lbl_year_text.setStyleSheet(_translate("TaxManagementWidget", "font-weight: bold; color: #64748b;"))
         self.lbl_year_text.setText(_translate("TaxManagementWidget", "Chọn năm báo cáo:"))
         self.card1.setProperty("class", _translate("TaxManagementWidget", "kpi-card"))

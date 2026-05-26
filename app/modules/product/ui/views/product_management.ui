@@ -29,8 +29,8 @@ QFrame#frame_container {
 
 QLabel#lbl_title {
     font-size: 26px;
-    font-weight: 700;
-    color: #1a1a1a;
+    font-weight: 800;
+    color: #0f172a;
     margin-bottom: 10px;
 }
 
@@ -105,7 +105,7 @@ QHeaderView::section {
    <item>
     <widget class="QLabel" name="lbl_title">
      <property name="text">
-      <string>QUẢN LÝ SẢN PHẨM</string>
+      <string>Quản lý sản phẩm</string>
      </property>
     </widget>
    </item>

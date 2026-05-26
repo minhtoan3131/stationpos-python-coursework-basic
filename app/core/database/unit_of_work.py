@@ -5,6 +5,7 @@ from app.modules.inventory.repositories.impl.po_history_repository_impl import P
 from app.modules.product.repositories.impl.product_repository_impl import ProductRepositoryImpl
 from app.modules.product.repositories.impl.supplier_repository_impl import SupplierRepositoryImpl
 from app.modules.report.repositories.impl.report_repository_impl import ReportRepositoryImpl
+from app.modules.sale.repositories.impl.invoice_history_repository_impl import InvoiceHistoryRepositoryImpl
 from app.modules.sale.repositories.impl.sale_repository_impl import SaleRepositoryImpl
 from app.modules.setting.repositories.impl.setting_repository_impl import SettingRepositoryImpl
 from app.modules.tax.repositories.impl.tax_repository_impl import TaxConfigRepository, TaxReportRepository
@@ -35,6 +36,7 @@ class UnitOfWork:
         self.tax_report_repo = TaxReportRepository(self.connection)
         self.setting_repo = SettingRepositoryImpl(self.connection)
         self.po_history_repo = PurchaseOrderHistoryRepositoryImpl(self.connection)
+        self.invoice_history_repo = InvoiceHistoryRepositoryImpl(self.connection)
 
         return self
 

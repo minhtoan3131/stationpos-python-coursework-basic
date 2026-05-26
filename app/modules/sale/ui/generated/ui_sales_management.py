@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'app/ui/sale/views/sales_management.ui'
+# Form implementation generated from reading ui file 'app/modules/sale/ui/views/sales_management.ui'
 #
 # Created by: PyQt6 UI code generator 6.11.0
 #
@@ -12,9 +12,9 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 class Ui_SalesManagementWidget(object):
     def setupUi(self, SalesManagementWidget):
         SalesManagementWidget.setObjectName("SalesManagementWidget")
-        SalesManagementWidget.resize(1400, 800)
+        SalesManagementWidget.resize(1400, 850)
         SalesManagementWidget.setStyleSheet("\n"
-"    /* Cấu trúc nền tảng Enterprise POS */\n"
+"    /* Nền tảng Enterprise POS */\n"
 "    QWidget {\n"
 "        background-color: #f8fafc;\n"
 "        font-family: \'Segoe UI\', \'Roboto\', sans-serif;\n"
@@ -35,7 +35,8 @@ class Ui_SalesManagementWidget(object):
 "        padding-bottom: 5px;\n"
 "    }\n"
 "\n"
-"    QLabel#lbl_sub_left, QLabel#lbl_sub_right {\n"
+"    /* Tiêu đề các cột/khung */\n"
+"    QLabel#lbl_sub_left, QLabel#lbl_sub_right, QLabel#lbl_sub_history_sales {\n"
 "        font-size: 15px;\n"
 "        font-weight: 700;\n"
 "        color: #475569;\n"
@@ -44,13 +45,18 @@ class Ui_SalesManagementWidget(object):
 "        padding-bottom: 4px;\n"
 "    }\n"
 "\n"
-"    QLineEdit {\n"
+"    /* Riêng tab Lịch sử dùng màu xanh dương để phân biệt với POS */\n"
+"    QLabel#lbl_sub_history_sales {\n"
+"        border-bottom: 2px solid #3b82f6;\n"
+"    }\n"
+"\n"
+"    QLineEdit, QComboBox, QDateEdit {\n"
 "        padding: 8px 12px;\n"
 "        border: 1px solid #cbd5e1;\n"
 "        border-radius: 6px;\n"
 "        background-color: #ffffff;\n"
 "    }\n"
-"    QLineEdit:focus {\n"
+"    QLineEdit:focus, QComboBox:focus, QDateEdit:focus {\n"
 "        border: 2px solid #10b981;\n"
 "        background-color: #f0fdf4;\n"
 "    }\n"
@@ -73,46 +79,41 @@ class Ui_SalesManagementWidget(object):
 "        border-bottom: 1px solid #e2e8f0;\n"
 "    }\n"
 "\n"
-"    /* Styling cho QSpinBox khi chèn vào bảng giỏ hàng */\n"
-"    QSpinBox {\n"
-"        border: 1px solid #cbd5e1;\n"
-"        border-radius: 4px;\n"
-"        padding: 2px;\n"
-"        background-color: #ffffff;\n"
-"        min-width: 50px;\n"
-"    }\n"
-"    QSpinBox:focus {\n"
-"        border: 1px solid #10b981;\n"
-"        background-color: #f0fdf4;\n"
-"    }\n"
-"\n"
 "    QPushButton {\n"
 "        padding: 10px 20px;\n"
 "        border-radius: 6px;\n"
 "        font-weight: bold;\n"
 "    }\n"
 "\n"
+"    /* Buttons cho POS (Màu xanh lá) */\n"
 "    QPushButton#btn_search { background-color: #64748b; color: white; }\n"
 "    QPushButton#btn_add_to_cart { background-color: #10b981; color: white; border: none; }\n"
-"    QPushButton#btn_add_to_cart:hover { background-color: #059669; }\n"
-"\n"
-"    QPushButton#btn_cancel_bill { background-color: #ef4444; color: white; border: none; }\n"
-"    QPushButton#btn_cancel_bill:hover { background-color: #dc2626; }\n"
-"\n"
 "    QPushButton#btn_checkout { background-color: #059669; color: white; border: none; font-size: 16px; }\n"
-"    QPushButton#btn_checkout:hover { background-color: #047857; }\n"
 "\n"
-"    QLabel#lbl_total_bill {\n"
+"    /* Buttons cho Lịch sử (Màu xanh dương) */\n"
+"    QPushButton#btn_filter_invoice { background-color: #3b82f6; color: white; border: none; }\n"
+"    QPushButton#btn_reprint_invoice { background-color: #0ea5e9; color: white; border: none; }\n"
+"    QPushButton#btn_export_invoice_excel { background-color: #0f766e; color: white; border: none; }\n"
+"\n"
+"    /* Button Hủy (Màu đỏ) */\n"
+"    QPushButton#btn_cancel_bill, QPushButton#btn_cancel_invoice { background-color: #ef4444; color: white; border: none; }\n"
+"\n"
+"    QLabel#lbl_total_bill, QLabel#lbl_detail_total_value {\n"
 "        font-size: 32px;\n"
 "        font-weight: 900;\n"
 "        color: #ef4444;\n"
 "    }\n"
 "\n"
-"    QLabel#lbl_total_text {\n"
-"        font-size: 14px;\n"
-"        font-weight: bold;\n"
-"        color: #64748b;\n"
+"    /* Giao diện Tab Widget hiện đại */\n"
+"    QTabWidget::tab-bar { alignment: left; }\n"
+"    QTabWidget::pane { border: 1px solid #e2e8f0; background: #ffffff; border-radius: 8px; }\n"
+"    QTabBar::tab {\n"
+"        background: #e2e8f0; color: #475569; padding: 10px 20px; font-weight: bold;\n"
+"        border-top-left-radius: 6px; border-top-right-radius: 6px; margin-right: 4px;\n"
 "    }\n"
+"    QTabBar::tab:selected { background: #ffffff; color: #10b981; border-bottom: 3px solid #10b981; }\n"
+"\n"
+"    /* Tab Lịch sử có thể đổi màu indicator sang xanh dương nếu muốn bằng code, ở đây mặc định theo POS */\n"
 "   ")
         self.verticalLayout_main = QtWidgets.QVBoxLayout(SalesManagementWidget)
         self.verticalLayout_main.setContentsMargins(15, 15, 15, 15)
@@ -121,10 +122,14 @@ class Ui_SalesManagementWidget(object):
         self.lbl_title = QtWidgets.QLabel(parent=SalesManagementWidget)
         self.lbl_title.setObjectName("lbl_title")
         self.verticalLayout_main.addWidget(self.lbl_title)
-        self.horizontalLayout_content = QtWidgets.QHBoxLayout()
+        self.tabWidget_sales = QtWidgets.QTabWidget(parent=SalesManagementWidget)
+        self.tabWidget_sales.setObjectName("tabWidget_sales")
+        self.tab_pos = QtWidgets.QWidget()
+        self.tab_pos.setObjectName("tab_pos")
+        self.horizontalLayout_content = QtWidgets.QHBoxLayout(self.tab_pos)
         self.horizontalLayout_content.setSpacing(20)
         self.horizontalLayout_content.setObjectName("horizontalLayout_content")
-        self.frame_left = QtWidgets.QFrame(parent=SalesManagementWidget)
+        self.frame_left = QtWidgets.QFrame(parent=self.tab_pos)
         self.frame_left.setObjectName("frame_left")
         self.verticalLayout_left = QtWidgets.QVBoxLayout(self.frame_left)
         self.verticalLayout_left.setProperty("contentsMargins", 15)
@@ -168,7 +173,7 @@ class Ui_SalesManagementWidget(object):
         self.layout_left_btns.addWidget(self.btn_add_to_cart)
         self.verticalLayout_left.addLayout(self.layout_left_btns)
         self.horizontalLayout_content.addWidget(self.frame_left)
-        self.frame_right = QtWidgets.QFrame(parent=SalesManagementWidget)
+        self.frame_right = QtWidgets.QFrame(parent=self.tab_pos)
         self.frame_right.setObjectName("frame_right")
         self.verticalLayout_right = QtWidgets.QVBoxLayout(self.frame_right)
         self.verticalLayout_right.setProperty("contentsMargins", 15)
@@ -224,15 +229,165 @@ class Ui_SalesManagementWidget(object):
         self.horizontalLayout_content.addWidget(self.frame_right)
         self.horizontalLayout_content.setStretch(0, 1)
         self.horizontalLayout_content.setStretch(1, 1)
-        self.verticalLayout_main.addLayout(self.horizontalLayout_content)
+        self.tabWidget_sales.addTab(self.tab_pos, "")
+        self.tab_invoice_history = QtWidgets.QWidget()
+        self.tab_invoice_history.setObjectName("tab_invoice_history")
+        self.verticalLayout_history = QtWidgets.QVBoxLayout(self.tab_invoice_history)
+        self.verticalLayout_history.setSpacing(15)
+        self.verticalLayout_history.setObjectName("verticalLayout_history")
+        self.layout_filters_invoice = QtWidgets.QHBoxLayout()
+        self.layout_filters_invoice.setSpacing(10)
+        self.layout_filters_invoice.setObjectName("layout_filters_invoice")
+        self.txt_search_invoice = QtWidgets.QLineEdit(parent=self.tab_invoice_history)
+        self.txt_search_invoice.setMinimumSize(QtCore.QSize(250, 0))
+        self.txt_search_invoice.setObjectName("txt_search_invoice")
+        self.layout_filters_invoice.addWidget(self.txt_search_invoice)
+        self.lbl_date_from = QtWidgets.QLabel(parent=self.tab_invoice_history)
+        self.lbl_date_from.setObjectName("lbl_date_from")
+        self.layout_filters_invoice.addWidget(self.lbl_date_from)
+        self.date_invoice_from = QtWidgets.QDateEdit(parent=self.tab_invoice_history)
+        self.date_invoice_from.setCalendarPopup(True)
+        self.date_invoice_from.setObjectName("date_invoice_from")
+        self.layout_filters_invoice.addWidget(self.date_invoice_from)
+        self.lbl_date_to = QtWidgets.QLabel(parent=self.tab_invoice_history)
+        self.lbl_date_to.setObjectName("lbl_date_to")
+        self.layout_filters_invoice.addWidget(self.lbl_date_to)
+        self.date_invoice_to = QtWidgets.QDateEdit(parent=self.tab_invoice_history)
+        self.date_invoice_to.setCalendarPopup(True)
+        self.date_invoice_to.setObjectName("date_invoice_to")
+        self.layout_filters_invoice.addWidget(self.date_invoice_to)
+        self.cbo_payment_method_filter = QtWidgets.QComboBox(parent=self.tab_invoice_history)
+        self.cbo_payment_method_filter.setMinimumSize(QtCore.QSize(150, 0))
+        self.cbo_payment_method_filter.setObjectName("cbo_payment_method_filter")
+        self.cbo_payment_method_filter.addItem("")
+        self.cbo_payment_method_filter.addItem("")
+        self.cbo_payment_method_filter.addItem("")
+        self.layout_filters_invoice.addWidget(self.cbo_payment_method_filter)
+        self.cbo_status_invoice = QtWidgets.QComboBox(parent=self.tab_invoice_history)
+        self.cbo_status_invoice.setMinimumSize(QtCore.QSize(150, 0))
+        self.cbo_status_invoice.setObjectName("cbo_status_invoice")
+        self.cbo_status_invoice.addItem("")
+        self.cbo_status_invoice.addItem("")
+        self.cbo_status_invoice.addItem("")
+        self.layout_filters_invoice.addWidget(self.cbo_status_invoice)
+        self.btn_filter_invoice = QtWidgets.QPushButton(parent=self.tab_invoice_history)
+        self.btn_filter_invoice.setObjectName("btn_filter_invoice")
+        self.layout_filters_invoice.addWidget(self.btn_filter_invoice)
+        spacerItem2 = QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
+        self.layout_filters_invoice.addItem(spacerItem2)
+        self.btn_reset_filter_invoice = QtWidgets.QPushButton(parent=self.tab_invoice_history)
+        self.btn_reset_filter_invoice.setStyleSheet("background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;")
+        self.btn_reset_filter_invoice.setObjectName("btn_reset_filter_invoice")
+        self.layout_filters_invoice.addWidget(self.btn_reset_filter_invoice)
+        self.verticalLayout_history.addLayout(self.layout_filters_invoice)
+        self.splitter_invoice = QtWidgets.QSplitter(parent=self.tab_invoice_history)
+        self.splitter_invoice.setOrientation(QtCore.Qt.Orientation.Horizontal)
+        self.splitter_invoice.setObjectName("splitter_invoice")
+        self.tbl_invoice_master = QtWidgets.QTableWidget(parent=self.splitter_invoice)
+        self.tbl_invoice_master.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.tbl_invoice_master.setObjectName("tbl_invoice_master")
+        self.tbl_invoice_master.setColumnCount(5)
+        self.tbl_invoice_master.setRowCount(0)
+        item = QtWidgets.QTableWidgetItem()
+        self.tbl_invoice_master.setHorizontalHeaderItem(0, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tbl_invoice_master.setHorizontalHeaderItem(1, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tbl_invoice_master.setHorizontalHeaderItem(2, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tbl_invoice_master.setHorizontalHeaderItem(3, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tbl_invoice_master.setHorizontalHeaderItem(4, item)
+        self.frame_invoice_detail = QtWidgets.QFrame(parent=self.splitter_invoice)
+        self.frame_invoice_detail.setStyleSheet("\n"
+"            QFrame#frame_invoice_detail {\n"
+"                background-color: #ffffff;\n"
+"                border: 1px solid #e2e8f0;\n"
+"                border-radius: 10px;\n"
+"            }\n"
+"           ")
+        self.frame_invoice_detail.setObjectName("frame_invoice_detail")
+        self.verticalLayout_invoice_detail = QtWidgets.QVBoxLayout(self.frame_invoice_detail)
+        self.verticalLayout_invoice_detail.setProperty("contentsMargins", 15)
+        self.verticalLayout_invoice_detail.setObjectName("verticalLayout_invoice_detail")
+        self.lbl_sub_history_sales = QtWidgets.QLabel(parent=self.frame_invoice_detail)
+        self.lbl_sub_history_sales.setObjectName("lbl_sub_history_sales")
+        self.verticalLayout_invoice_detail.addWidget(self.lbl_sub_history_sales)
+        self.layout_invoice_meta = QtWidgets.QGridLayout()
+        self.layout_invoice_meta.setObjectName("layout_invoice_meta")
+        self.lbl_md_invoice_id = QtWidgets.QLabel(parent=self.frame_invoice_detail)
+        self.lbl_md_invoice_id.setObjectName("lbl_md_invoice_id")
+        self.layout_invoice_meta.addWidget(self.lbl_md_invoice_id, 0, 0, 1, 1)
+        self.lbl_md_invoice_date = QtWidgets.QLabel(parent=self.frame_invoice_detail)
+        self.lbl_md_invoice_date.setObjectName("lbl_md_invoice_date")
+        self.layout_invoice_meta.addWidget(self.lbl_md_invoice_date, 0, 1, 1, 1)
+        self.lbl_md_invoice_status = QtWidgets.QLabel(parent=self.frame_invoice_detail)
+        self.lbl_md_invoice_status.setObjectName("lbl_md_invoice_status")
+        self.layout_invoice_meta.addWidget(self.lbl_md_invoice_status, 1, 0, 1, 2)
+        self.verticalLayout_invoice_detail.addLayout(self.layout_invoice_meta)
+        self.tbl_invoice_details = QtWidgets.QTableWidget(parent=self.frame_invoice_detail)
+        self.tbl_invoice_details.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.tbl_invoice_details.setObjectName("tbl_invoice_details")
+        self.tbl_invoice_details.setColumnCount(5)
+        self.tbl_invoice_details.setRowCount(0)
+        item = QtWidgets.QTableWidgetItem()
+        self.tbl_invoice_details.setHorizontalHeaderItem(0, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tbl_invoice_details.setHorizontalHeaderItem(1, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tbl_invoice_details.setHorizontalHeaderItem(2, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tbl_invoice_details.setHorizontalHeaderItem(3, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tbl_invoice_details.setHorizontalHeaderItem(4, item)
+        self.verticalLayout_invoice_detail.addWidget(self.tbl_invoice_details)
+        self.layout_detail_total_invoice = QtWidgets.QVBoxLayout()
+        self.layout_detail_total_invoice.setSpacing(2)
+        self.layout_detail_total_invoice.setObjectName("layout_detail_total_invoice")
+        self.lbl_detail_total_label = QtWidgets.QLabel(parent=self.frame_invoice_detail)
+        self.lbl_detail_total_label.setStyleSheet("font-weight: bold; color: #64748b;")
+        self.lbl_detail_total_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight|QtCore.Qt.AlignmentFlag.AlignTrailing|QtCore.Qt.AlignmentFlag.AlignVCenter)
+        self.lbl_detail_total_label.setObjectName("lbl_detail_total_label")
+        self.layout_detail_total_invoice.addWidget(self.lbl_detail_total_label)
+        self.lbl_detail_total_value = QtWidgets.QLabel(parent=self.frame_invoice_detail)
+        self.lbl_detail_total_value.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight|QtCore.Qt.AlignmentFlag.AlignTrailing|QtCore.Qt.AlignmentFlag.AlignVCenter)
+        self.lbl_detail_total_value.setObjectName("lbl_detail_total_value")
+        self.layout_detail_total_invoice.addWidget(self.lbl_detail_total_value)
+        self.lbl_detail_cash_received_label = QtWidgets.QLabel(parent=self.frame_invoice_detail)
+        self.lbl_detail_cash_received_label.setStyleSheet("font-weight: bold; color: #94a3b8; font-size: 13px;")
+        self.lbl_detail_cash_received_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight|QtCore.Qt.AlignmentFlag.AlignTrailing|QtCore.Qt.AlignmentFlag.AlignVCenter)
+        self.lbl_detail_cash_received_label.setObjectName("lbl_detail_cash_received_label")
+        self.layout_detail_total_invoice.addWidget(self.lbl_detail_cash_received_label)
+        self.verticalLayout_invoice_detail.addLayout(self.layout_detail_total_invoice)
+        self.layout_detail_actions_invoice = QtWidgets.QHBoxLayout()
+        self.layout_detail_actions_invoice.setObjectName("layout_detail_actions_invoice")
+        self.btn_cancel_invoice = QtWidgets.QPushButton(parent=self.frame_invoice_detail)
+        self.btn_cancel_invoice.setMinimumSize(QtCore.QSize(110, 35))
+        self.btn_cancel_invoice.setObjectName("btn_cancel_invoice")
+        self.layout_detail_actions_invoice.addWidget(self.btn_cancel_invoice)
+        spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
+        self.layout_detail_actions_invoice.addItem(spacerItem3)
+        self.btn_reprint_invoice = QtWidgets.QPushButton(parent=self.frame_invoice_detail)
+        self.btn_reprint_invoice.setMinimumSize(QtCore.QSize(120, 35))
+        self.btn_reprint_invoice.setObjectName("btn_reprint_invoice")
+        self.layout_detail_actions_invoice.addWidget(self.btn_reprint_invoice)
+        self.btn_export_invoice_excel = QtWidgets.QPushButton(parent=self.frame_invoice_detail)
+        self.btn_export_invoice_excel.setMinimumSize(QtCore.QSize(120, 35))
+        self.btn_export_invoice_excel.setObjectName("btn_export_invoice_excel")
+        self.layout_detail_actions_invoice.addWidget(self.btn_export_invoice_excel)
+        self.verticalLayout_invoice_detail.addLayout(self.layout_detail_actions_invoice)
+        self.verticalLayout_history.addWidget(self.splitter_invoice)
+        self.tabWidget_sales.addTab(self.tab_invoice_history, "")
+        self.verticalLayout_main.addWidget(self.tabWidget_sales)
 
         self.retranslateUi(SalesManagementWidget)
+        self.tabWidget_sales.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(SalesManagementWidget)
 
     def retranslateUi(self, SalesManagementWidget):
         _translate = QtCore.QCoreApplication.translate
         SalesManagementWidget.setWindowTitle(_translate("SalesManagementWidget", "Bán hàng tại quầy (POS)"))
-        self.lbl_title.setText(_translate("SalesManagementWidget", "Bán hàng"))
+        self.lbl_title.setText(_translate("SalesManagementWidget", "Bán hàng & Quản lý hóa đơn"))
         self.lbl_sub_left.setText(_translate("SalesManagementWidget", "Danh sách Sản phẩm"))
         self.txt_search_sales.setPlaceholderText(_translate("SalesManagementWidget", "Tìm theo SKU, tên sản phẩm hoặc barcode..."))
         self.btn_search.setText(_translate("SalesManagementWidget", "Tìm kiếm"))
@@ -264,3 +419,46 @@ class Ui_SalesManagementWidget(object):
         self.lbl_total_bill.setText(_translate("SalesManagementWidget", "0 VND"))
         self.btn_cancel_bill.setText(_translate("SalesManagementWidget", "Hủy hóa đơn"))
         self.btn_checkout.setText(_translate("SalesManagementWidget", "THANH TOÁN (F9)"))
+        self.tabWidget_sales.setTabText(self.tabWidget_sales.indexOf(self.tab_pos), _translate("SalesManagementWidget", "🛒 Bán lẻ POS"))
+        self.txt_search_invoice.setPlaceholderText(_translate("SalesManagementWidget", "Tìm mã hóa đơn..."))
+        self.lbl_date_from.setText(_translate("SalesManagementWidget", "Từ ngày:"))
+        self.lbl_date_to.setText(_translate("SalesManagementWidget", "Đến ngày:"))
+        self.cbo_payment_method_filter.setItemText(0, _translate("SalesManagementWidget", "-- Hình thức --"))
+        self.cbo_payment_method_filter.setItemText(1, _translate("SalesManagementWidget", "Tiền mặt"))
+        self.cbo_payment_method_filter.setItemText(2, _translate("SalesManagementWidget", "Chuyển khoản"))
+        self.cbo_status_invoice.setItemText(0, _translate("SalesManagementWidget", "-- Trạng thái --"))
+        self.cbo_status_invoice.setItemText(1, _translate("SalesManagementWidget", "Hoàn thành"))
+        self.cbo_status_invoice.setItemText(2, _translate("SalesManagementWidget", "Đã hủy"))
+        self.btn_filter_invoice.setText(_translate("SalesManagementWidget", "Lọc Dữ Liệu"))
+        self.btn_reset_filter_invoice.setText(_translate("SalesManagementWidget", "Làm Mới"))
+        item = self.tbl_invoice_master.horizontalHeaderItem(0)
+        item.setText(_translate("SalesManagementWidget", "Mã HĐ"))
+        item = self.tbl_invoice_master.horizontalHeaderItem(1)
+        item.setText(_translate("SalesManagementWidget", "Thời gian"))
+        item = self.tbl_invoice_master.horizontalHeaderItem(2)
+        item.setText(_translate("SalesManagementWidget", "Tổng tiền"))
+        item = self.tbl_invoice_master.horizontalHeaderItem(3)
+        item.setText(_translate("SalesManagementWidget", "Thanh toán"))
+        item = self.tbl_invoice_master.horizontalHeaderItem(4)
+        item.setText(_translate("SalesManagementWidget", "Trạng thái"))
+        self.lbl_sub_history_sales.setText(_translate("SalesManagementWidget", "Chi tiết ấn phẩm hóa đơn"))
+        self.lbl_md_invoice_id.setText(_translate("SalesManagementWidget", "<b>Mã HĐ:</b> --"))
+        self.lbl_md_invoice_date.setText(_translate("SalesManagementWidget", "<b>Ngày bán:</b> --"))
+        self.lbl_md_invoice_status.setText(_translate("SalesManagementWidget", "<b>Trạng thái:</b> --"))
+        item = self.tbl_invoice_details.horizontalHeaderItem(0)
+        item.setText(_translate("SalesManagementWidget", "Tên Sản Phẩm"))
+        item = self.tbl_invoice_details.horizontalHeaderItem(1)
+        item.setText(_translate("SalesManagementWidget", "ĐVT"))
+        item = self.tbl_invoice_details.horizontalHeaderItem(2)
+        item.setText(_translate("SalesManagementWidget", "SL"))
+        item = self.tbl_invoice_details.horizontalHeaderItem(3)
+        item.setText(_translate("SalesManagementWidget", "Đơn giá"))
+        item = self.tbl_invoice_details.horizontalHeaderItem(4)
+        item.setText(_translate("SalesManagementWidget", "Thành Tiền"))
+        self.lbl_detail_total_label.setText(_translate("SalesManagementWidget", "TỔNG CỘNG KHÁCH TRẢ:"))
+        self.lbl_detail_total_value.setText(_translate("SalesManagementWidget", "0 VND"))
+        self.lbl_detail_cash_received_label.setText(_translate("SalesManagementWidget", "Tiền khách đưa: --"))
+        self.btn_cancel_invoice.setText(_translate("SalesManagementWidget", "Hủy Hóa Đơn"))
+        self.btn_reprint_invoice.setText(_translate("SalesManagementWidget", "🖨️ In lại hóa đơn"))
+        self.btn_export_invoice_excel.setText(_translate("SalesManagementWidget", "Xuất File Excel"))
+        self.tabWidget_sales.setTabText(self.tabWidget_sales.indexOf(self.tab_invoice_history), _translate("SalesManagementWidget", "📜 Nhật ký Hóa đơn"))

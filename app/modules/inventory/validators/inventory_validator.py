@@ -24,8 +24,10 @@ class InventoryValidator:
 
             if item.quantity <= 0:
                 raise ValidationException("Số lượng nhập phải lớn hơn 0.")
-            if item.unit_price < 0:
-                raise ValidationException("Giá nhập không được nhỏ hơn 0.")
+            if item.unit_price is None:
+                raise ValidationException(f"Sản phẩm ID {item.product_id} đang để trống giá nhập.")
+            if item.unit_price <= 0:
+                raise ValidationException(f"Giá nhập của sản phẩm ID {item.product_id} phải > 0.")
 
             product_dict = self.product_repo.get_product_detail_for_import(item.product_id)
             if not product_dict or not product_dict.get('is_active'):

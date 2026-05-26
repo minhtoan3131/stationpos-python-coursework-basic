@@ -4,7 +4,7 @@ from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QFont, QColor
 
 from app.core.database.unit_of_work import UnitOfWork
-from app.modules.home_wellcome.ui.controllers.home_welcome_controller import HomeWelcomeController
+from app.modules.dashboard.ui.controllers.home_welcome_controller import HomeWelcomeController
 from app.modules.inventory.services.impl.po_history_service_impl import PurchaseOrderHistoryServiceImpl
 from app.modules.main_window.ui_main_window import Ui_MainWindow
 
@@ -13,6 +13,7 @@ from app.modules.product.services.impl.supplier_service_impl import SupplierServ
 from app.modules.product.services.impl.unit_service_impl import UnitServiceImpl
 from app.modules.product.services.impl.product_service_impl import ProductServiceImpl
 from app.modules.inventory.services.impl.inventory_service_impl import InventoryServiceImpl
+from app.modules.sale.services.impl.invoice_history_service_impl import InvoiceHistoryServiceImpl
 from app.modules.sale.services.impl.sale_service_impl import SaleServiceImpl
 from app.modules.report.services.impl.report_service_impl import ReportServiceImpl
 from app.modules.setting.services.impl.setting_service_impl import SettingServiceImpl
@@ -44,6 +45,8 @@ class MainWindow(QMainWindow):
         self.tax_service = TaxService(uow_factory=UnitOfWork)
         self.setting_service = SettingServiceImpl(uow_factory=UnitOfWork)
         self.po_history_service = PurchaseOrderHistoryServiceImpl(uow_factory=UnitOfWork)
+
+        self.invoice_history_service = InvoiceHistoryServiceImpl(uow_factory=UnitOfWork)
 
         # Xử lý UI cho macOS và Hiệu ứng
         self.fix_macos_font_issue()
@@ -97,9 +100,10 @@ class MainWindow(QMainWindow):
         )
 
         self.page_sales = SalesManagementController(
-            inventory_service=self.inventory_service,
-            product_service=self.product_service,
-            sale_service=self.sale_service
+            inventory_service=self.inventory_service,  #
+            product_service=self.product_service,  #
+            sale_service=self.sale_service,  #
+            invoice_history_service=self.invoice_history_service
         )
 
         self.page_reports = ReportManagementController(

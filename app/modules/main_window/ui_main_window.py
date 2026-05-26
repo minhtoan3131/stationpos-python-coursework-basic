@@ -37,8 +37,8 @@ class Ui_MainWindow(object):
 "        font-size: 20px;\n"
 "        font-weight: 700;\n"
 "        padding: 20px;\n"
-"        background: qlineargradient(x1:0, y1:0, x2:0, y2:1,\n"
-"                                    stop:0 #4f46e5, stop:1 #7c3aed);\n"
+"        background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 #10b981, stop:1 #064e3b);\n"
+"\n"
 "        /* Gradient xanh tím enterprise */\n"
 "        border-bottom: 1px solid #e1e7ef;\n"
 "    }\n"
@@ -203,8 +203,8 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "POS MINI - Hệ thống Quản lý VPP Enterprise"))
-        self.lbl_logo.setText(_translate("MainWindow", "POS MINI"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "StationPOS - Hệ thống Quản lý văn phòng phẩm"))
+        self.lbl_logo.setText(_translate("MainWindow", "StationPOS"))
         __sortingEnabled = self.sidebar_menu.isSortingEnabled()
         self.sidebar_menu.setSortingEnabled(False)
         item = self.sidebar_menu.item(0)

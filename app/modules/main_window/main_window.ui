@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>POS MINI - Hệ thống Quản lý VPP Enterprise</string>
+   <string>StationPOS - Hệ thống Quản lý văn phòng phẩm</string>
   </property>
   <property name="styleSheet">
    <string notr="true">
@@ -38,8 +38,8 @@
         font-size: 20px;
         font-weight: 700;
         padding: 20px;
-        background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                                    stop:0 #4f46e5, stop:1 #7c3aed);
+        background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 #10b981, stop:1 #064e3b);
+
         /* Gradient xanh tím enterprise */
         border-bottom: 1px solid #e1e7ef;
     }
@@ -151,7 +151,7 @@
        <item>
         <widget class="QLabel" name="lbl_logo">
          <property name="text">
-          <string>POS MINI</string>
+          <string>StationPOS</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>

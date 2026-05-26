@@ -26,6 +26,7 @@ class LockScreenDialog(QDialog):
 
     def bind_events(self):
         self.ui.txt_pin.returnPressed.connect(self.handle_pin_submit)
+        self.ui.btn_unlock.clicked.connect(self.handle_pin_submit)
         self.ui.btn_forgot.clicked.connect(self.show_forgot_pin_notice)
         self.ui.btn_forgot.setAutoDefault(False)
         self.ui.txt_pin.setFocus()

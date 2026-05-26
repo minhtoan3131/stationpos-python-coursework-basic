@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'app/modules/home_wellcome/ui/views/home_welcome.ui'
+# Form implementation generated from reading ui file 'app/modules/dashboard/ui/views/home_welcome.ui'
 #
 # Created by: PyQt6 UI code generator 6.11.0
 #

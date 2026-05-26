@@ -84,16 +84,19 @@ class InventoryServiceImpl(InventoryService):
                     current_qty = inv_status['quantity']
                     current_total_val = Decimal(str(inv_status['total_value']))
 
+                    # Biến đổi quy đổi
                     base_qty = item.quantity
                     conv_unit_id = product_data.get('conversion_unit_id')
                     conv_ratio = product_data.get('conversion_ratio')
 
+                    # Triết lý "Chỉ nhìn Tổng": Nếu đơn vị chọn nhập là ĐVT Quy đổi (VD: Thùng) -> Quy đổi số lượng
                     if conv_unit_id and item.unit_id == conv_unit_id and conv_ratio:
                         base_qty = item.quantity * int(float(conv_ratio))
 
+                    # Tổng tiền thực trả của dòng hàng này (Không phụ thuộc vào giá sỉ hay lẻ, dùng tổng tiền thanh toán sau cùng)
                     import_total_val = Decimal(str(item.quantity)) * Decimal(str(item.unit_price))
 
-                    # 4. Tính MAC thuần túy
+                    # 4. Đẩy vào bộ tính toán MAC chuẩn (Gom tổng tiền và tổng lượng cơ bản)
                     new_qty, new_total_val, new_mac = MACCalculator.calculate_standard_mac(
                         current_qty=current_qty,
                         current_total_value=current_total_val,
@@ -101,15 +104,19 @@ class InventoryServiceImpl(InventoryService):
                         import_total_value=import_total_val
                     )
 
-                    # 5. Cập nhật qua Repo
+                    # 5. Cập nhật trạng thái xuống Database trong khối ACID Transaction
                     db.product_repo.update_cost_price(item.product_id, new_mac)
                     db.inventory_repo.update_inventory_status(item.product_id, new_qty, new_total_val)
+
+                    # Lưu thông tin hóa đơn lịch sử chi tiết
                     db.inventory_repo.create_purchase_order_item({
                         'po_id': po_id, 'product_id': item.product_id, 'unit_id': item.unit_id,
-                        'qty': item.quantity, 'price': item.unit_price, 'total': item.quantity * item.unit_price
+                        'qty': item.quantity, 'price': item.unit_price, 'total': float(import_total_val)
                     })
+
+                    # Log dòng dịch chuyển kho mang giá trị dương
                     db.inventory_repo.add_stock_transaction({
-                        'product_id': item.product_id, 'qty': base_qty,'type': 'IMPORT', 'ref_id': po_id
+                        'product_id': item.product_id, 'qty': base_qty, 'type': 'IMPORT', 'ref_id': po_id
                     })
 
                 return po_id
