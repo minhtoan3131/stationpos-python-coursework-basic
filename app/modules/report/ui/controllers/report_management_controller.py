@@ -101,10 +101,21 @@ class ReportManagementController(QWidget):
             QMessageBox.critical(self, "Lỗi Hệ Thống", f"Không thể tải dữ liệu báo cáo thống kê:\n{str(e)}")
 
     def update_kpi_cards(self, kpis):
-        self.ui.val_revenue.setText(f"{kpis.total_revenue:,.0f} VND")
-        self.ui.val_profit.setText(f"{kpis.total_profit:,.0f} VND")
-        self.ui.val_orders.setText(str(kpis.total_orders))
-        self.ui.val_stock_value.setText(f"{kpis.total_stock_value:,.0f} VND")
+        """Đổ dữ liệu kiểm toán chuẩn lên cụm 8 thẻ chỉ số phân loại."""
+        # Nhóm 1: Doanh thu & Hóa đơn
+        self.ui.val_gross_revenue.setText(f"{kpis.gross_revenue:,.0f} VND")
+        self.ui.val_cancelled_value.setText(f"{kpis.cancelled_value:,.0f} VND")
+        self.ui.val_net_revenue.setText(f"{kpis.net_revenue:,.0f} VND")
+
+        # Hợp nhất thông số phễu đơn hàng: Tổng (Thành công / Hủy)
+        order_stats_text = f"{kpis.total_orders_created} đơn ({kpis.total_orders_completed} / {kpis.total_orders_cancelled})"
+        self.ui.val_order_stats.setText(order_stats_text)
+
+        # Nhóm 2: Chi phí & Lợi nhuận
+        self.ui.val_cogs.setText(f"{kpis.total_cogs:,.0f} VND")
+        self.ui.val_gross_profit.setText(f"{kpis.gross_profit:,.0f} VND")
+        self.ui.val_variance_garbage.setText(f"{kpis.variance_garbage:,.0f} VND")
+        self.ui.val_net_profit.setText(f"{kpis.net_profit:,.0f} VND")
 
     def update_transaction_table(self, transactions):
         self.ui.tbl_transactions.setRowCount(0)

@@ -257,6 +257,59 @@ JOIN products p ON i.product_id = p.id
 JOIN units u ON p.base_unit_id = u.id;
 
 
+-- View kiểm toán tích hợp phục vụ cho 8 chỉ số trong báo cáo
+CREATE OR REPLACE VIEW vw_report_daily_financial_summary AS
+SELECT
+    report_date,
+    SUM(total_created) AS total_orders_created,
+    SUM(total_completed) AS total_orders_completed,
+    SUM(total_cancelled) AS total_orders_cancelled,
+    SUM(gross_revenue) AS gross_revenue,
+    SUM(cancelled_value) AS cancelled_value,
+    SUM(net_revenue) AS net_revenue,
+    SUM(total_cogs) AS total_cogs,
+    SUM(variance_garbage) AS variance_garbage
+FROM (
+    /* PHẦN 1: BÓC TÁCH DỮ LIỆU HOÁ ĐƠN THEO NGÀY */
+    SELECT
+        DATE(i.created_at) AS report_date,
+        COUNT(i.id) AS total_created,
+        SUM(CASE WHEN i.status = 'COMPLETED' THEN 1 ELSE 0 END) AS total_completed,
+        SUM(CASE WHEN i.status = 'CANCELLED' THEN 1 ELSE 0 END) AS total_cancelled,
+        IFNULL(SUM(i.total_amount), 0) AS gross_revenue,
+        IFNULL(SUM(CASE WHEN i.status = 'CANCELLED' THEN i.total_amount ELSE 0 END), 0) AS cancelled_value,
+        IFNULL(SUM(CASE WHEN i.status = 'COMPLETED' THEN i.total_amount ELSE 0 END), 0) AS net_revenue,
+        -- Tối ưu lấy COGS thông qua JOIN với cụm tích hợp sản phẩm
+        IFNULL(SUM(CASE WHEN i.status = 'COMPLETED' THEN cogs.invoice_cogs ELSE 0 END), 0) AS total_cogs,
+        0 AS variance_garbage
+    FROM invoices i
+    LEFT JOIN (
+        SELECT invoice_id, SUM(total_cogs_amount) AS invoice_cogs
+        FROM invoice_items
+        GROUP BY invoice_id
+    ) cogs ON i.id = cogs.invoice_id
+    GROUP BY DATE(i.created_at)
+
+    UNION ALL
+
+    /* PHẦN 2: LẤY SỐ LIỆU ĐIỀU CHỈNH RÁC KHO THEO NGÀY */
+    SELECT
+        DATE(st.created_at) AS report_date,
+        0 AS total_created,
+        0 AS total_completed,
+        0 AS total_cancelled,
+        0 AS gross_revenue,
+        0 AS cancelled_value,
+        0 AS net_revenue,
+        0 AS total_cogs,
+        IFNULL(SUM(st.variance_amount), 0) AS variance_garbage
+    FROM stock_transactions st
+    WHERE st.type IN ('DATA_CORRECTION', 'ADJUST_VARIANCE', 'ANOMALY_ADJUSTMENT')
+    GROUP BY DATE(st.created_at)
+) AS combined_data
+GROUP BY report_date;
+
+
 
 
 

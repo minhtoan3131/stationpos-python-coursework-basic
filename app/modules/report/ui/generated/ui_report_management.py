@@ -12,7 +12,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 class Ui_ReportManagementWidget(object):
     def setupUi(self, ReportManagementWidget):
         ReportManagementWidget.setObjectName("ReportManagementWidget")
-        ReportManagementWidget.resize(1400, 900)
+        ReportManagementWidget.resize(1400, 950)
         ReportManagementWidget.setStyleSheet("\n"
 "    /* Tổng thể Dashboard */\n"
 "    QWidget#ReportManagementWidget {\n"
@@ -29,12 +29,12 @@ class Ui_ReportManagementWidget(object):
 "        background-color: #e2e8f0;\n"
 "    }\n"
 "\n"
-"    /* Thẻ chỉ số (KPI Cards) */\n"
+"    /* Thẻ chỉ số (KPI Cards) & Nhóm phân loại */\n"
 "    QFrame.kpi-card {\n"
 "        background-color: #ffffff;\n"
 "        border-radius: 12px;\n"
 "        border: none;\n"
-"        min-height: 100px;\n"
+"        min-height: 115px;\n"
 "    }\n"
 "\n"
 "    QLabel#lbl_title_main {\n"
@@ -43,27 +43,45 @@ class Ui_ReportManagementWidget(object):
 "        color: #0f172a;\n"
 "    }\n"
 "\n"
-"    QLabel.kpi-label {\n"
+"    QLabel.kpi-group-title {\n"
 "        font-size: 14px;\n"
+"        font-weight: 700;\n"
+"        color: #334155;\n"
+"        text-transform: uppercase;\n"
+"        letter-spacing: 0.5px;\n"
+"        padding-left: 2px;\n"
+"    }\n"
+"\n"
+"    QLabel.kpi-label {\n"
+"        font-size: 13px;\n"
 "        font-weight: 600;\n"
 "        color: #64748b;\n"
 "        text-transform: uppercase;\n"
 "    }\n"
 "\n"
 "    QLabel.kpi-value {\n"
-"        font-size: 28px;\n"
+"        font-size: 24px;\n"
 "        font-weight: 800;\n"
 "    }\n"
 "\n"
-"    QLabel#val_revenue { color: #10b981; }\n"
-"    QLabel#val_profit { color: #3b82f6;\n"
-"}\n"
-"    QLabel#val_orders { color: #8b5cf6; }\n"
-"    QLabel#val_stock_value { color: #f59e0b;\n"
-"}\n"
+"    QLabel.kpi-desc {\n"
+"        font-size: 11px;\n"
+"        color: #64748b;\n"
+"        font-weight: 500;\n"
+"    }\n"
 "\n"
-"    /* Khu vực Biểu đồ &\n"
-"Bảng */\n"
+"    /* Đổ màu chuyên biệt cho từng chỉ số mới */\n"
+"    QLabel#val_gross_revenue { color: #0284c7; }   /* Xanh dương nhạt - Doanh thu thô */\n"
+"    QLabel#val_cancelled_value { color: #ef4444; }  /* Đỏ - Tiền hủy hoàn */\n"
+"    QLabel#val_net_revenue { color: #10b981; }      /* Xanh lá - Thực thu sạch */\n"
+"    QLabel#val_order_stats { color: #8b5cf6; }      /* Tím - Phễu đơn hàng */\n"
+"\n"
+"    QLabel#val_cogs { color: #f59e0b; }             /* Cam - Giá vốn */\n"
+"    QLabel#val_gross_profit { color: #3b82f6; }     /* Xanh Lam - Lợi nhuận gộp */\n"
+"    QLabel#val_variance_garbage { color: #64748b; } /* Xám - Tiền dọn rác kho */\n"
+"    QLabel#val_net_profit { color: #0d9488; }       /* Xanh ngọc - Lợi nhuận thực */\n"
+"\n"
+"    /* Khu vực Biểu đồ & Bảng */\n"
 "    QFrame#frame_revenue_trend, QFrame#frame_top_products, QFrame#frame_history, QFrame#frame_inventory, QFrame#frame_diagram {\n"
 "        background-color: #ffffff;\n"
 "        border-radius: 12px;\n"
@@ -109,10 +127,10 @@ class Ui_ReportManagementWidget(object):
 "        background-color: #ffffff;\n"
 "        border: 1px solid #cbd5e1;\n"
 "        border-radius: 6px;\n"
-"        padding: 6px 26px 6px 10px; /* Thêm khoảng trống bên phải để không đè chữ lên mũi tên */\n"
+"        padding: 6px 26px 6px 10px;\n"
 "        font-weight: 600;\n"
 "        color: #475569;\n"
-"        max-width: 110px; /* Thu ngắn chiều ngang */\n"
+"        max-width: 110px;\n"
 "    }\n"
 "    QDateEdit:hover {\n"
 "        border-color: #94a3b8;\n"
@@ -129,7 +147,7 @@ class Ui_ReportManagementWidget(object):
 "    QDateEdit::down-arrow {\n"
 "        border-left: 4px solid transparent;\n"
 "        border-right: 4px solid transparent;\n"
-"        border-top: 5px solid #475569; /* Vẽ mũi tên tam giác cùng tone màu chữ */\n"
+"        border-top: 5px solid #475569;\n"
 "        width: 0;\n"
 "        height: 0;\n"
 "    }\n"
@@ -156,7 +174,7 @@ class Ui_ReportManagementWidget(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollContents = QtWidgets.QWidget()
-        self.scrollContents.setGeometry(QtCore.QRect(0, 0, 1385, 1450))
+        self.scrollContents.setGeometry(QtCore.QRect(0, 0, 1385, 1674))
         self.scrollContents.setObjectName("scrollContents")
         self.scrollLayout = QtWidgets.QVBoxLayout(self.scrollContents)
         self.scrollLayout.setContentsMargins(25, 25, 25, 25)
@@ -206,91 +224,175 @@ class Ui_ReportManagementWidget(object):
         self.layout_filters.addWidget(self.btn_run_filter)
         self.layout_header.addLayout(self.layout_filters)
         self.scrollLayout.addLayout(self.layout_header)
-        self.layout_kpi_cards = QtWidgets.QHBoxLayout()
-        self.layout_kpi_cards.setSpacing(20)
+        self.layout_kpi_cards = QtWidgets.QVBoxLayout()
+        self.layout_kpi_cards.setSpacing(12)
         self.layout_kpi_cards.setObjectName("layout_kpi_cards")
-        self.card_revenue = QtWidgets.QFrame(parent=self.scrollContents)
-        self.card_revenue.setObjectName("card_revenue")
-        self.vboxlayout = QtWidgets.QVBoxLayout(self.card_revenue)
+        self.lbl_title_group_revenue = QtWidgets.QLabel(parent=self.scrollContents)
+        self.lbl_title_group_revenue.setObjectName("lbl_title_group_revenue")
+        self.layout_kpi_cards.addWidget(self.lbl_title_group_revenue)
+        self.layout_row_revenue = QtWidgets.QHBoxLayout()
+        self.layout_row_revenue.setSpacing(20)
+        self.layout_row_revenue.setObjectName("layout_row_revenue")
+        self.card_gross_revenue = QtWidgets.QFrame(parent=self.scrollContents)
+        self.card_gross_revenue.setObjectName("card_gross_revenue")
+        self.vboxlayout = QtWidgets.QVBoxLayout(self.card_gross_revenue)
         self.vboxlayout.setObjectName("vboxlayout")
-        self.label1 = QtWidgets.QLabel(parent=self.card_revenue)
-        self.label1.setObjectName("label1")
-        self.vboxlayout.addWidget(self.label1)
-        self.val_revenue = QtWidgets.QLabel(parent=self.card_revenue)
-        self.val_revenue.setObjectName("val_revenue")
-        self.vboxlayout.addWidget(self.val_revenue)
-        self.layout_kpi_cards.addWidget(self.card_revenue)
-        self.card_profit = QtWidgets.QFrame(parent=self.scrollContents)
-        self.card_profit.setObjectName("card_profit")
-        self.vboxlayout1 = QtWidgets.QVBoxLayout(self.card_profit)
+        self.lbl_gross_rev = QtWidgets.QLabel(parent=self.card_gross_revenue)
+        self.lbl_gross_rev.setObjectName("lbl_gross_rev")
+        self.vboxlayout.addWidget(self.lbl_gross_rev)
+        self.val_gross_revenue = QtWidgets.QLabel(parent=self.card_gross_revenue)
+        self.val_gross_revenue.setObjectName("val_gross_revenue")
+        self.vboxlayout.addWidget(self.val_gross_revenue)
+        self.desc_gross_revenue = QtWidgets.QLabel(parent=self.card_gross_revenue)
+        self.desc_gross_revenue.setObjectName("desc_gross_revenue")
+        self.vboxlayout.addWidget(self.desc_gross_revenue)
+        self.layout_row_revenue.addWidget(self.card_gross_revenue)
+        self.card_cancelled_value = QtWidgets.QFrame(parent=self.scrollContents)
+        self.card_cancelled_value.setObjectName("card_cancelled_value")
+        self.vboxlayout1 = QtWidgets.QVBoxLayout(self.card_cancelled_value)
         self.vboxlayout1.setObjectName("vboxlayout1")
-        self.label2 = QtWidgets.QLabel(parent=self.card_profit)
-        self.label2.setObjectName("label2")
-        self.vboxlayout1.addWidget(self.label2)
-        self.val_profit = QtWidgets.QLabel(parent=self.card_profit)
-        self.val_profit.setObjectName("val_profit")
-        self.vboxlayout1.addWidget(self.val_profit)
-        self.layout_kpi_cards.addWidget(self.card_profit)
-        self.card_orders = QtWidgets.QFrame(parent=self.scrollContents)
-        self.card_orders.setObjectName("card_orders")
-        self.vboxlayout2 = QtWidgets.QVBoxLayout(self.card_orders)
+        self.lbl_cancelled_val = QtWidgets.QLabel(parent=self.card_cancelled_value)
+        self.lbl_cancelled_val.setObjectName("lbl_cancelled_val")
+        self.vboxlayout1.addWidget(self.lbl_cancelled_val)
+        self.val_cancelled_value = QtWidgets.QLabel(parent=self.card_cancelled_value)
+        self.val_cancelled_value.setObjectName("val_cancelled_value")
+        self.vboxlayout1.addWidget(self.val_cancelled_value)
+        self.desc_cancelled_value = QtWidgets.QLabel(parent=self.card_cancelled_value)
+        self.desc_cancelled_value.setObjectName("desc_cancelled_value")
+        self.vboxlayout1.addWidget(self.desc_cancelled_value)
+        self.layout_row_revenue.addWidget(self.card_cancelled_value)
+        self.card_net_revenue = QtWidgets.QFrame(parent=self.scrollContents)
+        self.card_net_revenue.setObjectName("card_net_revenue")
+        self.vboxlayout2 = QtWidgets.QVBoxLayout(self.card_net_revenue)
         self.vboxlayout2.setObjectName("vboxlayout2")
-        self.label3 = QtWidgets.QLabel(parent=self.card_orders)
-        self.label3.setObjectName("label3")
-        self.vboxlayout2.addWidget(self.label3)
-        self.val_orders = QtWidgets.QLabel(parent=self.card_orders)
-        self.val_orders.setObjectName("val_orders")
-        self.vboxlayout2.addWidget(self.val_orders)
-        self.layout_kpi_cards.addWidget(self.card_orders)
-        self.card_stock = QtWidgets.QFrame(parent=self.scrollContents)
-        self.card_stock.setObjectName("card_stock")
-        self.vboxlayout3 = QtWidgets.QVBoxLayout(self.card_stock)
+        self.lbl_net_rev = QtWidgets.QLabel(parent=self.card_net_revenue)
+        self.lbl_net_rev.setObjectName("lbl_net_rev")
+        self.vboxlayout2.addWidget(self.lbl_net_rev)
+        self.val_net_revenue = QtWidgets.QLabel(parent=self.card_net_revenue)
+        self.val_net_revenue.setObjectName("val_net_revenue")
+        self.vboxlayout2.addWidget(self.val_net_revenue)
+        self.desc_net_revenue = QtWidgets.QLabel(parent=self.card_net_revenue)
+        self.desc_net_revenue.setObjectName("desc_net_revenue")
+        self.vboxlayout2.addWidget(self.desc_net_revenue)
+        self.layout_row_revenue.addWidget(self.card_net_revenue)
+        self.card_order_stats = QtWidgets.QFrame(parent=self.scrollContents)
+        self.card_order_stats.setObjectName("card_order_stats")
+        self.vboxlayout3 = QtWidgets.QVBoxLayout(self.card_order_stats)
         self.vboxlayout3.setObjectName("vboxlayout3")
-        self.label4 = QtWidgets.QLabel(parent=self.card_stock)
-        self.label4.setObjectName("label4")
-        self.vboxlayout3.addWidget(self.label4)
-        self.val_stock_value = QtWidgets.QLabel(parent=self.card_stock)
-        self.val_stock_value.setObjectName("val_stock_value")
-        self.vboxlayout3.addWidget(self.val_stock_value)
-        self.layout_kpi_cards.addWidget(self.card_stock)
+        self.lbl_order_stats = QtWidgets.QLabel(parent=self.card_order_stats)
+        self.lbl_order_stats.setObjectName("lbl_order_stats")
+        self.vboxlayout3.addWidget(self.lbl_order_stats)
+        self.val_order_stats = QtWidgets.QLabel(parent=self.card_order_stats)
+        self.val_order_stats.setObjectName("val_order_stats")
+        self.vboxlayout3.addWidget(self.val_order_stats)
+        self.desc_order_stats = QtWidgets.QLabel(parent=self.card_order_stats)
+        self.desc_order_stats.setObjectName("desc_order_stats")
+        self.vboxlayout3.addWidget(self.desc_order_stats)
+        self.layout_row_revenue.addWidget(self.card_order_stats)
+        self.layout_kpi_cards.addLayout(self.layout_row_revenue)
+        spacerItem1 = QtWidgets.QSpacerItem(20, 8, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.layout_kpi_cards.addItem(spacerItem1)
+        self.lbl_title_group_profit = QtWidgets.QLabel(parent=self.scrollContents)
+        self.lbl_title_group_profit.setObjectName("lbl_title_group_profit")
+        self.layout_kpi_cards.addWidget(self.lbl_title_group_profit)
+        self.layout_row_profit = QtWidgets.QHBoxLayout()
+        self.layout_row_profit.setSpacing(20)
+        self.layout_row_profit.setObjectName("layout_row_profit")
+        self.card_cogs = QtWidgets.QFrame(parent=self.scrollContents)
+        self.card_cogs.setObjectName("card_cogs")
+        self.vboxlayout4 = QtWidgets.QVBoxLayout(self.card_cogs)
+        self.vboxlayout4.setObjectName("vboxlayout4")
+        self.lbl_cogs = QtWidgets.QLabel(parent=self.card_cogs)
+        self.lbl_cogs.setObjectName("lbl_cogs")
+        self.vboxlayout4.addWidget(self.lbl_cogs)
+        self.val_cogs = QtWidgets.QLabel(parent=self.card_cogs)
+        self.val_cogs.setObjectName("val_cogs")
+        self.vboxlayout4.addWidget(self.val_cogs)
+        self.desc_cogs = QtWidgets.QLabel(parent=self.card_cogs)
+        self.desc_cogs.setObjectName("desc_cogs")
+        self.vboxlayout4.addWidget(self.desc_cogs)
+        self.layout_row_profit.addWidget(self.card_cogs)
+        self.card_gross_profit = QtWidgets.QFrame(parent=self.scrollContents)
+        self.card_gross_profit.setObjectName("card_gross_profit")
+        self.vboxlayout5 = QtWidgets.QVBoxLayout(self.card_gross_profit)
+        self.vboxlayout5.setObjectName("vboxlayout5")
+        self.lbl_gross_profit = QtWidgets.QLabel(parent=self.card_gross_profit)
+        self.lbl_gross_profit.setObjectName("lbl_gross_profit")
+        self.vboxlayout5.addWidget(self.lbl_gross_profit)
+        self.val_gross_profit = QtWidgets.QLabel(parent=self.card_gross_profit)
+        self.val_gross_profit.setObjectName("val_gross_profit")
+        self.vboxlayout5.addWidget(self.val_gross_profit)
+        self.desc_gross_profit = QtWidgets.QLabel(parent=self.card_gross_profit)
+        self.desc_gross_profit.setObjectName("desc_gross_profit")
+        self.vboxlayout5.addWidget(self.desc_gross_profit)
+        self.layout_row_profit.addWidget(self.card_gross_profit)
+        self.card_variance_garbage = QtWidgets.QFrame(parent=self.scrollContents)
+        self.card_variance_garbage.setObjectName("card_variance_garbage")
+        self.vboxlayout6 = QtWidgets.QVBoxLayout(self.card_variance_garbage)
+        self.vboxlayout6.setObjectName("vboxlayout6")
+        self.lbl_variance_garbage = QtWidgets.QLabel(parent=self.card_variance_garbage)
+        self.lbl_variance_garbage.setObjectName("lbl_variance_garbage")
+        self.vboxlayout6.addWidget(self.lbl_variance_garbage)
+        self.val_variance_garbage = QtWidgets.QLabel(parent=self.card_variance_garbage)
+        self.val_variance_garbage.setObjectName("val_variance_garbage")
+        self.vboxlayout6.addWidget(self.val_variance_garbage)
+        self.desc_variance_garbage = QtWidgets.QLabel(parent=self.card_variance_garbage)
+        self.desc_variance_garbage.setObjectName("desc_variance_garbage")
+        self.vboxlayout6.addWidget(self.desc_variance_garbage)
+        self.layout_row_profit.addWidget(self.card_variance_garbage)
+        self.card_net_profit = QtWidgets.QFrame(parent=self.scrollContents)
+        self.card_net_profit.setObjectName("card_net_profit")
+        self.vboxlayout7 = QtWidgets.QVBoxLayout(self.card_net_profit)
+        self.vboxlayout7.setObjectName("vboxlayout7")
+        self.lbl_net_profit = QtWidgets.QLabel(parent=self.card_net_profit)
+        self.lbl_net_profit.setObjectName("lbl_net_profit")
+        self.vboxlayout7.addWidget(self.lbl_net_profit)
+        self.val_net_profit = QtWidgets.QLabel(parent=self.card_net_profit)
+        self.val_net_profit.setObjectName("val_net_profit")
+        self.vboxlayout7.addWidget(self.val_net_profit)
+        self.desc_net_profit = QtWidgets.QLabel(parent=self.card_net_profit)
+        self.desc_net_profit.setObjectName("desc_net_profit")
+        self.vboxlayout7.addWidget(self.desc_net_profit)
+        self.layout_row_profit.addWidget(self.card_net_profit)
+        self.layout_kpi_cards.addLayout(self.layout_row_profit)
         self.scrollLayout.addLayout(self.layout_kpi_cards)
         self.layout_charts = QtWidgets.QHBoxLayout()
         self.layout_charts.setSpacing(20)
         self.layout_charts.setObjectName("layout_charts")
         self.frame_revenue_trend = QtWidgets.QFrame(parent=self.scrollContents)
         self.frame_revenue_trend.setObjectName("frame_revenue_trend")
-        self.vboxlayout4 = QtWidgets.QVBoxLayout(self.frame_revenue_trend)
-        self.vboxlayout4.setObjectName("vboxlayout4")
-        self.label5 = QtWidgets.QLabel(parent=self.frame_revenue_trend)
-        self.label5.setObjectName("label5")
-        self.vboxlayout4.addWidget(self.label5)
+        self.vboxlayout8 = QtWidgets.QVBoxLayout(self.frame_revenue_trend)
+        self.vboxlayout8.setObjectName("vboxlayout8")
+        self.label1 = QtWidgets.QLabel(parent=self.frame_revenue_trend)
+        self.label1.setObjectName("label1")
+        self.vboxlayout8.addWidget(self.label1)
         self.chart_revenue = QtWidgets.QWidget(parent=self.frame_revenue_trend)
         self.chart_revenue.setMinimumSize(QtCore.QSize(0, 300))
         self.chart_revenue.setObjectName("chart_revenue")
-        self.vboxlayout4.addWidget(self.chart_revenue)
+        self.vboxlayout8.addWidget(self.chart_revenue)
         self.layout_charts.addWidget(self.frame_revenue_trend)
         self.frame_top_products = QtWidgets.QFrame(parent=self.scrollContents)
         self.frame_top_products.setObjectName("frame_top_products")
-        self.vboxlayout5 = QtWidgets.QVBoxLayout(self.frame_top_products)
-        self.vboxlayout5.setObjectName("vboxlayout5")
-        self.label6 = QtWidgets.QLabel(parent=self.frame_top_products)
-        self.label6.setObjectName("label6")
-        self.vboxlayout5.addWidget(self.label6)
+        self.vboxlayout9 = QtWidgets.QVBoxLayout(self.frame_top_products)
+        self.vboxlayout9.setObjectName("vboxlayout9")
+        self.label2 = QtWidgets.QLabel(parent=self.frame_top_products)
+        self.label2.setObjectName("label2")
+        self.vboxlayout9.addWidget(self.label2)
         self.chart_top_products = QtWidgets.QWidget(parent=self.frame_top_products)
         self.chart_top_products.setMinimumSize(QtCore.QSize(0, 300))
         self.chart_top_products.setObjectName("chart_top_products")
-        self.vboxlayout5.addWidget(self.chart_top_products)
+        self.vboxlayout9.addWidget(self.chart_top_products)
         self.layout_charts.addWidget(self.frame_top_products)
         self.layout_charts.setStretch(0, 7)
         self.layout_charts.setStretch(1, 3)
         self.scrollLayout.addLayout(self.layout_charts)
         self.frame_history = QtWidgets.QFrame(parent=self.scrollContents)
         self.frame_history.setObjectName("frame_history")
-        self.vboxlayout6 = QtWidgets.QVBoxLayout(self.frame_history)
-        self.vboxlayout6.setObjectName("vboxlayout6")
-        self.label7 = QtWidgets.QLabel(parent=self.frame_history)
-        self.label7.setObjectName("label7")
-        self.vboxlayout6.addWidget(self.label7)
+        self.vboxlayout10 = QtWidgets.QVBoxLayout(self.frame_history)
+        self.vboxlayout10.setObjectName("vboxlayout10")
+        self.label3 = QtWidgets.QLabel(parent=self.frame_history)
+        self.label3.setObjectName("label3")
+        self.vboxlayout10.addWidget(self.label3)
         self.tbl_transactions = QtWidgets.QTableWidget(parent=self.frame_history)
         self.tbl_transactions.setMinimumSize(QtCore.QSize(0, 300))
         self.tbl_transactions.setObjectName("tbl_transactions")
@@ -304,15 +406,15 @@ class Ui_ReportManagementWidget(object):
         self.tbl_transactions.setHorizontalHeaderItem(2, item)
         item = QtWidgets.QTableWidgetItem()
         self.tbl_transactions.setHorizontalHeaderItem(3, item)
-        self.vboxlayout6.addWidget(self.tbl_transactions)
+        self.vboxlayout10.addWidget(self.tbl_transactions)
         self.scrollLayout.addWidget(self.frame_history)
         self.frame_inventory = QtWidgets.QFrame(parent=self.scrollContents)
         self.frame_inventory.setObjectName("frame_inventory")
-        self.vboxlayout7 = QtWidgets.QVBoxLayout(self.frame_inventory)
-        self.vboxlayout7.setObjectName("vboxlayout7")
-        self.label8 = QtWidgets.QLabel(parent=self.frame_inventory)
-        self.label8.setObjectName("label8")
-        self.vboxlayout7.addWidget(self.label8)
+        self.vboxlayout11 = QtWidgets.QVBoxLayout(self.frame_inventory)
+        self.vboxlayout11.setObjectName("vboxlayout11")
+        self.label4 = QtWidgets.QLabel(parent=self.frame_inventory)
+        self.label4.setObjectName("label4")
+        self.vboxlayout11.addWidget(self.label4)
         self.tbl_inventory_report = QtWidgets.QTableWidget(parent=self.frame_inventory)
         self.tbl_inventory_report.setMinimumSize(QtCore.QSize(0, 300))
         self.tbl_inventory_report.setObjectName("tbl_inventory_report")
@@ -328,7 +430,7 @@ class Ui_ReportManagementWidget(object):
         self.tbl_inventory_report.setHorizontalHeaderItem(3, item)
         item = QtWidgets.QTableWidgetItem()
         self.tbl_inventory_report.setHorizontalHeaderItem(4, item)
-        self.vboxlayout7.addWidget(self.tbl_inventory_report)
+        self.vboxlayout11.addWidget(self.tbl_inventory_report)
         self.scrollLayout.addWidget(self.frame_inventory)
         self.scrollArea.setWidget(self.scrollContents)
         self.verticalLayout_root.addWidget(self.scrollArea)
@@ -338,8 +440,7 @@ class Ui_ReportManagementWidget(object):
 
     def retranslateUi(self, ReportManagementWidget):
         _translate = QtCore.QCoreApplication.translate
-        ReportManagementWidget.setWindowTitle(_translate("ReportManagementWidget", "Báo cáo &\n"
-"Thống kê Hệ thống"))
+        ReportManagementWidget.setWindowTitle(_translate("ReportManagementWidget", "Báo cáo & Thống kê Hệ thống"))
         self.lbl_title_main.setText(_translate("ReportManagementWidget", "Báo cáo & Thống kê Tổng quan"))
         self.btn_filter_today.setText(_translate("ReportManagementWidget", "Hôm nay"))
         self.btn_filter_today.setProperty("class", _translate("ReportManagementWidget", "btn-filter"))
@@ -349,32 +450,72 @@ class Ui_ReportManagementWidget(object):
         self.btn_filter_month.setProperty("class", _translate("ReportManagementWidget", "btn-filter"))
         self.label.setText(_translate("ReportManagementWidget", "→"))
         self.btn_run_filter.setText(_translate("ReportManagementWidget", "LỌC"))
-        self.card_revenue.setProperty("class", _translate("ReportManagementWidget", "kpi-card"))
-        self.label1.setText(_translate("ReportManagementWidget", "Doanh thu"))
-        self.label1.setProperty("class", _translate("ReportManagementWidget", "kpi-label"))
-        self.val_revenue.setText(_translate("ReportManagementWidget", "0 VND"))
-        self.val_revenue.setProperty("class", _translate("ReportManagementWidget", "kpi-value"))
-        self.card_profit.setProperty("class", _translate("ReportManagementWidget", "kpi-card"))
-        self.label2.setText(_translate("ReportManagementWidget", "Lợi nhuận gộp"))
-        self.label2.setProperty("class", _translate("ReportManagementWidget", "kpi-label"))
-        self.val_profit.setText(_translate("ReportManagementWidget", "0 VND"))
-        self.val_profit.setProperty("class", _translate("ReportManagementWidget", "kpi-value"))
-        self.card_orders.setProperty("class", _translate("ReportManagementWidget", "kpi-card"))
-        self.label3.setText(_translate("ReportManagementWidget", "Số hóa đơn"))
-        self.label3.setProperty("class", _translate("ReportManagementWidget", "kpi-label"))
-        self.val_orders.setText(_translate("ReportManagementWidget", "0"))
-        self.val_orders.setProperty("class", _translate("ReportManagementWidget", "kpi-value"))
-        self.card_stock.setProperty("class", _translate("ReportManagementWidget", "kpi-card"))
-        self.label4.setText(_translate("ReportManagementWidget", "Giá trị tồn kho"))
-        self.label4.setProperty("class", _translate("ReportManagementWidget", "kpi-label"))
-        self.val_stock_value.setText(_translate("ReportManagementWidget", "0 VND"))
-        self.val_stock_value.setProperty("class", _translate("ReportManagementWidget", "kpi-value"))
-        self.label5.setText(_translate("ReportManagementWidget", "📈 Xu hướng doanh thu"))
-        self.label5.setProperty("class", _translate("ReportManagementWidget", "section-title"))
-        self.label6.setText(_translate("ReportManagementWidget", "🏆 Top sản phẩm"))
-        self.label6.setProperty("class", _translate("ReportManagementWidget", "section-title"))
-        self.label7.setText(_translate("ReportManagementWidget", "📜 Lịch sử giao dịch hóa đơn"))
-        self.label7.setProperty("class", _translate("ReportManagementWidget", "section-title"))
+        self.lbl_title_group_revenue.setText(_translate("ReportManagementWidget", "📈 Nhóm Doanh thu & Hóa đơn"))
+        self.lbl_title_group_revenue.setProperty("class", _translate("ReportManagementWidget", "kpi-group-title"))
+        self.card_gross_revenue.setProperty("class", _translate("ReportManagementWidget", "kpi-card"))
+        self.lbl_gross_rev.setText(_translate("ReportManagementWidget", "Doanh thu phát sinh (Gross)"))
+        self.lbl_gross_rev.setProperty("class", _translate("ReportManagementWidget", "kpi-label"))
+        self.val_gross_revenue.setText(_translate("ReportManagementWidget", "0 VND"))
+        self.val_gross_revenue.setProperty("class", _translate("ReportManagementWidget", "kpi-value"))
+        self.desc_gross_revenue.setText(_translate("ReportManagementWidget", "Gồm cả đơn thành công & đơn đã hủy"))
+        self.desc_gross_revenue.setProperty("class", _translate("ReportManagementWidget", "kpi-desc"))
+        self.card_cancelled_value.setProperty("class", _translate("ReportManagementWidget", "kpi-card"))
+        self.lbl_cancelled_val.setText(_translate("ReportManagementWidget", "Giá trị hóa đơn hủy"))
+        self.lbl_cancelled_val.setProperty("class", _translate("ReportManagementWidget", "kpi-label"))
+        self.val_cancelled_value.setText(_translate("ReportManagementWidget", "0 VND"))
+        self.val_cancelled_value.setProperty("class", _translate("ReportManagementWidget", "kpi-value"))
+        self.desc_cancelled_value.setText(_translate("ReportManagementWidget", "Tổng tiền hoàn trả thực tế từ đơn hủy"))
+        self.desc_cancelled_value.setProperty("class", _translate("ReportManagementWidget", "kpi-desc"))
+        self.card_net_revenue.setProperty("class", _translate("ReportManagementWidget", "kpi-card"))
+        self.lbl_net_rev.setText(_translate("ReportManagementWidget", "Doanh thu thuần (Net)"))
+        self.lbl_net_rev.setProperty("class", _translate("ReportManagementWidget", "kpi-label"))
+        self.val_net_revenue.setText(_translate("ReportManagementWidget", "0 VND"))
+        self.val_net_revenue.setProperty("class", _translate("ReportManagementWidget", "kpi-value"))
+        self.desc_net_revenue.setText(_translate("ReportManagementWidget", "Bằng: Doanh thu phát sinh - Đơn hủy"))
+        self.desc_net_revenue.setProperty("class", _translate("ReportManagementWidget", "kpi-desc"))
+        self.card_order_stats.setProperty("class", _translate("ReportManagementWidget", "kpi-card"))
+        self.lbl_order_stats.setText(_translate("ReportManagementWidget", "Thống kê đơn hàng"))
+        self.lbl_order_stats.setProperty("class", _translate("ReportManagementWidget", "kpi-label"))
+        self.val_order_stats.setText(_translate("ReportManagementWidget", "0 đơn (0 / 0)"))
+        self.val_order_stats.setProperty("class", _translate("ReportManagementWidget", "kpi-value"))
+        self.desc_order_stats.setText(_translate("ReportManagementWidget", "Tổng đơn (Thành công / Đã hủy)"))
+        self.desc_order_stats.setProperty("class", _translate("ReportManagementWidget", "kpi-desc"))
+        self.lbl_title_group_profit.setText(_translate("ReportManagementWidget", "💰 Nhóm Chi phí & Lợi nhuận"))
+        self.lbl_title_group_profit.setProperty("class", _translate("ReportManagementWidget", "kpi-group-title"))
+        self.card_cogs.setProperty("class", _translate("ReportManagementWidget", "kpi-card"))
+        self.lbl_cogs.setText(_translate("ReportManagementWidget", "Tổng giá vốn (COGS)"))
+        self.lbl_cogs.setProperty("class", _translate("ReportManagementWidget", "kpi-label"))
+        self.val_cogs.setText(_translate("ReportManagementWidget", "0 VND"))
+        self.val_cogs.setProperty("class", _translate("ReportManagementWidget", "kpi-value"))
+        self.desc_cogs.setText(_translate("ReportManagementWidget", "Giá vốn lũy kế của các đơn thành công"))
+        self.desc_cogs.setProperty("class", _translate("ReportManagementWidget", "kpi-desc"))
+        self.card_gross_profit.setProperty("class", _translate("ReportManagementWidget", "kpi-card"))
+        self.lbl_gross_profit.setText(_translate("ReportManagementWidget", "Lợi nhuận gộp kỹ thuật"))
+        self.lbl_gross_profit.setProperty("class", _translate("ReportManagementWidget", "kpi-label"))
+        self.val_gross_profit.setText(_translate("ReportManagementWidget", "0 VND"))
+        self.val_gross_profit.setProperty("class", _translate("ReportManagementWidget", "kpi-value"))
+        self.desc_gross_profit.setText(_translate("ReportManagementWidget", "Bằng: Doanh thu thuần - Tổng giá vốn"))
+        self.desc_gross_profit.setProperty("class", _translate("ReportManagementWidget", "kpi-desc"))
+        self.card_variance_garbage.setProperty("class", _translate("ReportManagementWidget", "kpi-card"))
+        self.lbl_variance_garbage.setText(_translate("ReportManagementWidget", "Điều chỉnh chênh lệch"))
+        self.lbl_variance_garbage.setProperty("class", _translate("ReportManagementWidget", "kpi-label"))
+        self.val_variance_garbage.setText(_translate("ReportManagementWidget", "0 VND"))
+        self.val_variance_garbage.setProperty("class", _translate("ReportManagementWidget", "kpi-value"))
+        self.desc_variance_garbage.setText(_translate("ReportManagementWidget", "Tiền dọn rác khi ép kho rỗng/âm về 0"))
+        self.desc_variance_garbage.setProperty("class", _translate("ReportManagementWidget", "kpi-desc"))
+        self.card_net_profit.setProperty("class", _translate("ReportManagementWidget", "kpi-card"))
+        self.lbl_net_profit.setText(_translate("ReportManagementWidget", "Lợi nhuận thuần thực tế"))
+        self.lbl_net_profit.setProperty("class", _translate("ReportManagementWidget", "kpi-label"))
+        self.val_net_profit.setText(_translate("ReportManagementWidget", "0 VND"))
+        self.val_net_profit.setProperty("class", _translate("ReportManagementWidget", "kpi-value"))
+        self.desc_net_profit.setText(_translate("ReportManagementWidget", "Bằng: Lợi nhuận gộp + Tiền điều chênh lệch"))
+        self.desc_net_profit.setProperty("class", _translate("ReportManagementWidget", "kpi-desc"))
+        self.label1.setText(_translate("ReportManagementWidget", "📈 Xu hướng doanh thu"))
+        self.label1.setProperty("class", _translate("ReportManagementWidget", "section-title"))
+        self.label2.setText(_translate("ReportManagementWidget", "🏆 Top sản phẩm"))
+        self.label2.setProperty("class", _translate("ReportManagementWidget", "section-title"))
+        self.label3.setText(_translate("ReportManagementWidget", "📜 Lịch sử giao dịch hóa đơn"))
+        self.label3.setProperty("class", _translate("ReportManagementWidget", "section-title"))
         item = self.tbl_transactions.horizontalHeaderItem(0)
         item.setText(_translate("ReportManagementWidget", "Mã HĐ"))
         item = self.tbl_transactions.horizontalHeaderItem(1)
@@ -383,8 +524,8 @@ class Ui_ReportManagementWidget(object):
         item.setText(_translate("ReportManagementWidget", "Tổng tiền"))
         item = self.tbl_transactions.horizontalHeaderItem(3)
         item.setText(_translate("ReportManagementWidget", "Thanh toán"))
-        self.label8.setText(_translate("ReportManagementWidget", "📦 Báo cáo giá trị tồn kho hiện tại"))
-        self.label8.setProperty("class", _translate("ReportManagementWidget", "section-title"))
+        self.label4.setText(_translate("ReportManagementWidget", "📦 Báo cáo giá trị tồn kho hiện tại"))
+        self.label4.setProperty("class", _translate("ReportManagementWidget", "section-title"))
         item = self.tbl_inventory_report.horizontalHeaderItem(0)
         item.setText(_translate("ReportManagementWidget", "Sản phẩm"))
         item = self.tbl_inventory_report.horizontalHeaderItem(1)

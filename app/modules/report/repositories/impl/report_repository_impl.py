@@ -9,60 +9,43 @@ class ReportRepositoryImpl(BaseRepository, ReportRepository):
 
     def get_kpi_metrics(self, start_date: str, end_date: str) -> Dict[str, Any]:
         """
-        Kiểm toán KPIs: Doanh thu thuần = Doanh thu COMPLETED - Tiền hoàn trả CANCELLED thực tế từ lịch sử.
-        Lợi nhuận thuần = Lợi nhuận COMPLETED + Tiền dọn rác tồn đọng.
+        Truy vấn dữ liệu từ View tổng hợp tích hợp mới để lấy ra 8 chỉ số cốt lõi.
         """
-        # 1. Thu thập doanh thu và lợi nhuận từ các hóa đơn COMPLETED chuẩn
-        sql_sales = """
+        sql_kpis = """
             SELECT 
-                COUNT(invoice_id) AS total_orders, 
-                IFNULL(SUM(revenue), 0) AS total_revenue, 
-                IFNULL(SUM(gross_profit), 0) AS total_profit
-            FROM vw_report_invoice_summary
-            WHERE sale_date BETWEEN %s AND %s
+                IFNULL(SUM(total_orders_created), 0)    AS total_orders_created,
+                IFNULL(SUM(total_orders_completed), 0)  AS total_orders_completed,
+                IFNULL(SUM(total_orders_cancelled), 0)  AS total_orders_cancelled,
+                IFNULL(SUM(gross_revenue), 0)           AS gross_revenue,
+                IFNULL(SUM(cancelled_value), 0)         AS cancelled_value,
+                IFNULL(SUM(net_revenue), 0)             AS net_revenue,
+                IFNULL(SUM(total_cogs), 0)              AS total_cogs,
+                IFNULL(SUM(variance_garbage), 0)        AS variance_garbage
+            FROM vw_report_daily_financial_summary
+            WHERE report_date BETWEEN %s AND %s
         """
-        self.cursor.execute(sql_sales, (start_date, end_date))
-        sales_row = self.cursor.fetchone() or {}
+        self.cursor.execute(sql_kpis, (start_date, end_date))
+        row = self.cursor.fetchone() or {}
 
-        # 2. KIỂM TOÁN LÙI CHUẨN XÁC: Chỉ trừ tiền hoàn trả của hóa đơn hủy từ Nhật ký lịch sử (Luồng 4)
-        # Đã cập nhật: Bổ sung "AND cancel_reason IS NOT NULL" để loại bỏ hóa đơn lỗi hệ thống
-        sql_cancelled = """
-            SELECT IFNULL(SUM(total_amount), 0) AS returned_cash
-            FROM invoices 
-            WHERE status = 'CANCELLED' 
-              AND cancel_reason IS NOT NULL
-              AND DATE(created_at) BETWEEN %s AND %s
-        """
-        self.cursor.execute(sql_cancelled, (start_date, end_date))
-        cancelled_row = self.cursor.fetchone() or {}
+        # Tính toán bắc cầu logic tài chính
+        net_revenue = float(row.get("net_revenue") or 0)
+        total_cogs = float(row.get("total_cogs") or 0)
+        variance_garbage = float(row.get("variance_garbage") or 0)
 
-        # 3. Thu thập tổng giá trị rác tài chính đã triệt tiêu mang ra sổ cái (Luồng 1 & Luồng 4)
-        sql_variance = """
-            SELECT IFNULL(SUM(variance_amount), 0) AS total_variance_garbage
-            FROM stock_transactions
-            WHERE type IN ('DATA_CORRECTION', 'ADJUST_VARIANCE')
-              AND DATE(created_at) BETWEEN %s AND %s
-        """
-        self.cursor.execute(sql_variance, (start_date, end_date))
-        variance_row = self.cursor.fetchone() or {}
-
-        # 4. Lấy tổng giá trị kho vật lý hiện hành thời gian thực
-        sql_stock = """
-            SELECT IFNULL(SUM(total_inventory_value), 0) AS total_stock_value 
-            FROM vw_report_inventory_valuation
-        """
-        self.cursor.execute(sql_stock)
-        stock_row = self.cursor.fetchone() or {}
-
-        # Tính toán dòng tiền sạch thực tế tại két
-        net_revenue = sales_row.get("total_revenue", 0) - cancelled_row.get("returned_cash", 0)
-        net_profit = sales_row.get("total_profit", 0) + variance_row.get("total_variance_garbage", 0)
+        gross_profit = net_revenue - total_cogs
+        net_profit = gross_profit + variance_garbage
 
         return {
-            "total_orders": sales_row.get("total_orders", 0),
-            "total_revenue": net_revenue,
-            "total_profit": net_profit,
-            "total_stock_value": stock_row.get("total_stock_value", 0)
+            "total_orders_created": int(row.get("total_orders_created") or 0),
+            "total_orders_completed": int(row.get("total_orders_completed") or 0),
+            "total_orders_cancelled": int(row.get("total_orders_cancelled") or 0),
+            "gross_revenue": row.get("gross_revenue") or 0,
+            "cancelled_value": row.get("cancelled_value") or 0,
+            "net_revenue": net_revenue,
+            "total_cogs": total_cogs,
+            "gross_profit": gross_profit,
+            "variance_garbage": variance_garbage,
+            "net_profit": net_profit
         }
 
     def get_revenue_trend(self, start_date: str, end_date: str) -> List[Dict[str, Any]]:

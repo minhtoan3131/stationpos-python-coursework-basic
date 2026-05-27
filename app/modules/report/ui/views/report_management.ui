@@ -7,12 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>1400</width>
-    <height>900</height>
+    <height>950</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Báo cáo &amp;
-Thống kê Hệ thống</string>
+   <string>Báo cáo &amp; Thống kê Hệ thống</string>
   </property>
   <property name="styleSheet">
    <string notr="true">
@@ -31,12 +30,12 @@ Thống kê Hệ thống</string>
         background-color: #e2e8f0;
     }
 
-    /* Thẻ chỉ số (KPI Cards) */
+    /* Thẻ chỉ số (KPI Cards) &amp; Nhóm phân loại */
     QFrame.kpi-card {
         background-color: #ffffff;
         border-radius: 12px;
         border: none;
-        min-height: 100px;
+        min-height: 115px;
     }
 
     QLabel#lbl_title_main {
@@ -45,27 +44,45 @@ Thống kê Hệ thống</string>
         color: #0f172a;
     }
 
-    QLabel.kpi-label {
+    QLabel.kpi-group-title {
         font-size: 14px;
+        font-weight: 700;
+        color: #334155;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding-left: 2px;
+    }
+
+    QLabel.kpi-label {
+        font-size: 13px;
         font-weight: 600;
         color: #64748b;
         text-transform: uppercase;
     }
 
     QLabel.kpi-value {
-        font-size: 28px;
+        font-size: 24px;
         font-weight: 800;
     }
 
-    QLabel#val_revenue { color: #10b981; }
-    QLabel#val_profit { color: #3b82f6;
-}
-    QLabel#val_orders { color: #8b5cf6; }
-    QLabel#val_stock_value { color: #f59e0b;
-}
+    QLabel.kpi-desc {
+        font-size: 11px;
+        color: #64748b;
+        font-weight: 500;
+    }
 
-    /* Khu vực Biểu đồ &amp;
-Bảng */
+    /* Đổ màu chuyên biệt cho từng chỉ số mới */
+    QLabel#val_gross_revenue { color: #0284c7; }   /* Xanh dương nhạt - Doanh thu thô */
+    QLabel#val_cancelled_value { color: #ef4444; }  /* Đỏ - Tiền hủy hoàn */
+    QLabel#val_net_revenue { color: #10b981; }      /* Xanh lá - Thực thu sạch */
+    QLabel#val_order_stats { color: #8b5cf6; }      /* Tím - Phễu đơn hàng */
+
+    QLabel#val_cogs { color: #f59e0b; }             /* Cam - Giá vốn */
+    QLabel#val_gross_profit { color: #3b82f6; }     /* Xanh Lam - Lợi nhuận gộp */
+    QLabel#val_variance_garbage { color: #64748b; } /* Xám - Tiền dọn rác kho */
+    QLabel#val_net_profit { color: #0d9488; }       /* Xanh ngọc - Lợi nhuận thực */
+
+    /* Khu vực Biểu đồ &amp; Bảng */
     QFrame#frame_revenue_trend, QFrame#frame_top_products, QFrame#frame_history, QFrame#frame_inventory, QFrame#frame_diagram {
         background-color: #ffffff;
         border-radius: 12px;
@@ -111,10 +128,10 @@ Bảng */
         background-color: #ffffff;
         border: 1px solid #cbd5e1;
         border-radius: 6px;
-        padding: 6px 26px 6px 10px; /* Thêm khoảng trống bên phải để không đè chữ lên mũi tên */
+        padding: 6px 26px 6px 10px;
         font-weight: 600;
         color: #475569;
-        max-width: 110px; /* Thu ngắn chiều ngang */
+        max-width: 110px;
     }
     QDateEdit:hover {
         border-color: #94a3b8;
@@ -131,7 +148,7 @@ Bảng */
     QDateEdit::down-arrow {
         border-left: 4px solid transparent;
         border-right: 4px solid transparent;
-        border-top: 5px solid #475569; /* Vẽ mũi tên tam giác cùng tone màu chữ */
+        border-top: 5px solid #475569;
         width: 0;
         height: 0;
     }
@@ -178,7 +195,7 @@ Bảng */
         <x>0</x>
         <y>0</y>
         <width>1385</width>
-        <height>1450</height>
+        <height>1674</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="scrollLayout">
@@ -306,125 +323,371 @@ Bảng */
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="layout_kpi_cards">
+        <layout class="QVBoxLayout" name="layout_kpi_cards">
          <property name="spacing">
-          <number>20</number>
+          <number>12</number>
          </property>
          <item>
-          <widget class="QFrame" name="card_revenue">
-           <property name="class" stdset="0">
-            <string>kpi-card</string>
+          <widget class="QLabel" name="lbl_title_group_revenue">
+           <property name="text">
+            <string>📈 Nhóm Doanh thu &amp; Hóa đơn</string>
            </property>
-           <layout class="QVBoxLayout">
-            <item>
-             <widget class="QLabel" name="label">
-              <property name="text">
-               <string>Doanh thu</string>
-              </property>
-              <property name="class" stdset="0">
-               <string>kpi-label</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="val_revenue">
-              <property name="text">
-               <string>0 VND</string>
-              </property>
-              <property name="class" stdset="0">
-               <string>kpi-value</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           <property name="class" stdset="0">
+            <string>kpi-group-title</string>
+           </property>
           </widget>
          </item>
          <item>
-          <widget class="QFrame" name="card_profit">
-           <property name="class" stdset="0">
-            <string>kpi-card</string>
+          <layout class="QHBoxLayout" name="layout_row_revenue">
+           <property name="spacing">
+            <number>20</number>
            </property>
-           <layout class="QVBoxLayout">
-            <item>
-             <widget class="QLabel" name="label">
-              <property name="text">
-               <string>Lợi nhuận gộp</string>
-              </property>
-              <property name="class" stdset="0">
-               <string>kpi-label</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="val_profit">
-              <property name="text">
-               <string>0 VND</string>
-              </property>
-              <property name="class" stdset="0">
-               <string>kpi-value</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           <item>
+            <widget class="QFrame" name="card_gross_revenue">
+             <property name="class" stdset="0">
+              <string>kpi-card</string>
+             </property>
+             <layout class="QVBoxLayout">
+              <item>
+               <widget class="QLabel" name="lbl_gross_rev">
+                <property name="text">
+                 <string>Doanh thu phát sinh (Gross)</string>
+                </property>
+                <property name="class" stdset="0">
+                 <string>kpi-label</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="val_gross_revenue">
+                <property name="text">
+                 <string>0 VND</string>
+                </property>
+                <property name="class" stdset="0">
+                 <string>kpi-value</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="desc_gross_revenue">
+                <property name="text">
+                 <string>Gồm cả đơn thành công &amp; đơn đã hủy</string>
+                </property>
+                <property name="class" stdset="0">
+                 <string>kpi-desc</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QFrame" name="card_cancelled_value">
+             <property name="class" stdset="0">
+              <string>kpi-card</string>
+             </property>
+             <layout class="QVBoxLayout">
+              <item>
+               <widget class="QLabel" name="lbl_cancelled_val">
+                <property name="text">
+                 <string>Giá trị hóa đơn hủy</string>
+                </property>
+                <property name="class" stdset="0">
+                 <string>kpi-label</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="val_cancelled_value">
+                <property name="text">
+                 <string>0 VND</string>
+                </property>
+                <property name="class" stdset="0">
+                 <string>kpi-value</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="desc_cancelled_value">
+                <property name="text">
+                 <string>Tổng tiền hoàn trả thực tế từ đơn hủy</string>
+                </property>
+                <property name="class" stdset="0">
+                 <string>kpi-desc</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QFrame" name="card_net_revenue">
+             <property name="class" stdset="0">
+              <string>kpi-card</string>
+             </property>
+             <layout class="QVBoxLayout">
+              <item>
+               <widget class="QLabel" name="lbl_net_rev">
+                <property name="text">
+                 <string>Doanh thu thuần (Net)</string>
+                </property>
+                <property name="class" stdset="0">
+                 <string>kpi-label</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="val_net_revenue">
+                <property name="text">
+                 <string>0 VND</string>
+                </property>
+                <property name="class" stdset="0">
+                 <string>kpi-value</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="desc_net_revenue">
+                <property name="text">
+                 <string>Bằng: Doanh thu phát sinh - Đơn hủy</string>
+                </property>
+                <property name="class" stdset="0">
+                 <string>kpi-desc</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QFrame" name="card_order_stats">
+             <property name="class" stdset="0">
+              <string>kpi-card</string>
+             </property>
+             <layout class="QVBoxLayout">
+              <item>
+               <widget class="QLabel" name="lbl_order_stats">
+                <property name="text">
+                 <string>Thống kê đơn hàng</string>
+                </property>
+                <property name="class" stdset="0">
+                 <string>kpi-label</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="val_order_stats">
+                <property name="text">
+                 <string>0 đơn (0 / 0)</string>
+                </property>
+                <property name="class" stdset="0">
+                 <string>kpi-value</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="desc_order_stats">
+                <property name="text">
+                 <string>Tổng đơn (Thành công / Đã hủy)</string>
+                </property>
+                <property name="class" stdset="0">
+                 <string>kpi-desc</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <spacer name="kpi_group_spacer">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>8</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="lbl_title_group_profit">
+           <property name="text">
+            <string>💰 Nhóm Chi phí &amp; Lợi nhuận</string>
+           </property>
+           <property name="class" stdset="0">
+            <string>kpi-group-title</string>
+           </property>
           </widget>
          </item>
          <item>
-          <widget class="QFrame" name="card_orders">
-           <property name="class" stdset="0">
-            <string>kpi-card</string>
+          <layout class="QHBoxLayout" name="layout_row_profit">
+           <property name="spacing">
+            <number>20</number>
            </property>
-           <layout class="QVBoxLayout">
-            <item>
-             <widget class="QLabel" name="label">
-              <property name="text">
-               <string>Số hóa đơn</string>
-              </property>
-              <property name="class" stdset="0">
-               <string>kpi-label</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="val_orders">
-              <property name="text">
-               <string>0</string>
-              </property>
-              <property name="class" stdset="0">
-               <string>kpi-value</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item>
-          <widget class="QFrame" name="card_stock">
-           <property name="class" stdset="0">
-            <string>kpi-card</string>
-           </property>
-           <layout class="QVBoxLayout">
-            <item>
-             <widget class="QLabel" name="label">
-              <property name="text">
-               <string>Giá trị tồn kho</string>
-              </property>
-              <property name="class" stdset="0">
-               <string>kpi-label</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="val_stock_value">
-              <property name="text">
-               <string>0 VND</string>
-              </property>
-              <property name="class" stdset="0">
-               <string>kpi-value</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
+           <item>
+            <widget class="QFrame" name="card_cogs">
+             <property name="class" stdset="0">
+              <string>kpi-card</string>
+             </property>
+             <layout class="QVBoxLayout">
+              <item>
+               <widget class="QLabel" name="lbl_cogs">
+                <property name="text">
+                 <string>Tổng giá vốn (COGS)</string>
+                </property>
+                <property name="class" stdset="0">
+                 <string>kpi-label</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="val_cogs">
+                <property name="text">
+                 <string>0 VND</string>
+                </property>
+                <property name="class" stdset="0">
+                 <string>kpi-value</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="desc_cogs">
+                <property name="text">
+                 <string>Giá vốn lũy kế của các đơn thành công</string>
+                </property>
+                <property name="class" stdset="0">
+                 <string>kpi-desc</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QFrame" name="card_gross_profit">
+             <property name="class" stdset="0">
+              <string>kpi-card</string>
+             </property>
+             <layout class="QVBoxLayout">
+              <item>
+               <widget class="QLabel" name="lbl_gross_profit">
+                <property name="text">
+                 <string>Lợi nhuận gộp kỹ thuật</string>
+                </property>
+                <property name="class" stdset="0">
+                 <string>kpi-label</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="val_gross_profit">
+                <property name="text">
+                 <string>0 VND</string>
+                </property>
+                <property name="class" stdset="0">
+                 <string>kpi-value</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="desc_gross_profit">
+                <property name="text">
+                 <string>Bằng: Doanh thu thuần - Tổng giá vốn</string>
+                </property>
+                <property name="class" stdset="0">
+                 <string>kpi-desc</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QFrame" name="card_variance_garbage">
+             <property name="class" stdset="0">
+              <string>kpi-card</string>
+             </property>
+             <layout class="QVBoxLayout">
+              <item>
+               <widget class="QLabel" name="lbl_variance_garbage">
+                <property name="text">
+                 <string>Điều chỉnh chênh lệch</string>
+                </property>
+                <property name="class" stdset="0">
+                 <string>kpi-label</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="val_variance_garbage">
+                <property name="text">
+                 <string>0 VND</string>
+                </property>
+                <property name="class" stdset="0">
+                 <string>kpi-value</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="desc_variance_garbage">
+                <property name="text">
+                 <string>Tiền dọn rác khi ép kho rỗng/âm về 0</string>
+                </property>
+                <property name="class" stdset="0">
+                 <string>kpi-desc</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QFrame" name="card_net_profit">
+             <property name="class" stdset="0">
+              <string>kpi-card</string>
+             </property>
+             <layout class="QVBoxLayout">
+              <item>
+               <widget class="QLabel" name="lbl_net_profit">
+                <property name="text">
+                 <string>Lợi nhuận thuần thực tế</string>
+                </property>
+                <property name="class" stdset="0">
+                 <string>kpi-label</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="val_net_profit">
+                <property name="text">
+                 <string>0 VND</string>
+                </property>
+                <property name="class" stdset="0">
+                 <string>kpi-value</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="desc_net_profit">
+                <property name="text">
+                 <string>Bằng: Lợi nhuận gộp + Tiền điều chênh lệch</string>
+                </property>
+                <property name="class" stdset="0">
+                 <string>kpi-desc</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
          </item>
         </layout>
        </item>

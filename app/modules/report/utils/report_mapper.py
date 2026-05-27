@@ -12,13 +12,20 @@ class ReportMapper:
     @staticmethod
     def map_kpi(raw_data: Dict[str, Any]) -> KPIDTO:
         if not raw_data:
-            return KPIDTO(0, Decimal('0'), Decimal('0'), Decimal('0'))
+            return KPIDTO(0, 0, 0, Decimal('0'), Decimal('0'), Decimal('0'), Decimal('0'), Decimal('0'), Decimal('0'),
+                          Decimal('0'))
 
         return KPIDTO(
-            total_orders=int(raw_data.get("total_orders") or 0),
-            total_revenue=Decimal(str(raw_data.get("total_revenue") or 0)),
-            total_profit=Decimal(str(raw_data.get("total_profit") or 0)),
-            total_stock_value=Decimal(str(raw_data.get("total_stock_value") or 0))
+            total_orders_created=int(raw_data.get("total_orders_created") or 0),
+            total_orders_completed=int(raw_data.get("total_orders_completed") or 0),
+            total_orders_cancelled=int(raw_data.get("total_orders_cancelled") or 0),
+            gross_revenue=Decimal(str(raw_data.get("gross_revenue") or 0)),
+            cancelled_value=Decimal(str(raw_data.get("cancelled_value") or 0)),
+            net_revenue=Decimal(str(raw_data.get("net_revenue") or 0)),
+            total_cogs=Decimal(str(raw_data.get("total_cogs") or 0)),
+            gross_profit=Decimal(str(raw_data.get("gross_profit") or 0)),
+            variance_garbage=Decimal(str(raw_data.get("variance_garbage") or 0)),
+            net_profit=Decimal(str(raw_data.get("net_profit") or 0))
         )
 
     @staticmethod

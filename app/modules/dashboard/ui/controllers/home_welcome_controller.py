@@ -38,7 +38,9 @@ class HomeWelcomeController(QWidget):
             # REPORT SERVICE: Badge đơn hàng & Nhật ký hoạt động
             # =========================================================================
             report_data = self.report_service.get_dashboard_report(current_date_str, current_date_str)
-            total_orders = report_data.kpis.total_orders if report_data and report_data.kpis else 0
+
+             Thay thế 'total_orders' thành 'total_orders_completed' để khớp với 8 chỉ số mới
+            total_orders = report_data.kpis.total_orders_completed if report_data and report_data.kpis else 0
             self.ui.val_badge_orders.setText(f'{total_orders:,} hóa đơn')
 
             activities = self.report_service.get_daily_activity_feed(current_date_str)

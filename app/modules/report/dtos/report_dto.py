@@ -4,11 +4,17 @@ from typing import List
 
 @dataclass
 class KPIDTO:
-    """DTO chứa các chỉ số KPI tổng quan hiển thị trên 4 thẻ chỉ số."""
-    total_orders: int          # Tổng số hóa đơn
-    total_revenue: Decimal     # Tổng doanh thu
-    total_profit: Decimal      # Tổng lợi nhuận gộp
-    total_stock_value: Decimal # Tổng giá trị tồn kho của cửa hàng hiện tại
+    """DTO chứa trọn vẹn bộ chỉ số kiểm toán hiển thị trên 8 thẻ KPI mới."""
+    total_orders_created: int       # Tổng đơn phát sinh
+    total_orders_completed: int     # Đơn thành công
+    total_orders_cancelled: int     # Đơn đã hủy
+    gross_revenue: Decimal          # Doanh thu thô phát sinh
+    cancelled_value: Decimal        # Giá trị hóa đơn hủy hoàn
+    net_revenue: Decimal            # Doanh thu thuần thực thu
+    total_cogs: Decimal             # Tổng giá vốn hàng bán
+    gross_profit: Decimal           # Lợi nhuận gộp bán hàng
+    variance_garbage: Decimal       # Điều chỉnh chênh lệch kế toán rác
+    net_profit: Decimal             # Lợi nhuận thuần thực tế thực nhận
 
 @dataclass
 class RevenueTrendItemDTO:
