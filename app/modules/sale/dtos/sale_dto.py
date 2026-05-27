@@ -3,6 +3,7 @@ from typing import List, Optional
 from decimal import Decimal
 
 @dataclass
+@dataclass
 class CartItemDTO:
     product_id: int
     sku: str
@@ -13,6 +14,7 @@ class CartItemDTO:
     price: Decimal
     total: Decimal
     cost_price: Decimal
+    total_cogs_amount: Decimal = Decimal('0.0000')
 
 @dataclass
 class CheckoutDTO:

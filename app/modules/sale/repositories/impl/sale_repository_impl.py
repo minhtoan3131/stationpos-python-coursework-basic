@@ -28,12 +28,13 @@ class SaleRepositoryImpl(BaseRepository, SaleRepository):
         sql = """
             INSERT INTO invoice_items (
                 invoice_id, product_id, unit_id, cost_price,
-                quantity, unit_price, total_price
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s)
+                quantity, unit_price, total_price, total_cogs_amount
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """
+        # Đọc trực tiếp trường cost_price (hiện hành) và total_cogs (gánh rác) từ DTO
         params_list = [
             (invoice_id, item.product_id, item.unit_id, item.cost_price,
-             item.quantity, item.price, item.total)
+             item.quantity, item.price, item.total, getattr(item, 'total_cogs_amount', 0.0000))
             for item in items
         ]
         self.cursor.executemany(sql, params_list)

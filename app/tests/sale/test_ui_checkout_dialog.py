@@ -13,17 +13,14 @@ from app.modules.sale.dtos.sale_dto import CheckoutDTO, CartItemDTO
 def sample_checkout_dto():
     """Tạo DTO mồi mô phỏng giỏ hàng được truyền từ màn hình chính sang"""
     items = [
+        # Đã bổ sung trường total_cogs_amount mặc định
         CartItemDTO(product_id=1, sku="SP01", name="Bút bi", unit_id=10, unit_name="Cái",
-                    quantity=5, price=Decimal('10000'), total=Decimal('50000'), cost_price=Decimal('4000'))
+                    quantity=5, price=Decimal('10000'), total=Decimal('50000'), cost_price=Decimal('4000'),
+                    total_cogs_amount=Decimal('20000'))
     ]
     return CheckoutDTO(
-        code="",  # Cố tình để trống để test logic tự sinh mã
-        total_amount=Decimal('50000'),
-        discount=Decimal('0'),
-        final_amount=Decimal('50000'),
-        payment_method='CASH',
-        cash_received=Decimal('0'),
-        items=items
+        code="", total_amount=Decimal('50000'), discount=Decimal('0'), final_amount=Decimal('50000'),
+        payment_method='CASH', cash_received=Decimal('0'), items=items
     )
 
 

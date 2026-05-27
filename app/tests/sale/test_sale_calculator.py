@@ -1,5 +1,7 @@
 import pytest
 from decimal import Decimal
+
+from app.modules.sale.dtos.sale_dto import CartItemDTO
 from app.modules.sale.utils.sale_calculator import SaleCalculator
 
 
@@ -53,3 +55,16 @@ def test_calculate_conversion_details(wholesale_price, cost_price, base_stock, r
     assert actual_price == expected_price
     assert actual_cost == expected_cost
     assert actual_stock == expected_stock
+
+# ==========================================
+# TÍNH TỔNG TIỀN GIỎ HÀNG
+# ==========================================
+def test_calculate_total_amount_with_decimal_precision():
+    """Đảm bảo hàm tính tổng tiền hóa đơn cộng dồn chính xác, không lệch float"""
+    items = [
+         Thay thế '4k' và '8k' bằng chuỗi số chuẩn toán học để Decimal khởi tạo hợp lệ
+        CartItemDTO(100, "SP01", "A", 10, "Cái", 1, Decimal('10000.0001'), Decimal('10000.0001'), Decimal('4000')),
+        CartItemDTO(101, "SP02", "B", 10, "Cái", 1, Decimal('20000.0002'), Decimal('20000.0002'), Decimal('8000'))
+    ]
+    total = SaleCalculator.calculate_total_amount(items)
+    assert total == Decimal('30000.0003')

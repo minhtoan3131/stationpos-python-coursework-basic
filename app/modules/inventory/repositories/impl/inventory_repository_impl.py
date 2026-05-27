@@ -38,7 +38,8 @@ class InventoryRepositoryImpl(BaseRepository, InventoryRepository):
             item_data['total_price']  # Thay cho 'total'
         ))
 
-    def add_stock_transaction(self, trans_data):
+    def add_stock_transaction(self, trans_data) -> int:
+        """Ghi log dịch chuyển kho và TRẢ VỀ ID bản ghi vừa tạo để tầng trên kiểm soát"""
         sql = """
             INSERT INTO stock_transactions (product_id, change_quantity, type, variance_amount, note, reference_id) 
             VALUES (%s, %s, %s, %s, %s, %s)
@@ -47,10 +48,11 @@ class InventoryRepositoryImpl(BaseRepository, InventoryRepository):
             trans_data['product_id'],
             trans_data['qty'],
             trans_data['type'],
-            trans_data.get('variance_amount', 0.0000),  # Đọc khoản tiền bù trừ rác tài chính
-            trans_data.get('note', None),               # Đọc ghi chú giải trình dữ liệu
-            trans_data['ref_id']
+            trans_data.get('variance_amount', 0.0000),
+            trans_data.get('note', None),
+            trans_data.get('ref_id', None)
         ))
+        return self.cursor.lastrowid
 
     def update_inventory_status(self, product_id: int, new_qty: int, new_total_value):
         """Cập nhật đè trực tiếp Số lượng và Tổng giá trị mới nhất"""
@@ -123,3 +125,21 @@ class InventoryRepositoryImpl(BaseRepository, InventoryRepository):
                 "ratio": row["ratio"]  # Trả về dạng dict chứa key 'ratio'
             }
         return None
+
+    def link_stock_transactions_to_invoice(self, transaction_ids: list, invoice_id: int) -> None:
+
+        if not transaction_ids:
+            return
+
+        # Tạo chuỗi placeholder %s tương ứng với số lượng ID (Ví dụ: %s, %s, %s)
+        format_strings = ', '.join(['%s'] * len(transaction_ids))
+
+        sql = f"""
+            UPDATE stock_transactions 
+            SET reference_id = %s 
+            WHERE id IN ({format_strings})
+        """
+
+        # Tham số truyền vào gồm: invoice_id và giải nén list transaction_ids
+        params = [invoice_id] + transaction_ids
+        self.cursor.execute(sql, tuple(params))

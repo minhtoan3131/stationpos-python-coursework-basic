@@ -13,6 +13,7 @@ def sales_window(qtbot, mocker):
     mock_inventory_service = mocker.Mock()
     mock_product_service = mocker.Mock()
     mock_sale_service = mocker.Mock()
+    mock_invoice_history_service = mocker.Mock()
 
     # Mồi sẵn dữ liệu: 1 sản phẩm còn tồn kho, 1 sản phẩm hết tồn kho
     mock_product_service.get_product_sale_list.return_value = [
@@ -37,7 +38,8 @@ def sales_window(qtbot, mocker):
     window = SalesManagementController(
         inventory_service=mock_inventory_service,
         product_service=mock_product_service,
-        sale_service=mock_sale_service
+        sale_service=mock_sale_service,
+        invoice_history_service=mock_invoice_history_service
     )
     qtbot.addWidget(window)
 
