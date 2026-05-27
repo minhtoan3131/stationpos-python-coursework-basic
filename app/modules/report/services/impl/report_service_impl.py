@@ -53,7 +53,7 @@ class ReportServiceImpl(ReportService):
                     'type': 'SALE',
                     'code': trans.get('invoice_code', ''),
                     'created_at': dt_str,
-                    'amount': float(trans.get('final_amount', 0)),
+                    'amount': float(trans.get('total_amount', 0)),
                     'detail': trans.get('payment_method', '')
                 })
 

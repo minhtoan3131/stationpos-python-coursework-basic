@@ -45,7 +45,7 @@ class ReportMapper:
             TransactionHistoryDTO(
                 invoice_code=item["invoice_code"],
                 created_at=item["created_at"],
-                final_amount=Decimal(str(item["final_amount"] or 0)),
+                total_amount=Decimal(str(item["total_amount"] or 0)),
                 payment_method=item["payment_method"]
             ) for item in raw_list
         ]

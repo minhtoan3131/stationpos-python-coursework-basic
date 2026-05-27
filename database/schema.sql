@@ -105,6 +105,7 @@ CREATE TABLE stock_transactions (
 				'DATA_CORRECTION',
 				'ANOMALY_ADJUSTMENT') NOT NULL,
     variance_amount DECIMAL(15, 4) DEFAULT 0.0000, -- Cột này dùng để ghi lại số tiền 'rác' còn sót lại khi ép kho về 0
+    note TEXT NULL,
     reference_id INT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 
@@ -181,7 +182,7 @@ CREATE TABLE IF NOT EXISTS system_settings (
 
 
 -- View Tổng hợp Hóa đơn và Lợi nhuận
--- Mục đích: Tính toán chính xác doanh thu, tổng giá vốn (COGS), và lợi nhuận gộp của từng hóa đơn sau khi đã trừ chiết khấu (discount).
+-- Mục đích: Tính toán chính xác doanh thu (lúc này là total_amount), tổng giá vốn (COGS), và lợi nhuận gộp của từng hóa đơn.
 -- Ứng dụng UI: Phục vụ trực tiếp cho 3 thẻ KPI (Doanh thu, Lợi nhuận gộp, Số hóa đơn) và biểu đồ Xu hướng doanh thu.
 CREATE OR REPLACE VIEW vw_report_invoice_summary AS
 SELECT
@@ -190,12 +191,10 @@ SELECT
     i.created_at,
     DATE(i.created_at) AS sale_date,
     i.payment_method,
-    i.total_amount,
-    i.discount,
-    i.final_amount AS revenue,
+    i.total_amount AS revenue, -- total_amount vì doanh thu giờ là tổng tiền thực thu
     IFNULL(item_costs.total_cost, 0) AS total_cost,
-    -- Lợi nhuận gộp chuẩn = Doanh thu thuần - Tổng COGS thực tế (đã nuốt rác thập phân)
-    (i.final_amount - IFNULL(item_costs.total_cost, 0)) AS gross_profit
+    -- Lợi nhuận gộp chuẩn = Doanh thu (total_amount) - Tổng COGS thực tế (đã nuốt rác thập phân)
+    (i.total_amount - IFNULL(item_costs.total_cost, 0)) AS gross_profit
 FROM invoices i
 LEFT JOIN (
     -- Lấy trực tiếp snapshot cột total_cogs_amount gánh rác kế toán
@@ -206,7 +205,6 @@ LEFT JOIN (
     GROUP BY invoice_id
 ) item_costs ON i.id = item_costs.invoice_id
 WHERE i.status = 'COMPLETED';
-
 
 -- View Thống kê Doanh số Sản phẩm
 -- Mục đích: Tổng hợp số lượng bán ra và doanh thu thu được theo từng sản phẩm và theo từng ngày.
@@ -234,7 +232,7 @@ CREATE OR REPLACE VIEW vw_report_transaction_history AS
 SELECT
     code AS invoice_code,
     created_at,
-    final_amount,
+    total_amount,
     CASE
         WHEN payment_method = 'CASH' THEN 'Tiền mặt'
         WHEN payment_method = 'TRANSFER' THEN 'Chuyển khoản'
@@ -257,7 +255,6 @@ SELECT
 FROM inventory i
 JOIN products p ON i.product_id = p.id
 JOIN units u ON p.base_unit_id = u.id;
-
 
 
 

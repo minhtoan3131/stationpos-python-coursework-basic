@@ -27,7 +27,7 @@ class ReportRepositoryImpl(BaseRepository, ReportRepository):
         # 2. KIỂM TOÁN LÙI CHUẨN XÁC: Chỉ trừ tiền hoàn trả của hóa đơn hủy từ Nhật ký lịch sử (Luồng 4)
         # Đã cập nhật: Bổ sung "AND cancel_reason IS NOT NULL" để loại bỏ hóa đơn lỗi hệ thống
         sql_cancelled = """
-            SELECT IFNULL(SUM(final_amount), 0) AS returned_cash
+            SELECT IFNULL(SUM(total_amount), 0) AS returned_cash
             FROM invoices 
             WHERE status = 'CANCELLED' 
               AND cancel_reason IS NOT NULL
@@ -93,7 +93,7 @@ class ReportRepositoryImpl(BaseRepository, ReportRepository):
 
     def get_transaction_history(self, start_date: str, end_date: str) -> List[Dict[str, Any]]:
         sql = """
-            SELECT invoice_code, created_at, final_amount, payment_method_text
+            SELECT invoice_code, created_at, total_amount, payment_method_text
             FROM vw_report_transaction_history
             WHERE DATE(created_at) BETWEEN %s AND %s
             ORDER BY created_at DESC
@@ -103,7 +103,7 @@ class ReportRepositoryImpl(BaseRepository, ReportRepository):
         return [{"invoice_code": row.get("invoice_code", ""),
                  "created_at": row["created_at"].strftime("%Y-%m-%d %H:%M") if isinstance(row.get("created_at"),
                                                                                           datetime) else str(
-                     row.get("created_at", "")), "final_amount": row.get("final_amount", 0),
+                     row.get("created_at", "")), "total_amount": row.get("total_amount", 0),
                  "payment_method": row.get("payment_method_text", "")} for row in rows]
 
     def get_inventory_valuation(self) -> List[Dict[str, Any]]:

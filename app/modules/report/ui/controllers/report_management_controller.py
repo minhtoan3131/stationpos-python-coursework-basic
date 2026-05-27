@@ -113,7 +113,7 @@ class ReportManagementController(QWidget):
             self.ui.tbl_transactions.setItem(row, 0, QTableWidgetItem(trans.invoice_code))
             self.ui.tbl_transactions.setItem(row, 1, QTableWidgetItem(trans.created_at))
 
-            amount_item = QTableWidgetItem(f"{trans.final_amount:,.0f}")
+            amount_item = QTableWidgetItem(f"{trans.total_amount:,.0f}")
             amount_item.setTextAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
             self.ui.tbl_transactions.setItem(row, 2, amount_item)
 

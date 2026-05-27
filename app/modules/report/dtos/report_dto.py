@@ -27,7 +27,7 @@ class TransactionHistoryDTO:
     """DTO cho mỗi dòng hiển thị trong bảng Lịch sử giao dịch hóa đơn."""
     invoice_code: str          # Mã hóa đơn
     created_at: str            # Thời gian lập hóa đơn (VD: "2023-10-27 08:30:00")
-    final_amount: Decimal      # Tổng tiền hóa đơn (sau chiết khấu)
+    total_amount: Decimal      # Tổng tiền hóa đơn (sau chiết khấu)
     payment_method: str        # Hình thức thanh toán đã chuyển đổi ngôn ngữ ("Tiền mặt", "Chuyển khoản")
 
 @dataclass
