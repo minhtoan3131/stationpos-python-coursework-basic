@@ -1,58 +1,71 @@
+# File: app/modules/sale/repositories/impl/invoice_history_repository_impl.py
 from app.core.database.base_repository import BaseRepository
 from datetime import date
 from typing import List, Dict, Any
-
 from app.modules.sale.repositories.invoice_history_repository import InvoiceHistoryRepository
 
 
 class InvoiceHistoryRepositoryImpl(BaseRepository, InvoiceHistoryRepository):
-    """
-    Repository riêng biệt quản lý việc truy vấn dữ liệu lịch sử hóa đơn.
-    Kế thừa từ BaseRepository để sử dụng self.cursor và self.connection.
-    """
 
-    def fetch_invoices_master(self,
-                              keyword: str = None,
-                              date_from: date = None,
-                              date_to: date = None,
-                              payment_method: str = None,
+    def fetch_invoices_master(self, keyword: str = None, date_from: date = None,
+                              date_to: date = None, payment_method: str = None,
                               status: str = None) -> List[Dict[str, Any]]:
+        """Khai thác dữ liệu bộ lọc động từ bảng invoices"""
+        query = """
+            SELECT code, created_at, total_amount, discount, final_amount, payment_method, status, cancel_reason
+            FROM invoices
+            WHERE DATE(created_at) BETWEEN %s AND %s
         """
-        Truy vấn danh sách tổng quan hóa đơn dựa trên các điều kiện lọc.
-        Có thể khai thác từ bảng 'invoices' hoặc View 'vw_report_transaction_history'.
-        """
-        # TODO: Triển khai câu lệnh SQL SELECT kết hợp dựng chuỗi điều kiện WHERE động
-        # Ví dụ: SQL dựa trên các tham số keyword, date_from, date_to, payment_method, status
-        # Trả về danh sách các dict chứa thông tin: code, created_at, total_amount, payment_method, status
-        return []
+        params = [date_from, date_to]
+
+        if payment_method:
+            query += " AND payment_method = %s"
+            params.append(payment_method)
+
+        if status:
+            query += " AND status = %s"
+            params.append(status)
+
+        if keyword:
+            query += " AND code LIKE %s"
+            params.append(f"%{keyword}%")
+
+        query += " ORDER BY created_at DESC"
+        self.cursor.execute(query, tuple(params))
+        return self.cursor.fetchall()
 
     def fetch_invoice_details(self, invoice_code: str) -> List[Dict[str, Any]]:
+        """Truy vấn các mặt hàng chi tiết đi kèm snapshot COGS lịch sử"""
+        query = """
+            SELECT 
+                ii.product_id, ii.unit_id, p.sku, p.name AS product_name, 
+                u.name AS unit_name, ii.quantity, ii.unit_price, ii.total_price, 
+                ii.cost_price, ii.total_cogs_amount
+            FROM invoice_items ii
+            JOIN invoices i ON ii.invoice_id = i.id
+            JOIN products p ON ii.product_id = p.id
+            JOIN units u ON ii.unit_id = u.id
+            WHERE i.code = %s
         """
-        Truy vấn chi tiết các mặt hàng nằm bên trong một hóa đơn cụ thể.
-        Kết hợp bảng invoice_items, products và units để lấy thông tin hiển thị.
-        """
-        # TODO: Triển khai câu lệnh SQL chi tiết mặt hàng dựa trên invoice_code
-        # Trả về danh sách các dict chứa: product_name, unit_name, quantity, unit_price, total_price
-        return []
+        self.cursor.execute(query, (invoice_code,))
+        return self.cursor.fetchall()
 
     def fetch_invoice_metadata(self, invoice_code: str) -> Dict[str, Any]:
-        """
-        Truy vấn thông tin bổ sung (Snapshot) của hóa đơn như số tiền khách đưa, giảm giá...
-        """
-        # TODO: Triển khai SQL lấy thông tin chi tiết của Header hóa đơn từ bảng invoices
-        return {}
+        """Lấy Header snapshot của hóa đơn phục vụ hiển thị Panel bên phải"""
+        query = "SELECT * FROM invoices WHERE code = %s"
+        self.cursor.execute(query, (invoice_code,))
+        return self.cursor.fetchone() or {}
 
     def update_invoice_status(self, invoice_code: str, status: str, cancel_reason: str = None) -> bool:
-        """
-        Cập nhật trạng thái của hóa đơn (Ví dụ: Chuyển từ COMPLETED sang CANCELLED).
-        """
-        # TODO: Triển khai SQL UPDATE status và cancel_reason vào bảng invoices
+        """Đổi trạng thái hóa đơn gốc"""
+        query = "UPDATE invoices SET status = %s, cancel_reason = %s WHERE code = %s"
+        self.cursor.execute(query, (status, cancel_reason, invoice_code))
         return True
 
     def restore_inventory_stock(self, invoice_code: str) -> None:
         """
-        Hoàn lại số lượng tồn kho và tính lại tổng giá trị kho khi hóa đơn bị hủy.
+        Hàm này được để trống (pass) vì toàn bộ logic tính toán pha loãng phức tạp
+        và dọn rác của Luồng 4 sẽ do tầng Service xử lý tập trung, phối hợp giữa
+        inventory_repo và product_repo qua Unit Of Work để đảm bảo tính đóng gói.
         """
-        # TODO: Triển khai logic đọc các mặt hàng trong hóa đơn, cộng ngược lại bảng inventory
-        # và ghi nhận giao dịch biến động kho vào bảng stock_transactions với type='CANCEL'
         pass

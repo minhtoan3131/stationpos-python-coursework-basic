@@ -80,7 +80,7 @@ class SalesManagementController(QWidget):
             self.refresh_product_list()  # Cập nhật tồn kho mới nhất
         elif index == 1:  # Chuyển sang Tab Lịch sử hóa đơn
             self.ui.txt_search_invoice.clear()
-            self.invoice_history_controller.initial_load()
+            self.invoice_history_controller.load_master_data()
 
     # ==========================================
     # LOGIC BÊN TRÁI: DANH SÁCH SẢN PHẨM
