@@ -3,6 +3,8 @@ from PyQt6.QtWidgets import (
     QWidget, QHeaderView, QTableWidgetItem, QVBoxLayout, QMessageBox, QAbstractItemView, QButtonGroup
 )
 from PyQt6.QtCore import Qt, QDate
+
+from app.core.exceptions.validation_exception import ValidationException
 from app.modules.report.ui.generated.ui_report_management import Ui_ReportManagementWidget
 from app.modules.report.services.report_service import ReportService
 from app.modules.report.dtos.report_dto import DashboardReportDTO
@@ -85,18 +87,18 @@ class ReportManagementController(QWidget):
 
     def load_report_data(self, start_date: str, end_date: str):
         try:
-            # Gọi Service để nhận DTO chuẩn
             report_data: DashboardReportDTO = self.report_service.get_dashboard_report(start_date, end_date)
 
-            # Đổ dữ liệu lên các thành phần UI
             self.update_kpi_cards(report_data.kpis)
             self.update_transaction_table(report_data.transactions)
             self.update_inventory_table(report_data.inventory_valuation)
             self.render_charts(report_data.revenue_trend, report_data.top_products)
 
+        except ValidationException as ve:
+            # Lỗi chọn sai ngày của người dùng chỉ hiện Cảnh báo màu vàng thân thiện
+            QMessageBox.warning(self, "Lỗi bộ lọc", str(ve))
         except Exception as e:
-            traceback.print_exc()
-            QMessageBox.critical(self, "Lỗi Hệ Thống", f"Không thể tải dữ liệu báo cáo:\n{str(e)}")
+            QMessageBox.critical(self, "Lỗi Hệ Thống", f"Không thể tải dữ liệu báo cáo thống kê:\n{str(e)}")
 
     def update_kpi_cards(self, kpis):
         self.ui.val_revenue.setText(f"{kpis.total_revenue:,.0f} VND")

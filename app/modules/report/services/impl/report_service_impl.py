@@ -1,34 +1,33 @@
+# File: app/modules/report/services/impl/report_service_impl.py
 import datetime
-
 from app.modules.report.services.report_service import ReportService
 from app.modules.report.dtos.report_dto import DashboardReportDTO
 from app.modules.report.utils.report_mapper import ReportMapper
+from app.core.exceptions.validation_exception import ValidationException
+
 
 class ReportServiceImpl(ReportService):
     def __init__(self, uow_factory):
         self.uow_factory = uow_factory
 
     def get_dashboard_report(self, start_date: str, end_date: str) -> DashboardReportDTO:
-
         try:
             start = datetime.datetime.strptime(start_date, "%Y-%m-%d")
             end = datetime.datetime.strptime(end_date, "%Y-%m-%d")
         except (ValueError, TypeError):
-            raise ValueError("Định dạng ngày không hợp lệ. Phải có dạng YYYY-MM-DD.")
+            raise ValidationException("Định dạng ngày bộ lọc không hợp lệ. Phải có dạng YYYY-MM-DD.")
 
-            # Kiểm tra logic đảo lộn thời gian
         if start > end:
-            raise ValueError("Ngày bắt đầu không được lớn hơn ngày kết thúc!")
+            raise ValidationException(
+                "Ngày bắt đầu không được lớn hơn ngày kết thúc trên bộ lọc!")
 
         with self.uow_factory() as uow:
-            # Gọi Repository lấy Raw Data
             raw_kpis = uow.report_repo.get_kpi_metrics(start_date, end_date)
             raw_trend = uow.report_repo.get_revenue_trend(start_date, end_date)
             raw_top = uow.report_repo.get_top_products(start_date, end_date)
             raw_trans = uow.report_repo.get_transaction_history(start_date, end_date)
             raw_inventory = uow.report_repo.get_inventory_valuation()
 
-            # Gọi Mapper để đóng gói thành DTO
             return DashboardReportDTO(
                 kpis=ReportMapper.map_kpi(raw_kpis),
                 revenue_trend=ReportMapper.map_revenue_trend(raw_trend),
@@ -38,24 +37,32 @@ class ReportServiceImpl(ReportService):
             )
 
     def get_daily_activity_feed(self, date_str: str) -> list:
+        """Trộn luồng và chuẩn hóa 100% kiểu dữ liệu String cho trục thời gian để chống sập thuật toán sort"""
         with self.uow_factory() as uow:
-            # Gọi hàm cũ (Bán hàng)
             raw_transactions = uow.report_repo.get_transaction_history(date_str, date_str)
-            # Gọi hàm mới (Nhập kho)
             raw_purchase_orders = uow.report_repo.get_daily_purchase_orders(date_str)
 
             combined = []
             for trans in raw_transactions:
+                # Trích xuất chuỗi thời gian an toàn
+                dt_field = trans.get('created_at', '')
+                dt_str = dt_field.strftime("%Y-%m-%d %H:%M") if isinstance(dt_field, datetime.datetime) else str(
+                    dt_field)
+
                 combined.append({
                     'type': 'SALE',
                     'code': trans.get('invoice_code', ''),
-                    'created_at': trans.get('created_at', ''),
+                    'created_at': dt_str,
                     'amount': float(trans.get('final_amount', 0)),
                     'detail': trans.get('payment_method', '')
                 })
 
             for po in raw_purchase_orders:
-                dt_str = po['created_at'].strftime("%Y-%m-%d %H:%M") if po.get('created_at') else ""
+                # Ép chặt đối tượng datetime trong bảng purchase_orders về chuỗi văn bản trùng khớp
+                dt_field = po.get('created_at')
+                dt_str = dt_field.strftime("%Y-%m-%d %H:%M") if isinstance(dt_field, datetime.datetime) else str(
+                    dt_field)
+
                 combined.append({
                     'type': 'IMPORT',
                     'code': po.get('code', ''),
@@ -64,6 +71,6 @@ class ReportServiceImpl(ReportService):
                     'detail': po.get('supplier_name') or "Không rõ"
                 })
 
-            # Xử lý Business Logic: Sắp xếp
+            # Thuật toán sắp xếp tuyến tính chạy trơn tru tuyệt đối vì toàn bộ key 'created_at' đều là String
             combined.sort(key=lambda x: x['created_at'], reverse=True)
             return combined
