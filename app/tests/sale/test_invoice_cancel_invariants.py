@@ -28,6 +28,9 @@ class FakeInventoryRepo:
 
     def add_stock_transaction(self, trans_data): self.stock_transactions.append(trans_data)
 
+    def get_conversion_info(self, product_id, unit_id):
+        return {'ratio': Decimal('1')}
+
 
 class FakeSaleRepo:
     def add_invoice_log(self, invoice_id, action, note): pass
@@ -89,6 +92,7 @@ def test_cancel_invoice_transaction_rollback_on_unexpected_system_error(history_
     def mock_db_crash(*args, **kwargs):
         raise RuntimeError("CSDL mất kết nối đột ngột!")
 
+    # Cài bẫy chuẩn xác tại vị trí cuối cùng của luồng xử lý
     uow.invoice_history_repo.update_invoice_status = mock_db_crash
 
     with pytest.raises(Exception, match="CSDL mất kết nối đột ngột"):

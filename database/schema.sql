@@ -67,13 +67,13 @@ CREATE TABLE inventory (
 CREATE TABLE purchase_orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
     code VARCHAR(50) UNIQUE NOT NULL,       -- Mã phiếu nhập (VD: PN-20231027-001)
-    supplier_id INT,
+    supplier_id INT,                        
     total_amount DECIMAL(15,4),             -- Tổng giá trị phiếu nhập
     note TEXT,                              -- Ghi chú (Lý do, số hóa đơn gốc...)
     status ENUM('COMPLETED','CANCELLED') DEFAULT 'COMPLETED',
     cancel_reason TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-
+    
     FOREIGN KEY (supplier_id) REFERENCES suppliers(id)
 );
 
@@ -87,7 +87,7 @@ CREATE TABLE purchase_order_items (
     unit_price DECIMAL(15,4),
     total_price DECIMAL(15,4),
     actual_cost_at_import DECIMAL(15, 4) DEFAULT 0.0000, -- giá vốn gốc tại thời điểm nhập
-
+    
     FOREIGN KEY (purchase_order_id) REFERENCES purchase_orders(id),
     FOREIGN KEY (product_id) REFERENCES products(id),
     FOREIGN KEY (unit_id) REFERENCES units(id)
@@ -97,12 +97,12 @@ CREATE TABLE stock_transactions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     product_id INT,
     change_quantity INT,
-    type ENUM('IMPORT',
-				'SALE',
-				'ADJUST',
-				'CANCEL',
-				'ADJUST_VARIANCE',
-				'DATA_CORRECTION',
+    type ENUM('IMPORT', 
+				'SALE', 
+				'ADJUST', 
+				'CANCEL', 
+				'ADJUST_VARIANCE', 
+				'DATA_CORRECTION', 
 				'ANOMALY_ADJUSTMENT') NOT NULL,
     variance_amount DECIMAL(15, 4) DEFAULT 0.0000, -- Cột này dùng để ghi lại số tiền 'rác' còn sót lại khi ép kho về 0
     note TEXT NULL,
@@ -120,7 +120,7 @@ CREATE TABLE invoices (
     total_amount DECIMAL(15,4),
     discount DECIMAL(15,4) DEFAULT 0,
     final_amount DECIMAL(15,4),
-    payment_method ENUM('CASH', 'TRANSFER') DEFAULT 'CASH',
+    payment_method ENUM('CASH', 'TRANSFER') DEFAULT 'CASH', 
     cash_received DECIMAL(15,4) DEFAULT 0,
     status ENUM('COMPLETED','CANCELLED') DEFAULT 'COMPLETED',
     cancel_reason TEXT
@@ -210,7 +210,7 @@ WHERE i.status = 'COMPLETED';
 -- Mục đích: Tổng hợp số lượng bán ra và doanh thu thu được theo từng sản phẩm và theo từng ngày.
 -- Ứng dụng UI: Phục vụ cho biểu đồ Top 5 sản phẩm bán chạy.
 CREATE OR REPLACE VIEW vw_report_product_sales AS
-SELECT
+SELECT 
     DATE(i.created_at) AS sale_date,
     ii.product_id,
     p.sku AS product_sku,
@@ -229,11 +229,11 @@ GROUP BY DATE(i.created_at), ii.product_id, p.sku, p.name, u.name;
 -- Mục đích: Chuẩn hóa dữ liệu hiển thị và thực hiện chuyển đổi ngôn ngữ (Mapping) cho hình thức thanh toán ngay tại tầng Database.
 -- Ứng dụng UI: Đổ dữ liệu trực tiếp vào bảng Lịch sử giao dịch hóa đơn
 CREATE OR REPLACE VIEW vw_report_transaction_history AS
-SELECT
+SELECT 
     code AS invoice_code,
     created_at,
     total_amount,
-    CASE
+    CASE 
         WHEN payment_method = 'CASH' THEN 'Tiền mặt'
         WHEN payment_method = 'TRANSFER' THEN 'Chuyển khoản'
         ELSE payment_method
@@ -246,7 +246,7 @@ WHERE status = 'COMPLETED';
 -- Mục đích: Kết nối thông tin tồn kho hiện tại với danh mục sản phẩm và đơn vị tính cơ bản.
 -- Ứng dụng UI: Phục vụ cho thẻ KPI Giá trị tồn kho và hiển thị dữ liệu lên bảng Báo cáo giá trị tồn kho hiện tại
 CREATE OR REPLACE VIEW vw_report_inventory_valuation AS
-SELECT
+SELECT 
     p.name AS product_name,
     u.name AS unit_name,
     i.quantity AS stock_quantity,
@@ -259,7 +259,7 @@ JOIN units u ON p.base_unit_id = u.id;
 
 -- View kiểm toán tích hợp phục vụ cho 8 chỉ số trong báo cáo
 CREATE OR REPLACE VIEW vw_report_daily_financial_summary AS
-SELECT
+SELECT 
     report_date,
     SUM(total_created) AS total_orders_created,
     SUM(total_completed) AS total_orders_completed,
@@ -271,7 +271,7 @@ SELECT
     SUM(variance_garbage) AS variance_garbage
 FROM (
     /* PHẦN 1: BÓC TÁCH DỮ LIỆU HOÁ ĐƠN THEO NGÀY */
-    SELECT
+    SELECT 
         DATE(i.created_at) AS report_date,
         COUNT(i.id) AS total_created,
         SUM(CASE WHEN i.status = 'COMPLETED' THEN 1 ELSE 0 END) AS total_completed,
@@ -289,11 +289,11 @@ FROM (
         GROUP BY invoice_id
     ) cogs ON i.id = cogs.invoice_id
     GROUP BY DATE(i.created_at)
-
+    
     UNION ALL
-
+    
     /* PHẦN 2: LẤY SỐ LIỆU ĐIỀU CHỈNH RÁC KHO THEO NGÀY */
-    SELECT
+    SELECT 
         DATE(st.created_at) AS report_date,
         0 AS total_created,
         0 AS total_completed,

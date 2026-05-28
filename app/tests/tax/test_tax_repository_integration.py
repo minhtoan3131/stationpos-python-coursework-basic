@@ -84,25 +84,25 @@ def test_sql_view_calculates_monthly_revenue_correctly(tax_report_repo, db_test_
 
     # Tháng 1/2026: Có 2 hóa đơn thành công (Tổng = 150k)
     cursor.execute("""
-        INSERT INTO invoices (code, created_at, final_amount, status) 
-        VALUES 
-        ('INV-01', '2026-01-10', 100000, 'COMPLETED'),
-        ('INV-02', '2026-01-25', 50000, 'COMPLETED')
-    """)
+            INSERT INTO invoices (code, created_at, total_amount, final_amount, status) 
+            VALUES 
+            ('INV-01', '2026-01-10', 100000, 100000, 'COMPLETED'),
+            ('INV-02', '2026-01-25', 50000, 50000, 'COMPLETED')
+        """)
 
     # Tháng 2/2026: 1 hóa đơn thành công (200k) và 1 hóa đơn HỦY (500k - phải bị bỏ qua)
     cursor.execute("""
-        INSERT INTO invoices (code, created_at, final_amount, status) 
-        VALUES 
-        ('INV-03', '2026-02-05', 200000, 'COMPLETED'),
-        ('INV-04', '2026-02-20', 500000, 'CANCELLED')
-    """)
+            INSERT INTO invoices (code, created_at, total_amount, final_amount, status) 
+            VALUES 
+            ('INV-03', '2026-02-05', 200000, 200000, 'COMPLETED'),
+            ('INV-04', '2026-02-20', 500000, 500000, 'CANCELLED')
+        """)
 
     # Tháng 12/2025: Khác năm (phải bị lọc bỏ)
     cursor.execute("""
-        INSERT INTO invoices (code, created_at, final_amount, status) 
-        VALUES ('INV-05', '2025-12-31', 999999, 'COMPLETED')
-    """)
+            INSERT INTO invoices (code, created_at, total_amount, final_amount, status) 
+            VALUES ('INV-05', '2025-12-31', 999999, 999999, 'COMPLETED')
+        """)
 
     db_test_connection.commit()
     cursor.close()

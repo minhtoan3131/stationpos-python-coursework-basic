@@ -47,12 +47,16 @@ class InvoiceHistoryServiceImpl(InvoiceHistoryService):
             # VÒNG LẶP XỬ LÝ KHO CHO TỪNG MẶT HÀNG (PHỤC HỒI PHA LOÃNG)
             for item in invoice_items:
                 p_id = item['product_id']
-                sold_qty = item['quantity']
+                u_id = item['unit_id']  # Bảng invoice_items của bạn có lưu unit_id gốc lúc mua!
+                sold_qty = item['quantity']  # Số lượng gốc lúc mua (ví dụ: 1 Hộp)
                 total_cogs_amount = Decimal(str(item['total_cogs_amount']))
 
-                # Vì nghiệp vụ POS hiện tại của bạn đã gộp sỉ/lẻ về đơn vị cơ bản khi trừ kho,
-                # nên return_qty ở đây chính bằng sold_qty cơ bản. Tỷ lệ hoàn vốn là 100%.
-                return_qty = sold_qty
+                # ---  Truy vấn trực tiếp tỷ lệ quy đổi thật từ DB thông qua Repo ---
+                conv_info = uow.inventory_repo.get_conversion_info(p_id, u_id)
+                conversion_ratio = Decimal(str(conv_info['ratio'])) if conv_info else Decimal('1')
+
+                # Tính số lượng cơ bản thực tế cần hoàn lại kho (ví dụ: 1 Hộp * 10 = 10 Cái)
+                return_qty = int(sold_qty * conversion_ratio)
                 refund_cogs = total_cogs_amount  # Trả bao nhiêu cái hoàn đúng bấy nhiêu vốn gốc
 
                 # --- BƯỚC 1: KHÓA DÒNG INVENTORY (SELECT ... FOR UPDATE) ---

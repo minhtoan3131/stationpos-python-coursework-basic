@@ -77,7 +77,11 @@ class TaxService(ITaxService):
         with self.uow_factory() as uow:
             revenue_dtos = uow.tax_report_repo.get_monthly_revenue_by_year(year)
 
-        total_revenue = sum(r.revenue for r in revenue_dtos)
+        monthly_revenues = [Decimal('0') for _ in range(12)]
+        for record in revenue_dtos:
+            monthly_revenues[record.month - 1] = record.revenue
+
+        total_revenue = TaxCalculator.calculate_total_revenue(monthly_revenues)
         threshold = config.threshold_amount
 
         # Xử lý Business Logic: Ngưỡng & Cảnh báo 85%

@@ -38,6 +38,12 @@ class FakeInventoryRepo:
         }
         self.stock_transactions = []
 
+        self.conversion_info = {
+            10: {'ratio': Decimal('1')},  # unit_id = 10 đại diện cho Cái (Lẻ)
+            20: {'ratio': Decimal('10')},  # unit_id = 20 đại diện cho Hộp (Sỉ 1)
+            30: {'ratio': Decimal('100')}  # unit_id = 30 đại diện cho Thùng (Sỉ 2)
+        }
+
     def get_inventory_status(self, product_id):
         return self.inventory.get(product_id, {'quantity': 0, 'total_value': Decimal('0.0000')})
 
@@ -46,6 +52,9 @@ class FakeInventoryRepo:
 
     def add_stock_transaction(self, trans_data):
         self.stock_transactions.append(trans_data)
+
+    def get_conversion_info(self, product_id, unit_id):
+        return self.conversion_info.get(unit_id, {'ratio': Decimal('1')})
 
 
 class FakeSaleRepo:
@@ -82,7 +91,7 @@ class FakeInvoiceHistoryRepository:
             return [{
                 'product_id': 100,
                 'quantity': 5,
-                'unit_id': 10,
+                'unit_id': 10,  # Khai báo mặc định là đơn vị lẻ (Cái)
                 'sku': 'SP01',
                 'product_name': 'Bút bi Thiên Long',
                 'unit_name': 'Cái',
@@ -185,3 +194,48 @@ def test_cancel_invoice_happy_path_state_changes_and_mac_dilution(history_servic
     assert log_stock['variance_amount'] == Decimal('0.0000')
     assert log_stock['ref_id'] == 99  # Liên kết chính xác khóa chính ID của hóa đơn gốc
     assert "Nhập hàng trả lại từ hóa đơn bị hủy" in log_stock['note']
+
+
+@pytest.mark.parametrize("sold_unit, sold_qty, conversion_ratio, expected_returned_base_qty", [
+    ("Cái", 5, Decimal('1'), 5),  # Kịch bản lẻ: Hoàn nguyên 5 cái
+    ("Hộp", 2, Decimal('10'), 20),  # Kịch bản sỉ 1: Mua 2 hộp (mỗi hộp 10 cái) -> Phải hoàn 20 cái vào kho
+    ("Thùng", 1, Decimal('100'), 100),  # Kịch bản sỉ 2: Mua 1 thùng (mỗi thùng 100 cái) -> Phải hoàn 100 cái vào kho
+])
+def test_cancel_invoice_should_convert_multi_level_uom_to_base_unit_correctly(
+        history_service, uow, sold_unit, sold_qty, conversion_ratio, expected_returned_base_qty
+):
+    """
+    KỲ VỌNG KIỂM TOÁN: Dù khách mua bằng đơn vị sỉ hay lẻ, khi hủy đơn hoàn hàng,
+    hạ tầng kho phải quy đổi chính xác về Số Lượng Cơ Bản nhỏ nhất trước khi cộng dồn vào két.
+    """
+    # 1. ARRANGE: Sửa lại dữ liệu mồi của hóa đơn theo từng kịch bản unit sỉ/lẻ
+    invoice_code = "HD-20260527-777"
+    uow.invoice_history_repo.meta['code'] = invoice_code
+
+    #  Ánh xạ từ Tên đơn vị sang ID tương ứng phục vụ môi trường Fake Repo ---
+    unit_id_map = {"Cái": 10, "Hộp": 20, "Thùng": 30}
+    target_unit_id = unit_id_map.get(sold_unit, 10)
+
+    # Tiếp tế cấu hình tỷ lệ quy đổi động trực tiếp vào bộ nhớ RAM của Fake Repo theo từng Test Case
+    uow.inventory_repo.conversion_info[target_unit_id] = {'ratio': conversion_ratio}
+
+    # Giả lập bản ghi chi tiết hóa đơn lưu thông tin đơn vị sỉ/lẻ thực tế
+    uow.invoice_history_repo.fetch_invoice_details = lambda code: [{
+        'product_id': 100,
+        'unit_id': target_unit_id,  # < Đưa unit_id vào giỏ hàng mồi để triệt tiêu KeyError
+        'quantity': sold_qty,
+        'unit_name': sold_unit,
+        'total_cogs_amount': Decimal('15000.0000')
+    }]
+
+    # Thiết lập trạng thái kho ban đầu trống trơn (0 sản phẩm)
+    uow.inventory_repo.inventory[100] = {'quantity': 0, 'total_value': Decimal('0.0000')}
+
+    # 2. ACT
+    history_service.execute_cancel_invoice(invoice_code, "Giảng viên kiểm tra quy đổi UOM")
+
+    # 3. ASSERT: Số lượng hoàn kho cuối cùng BẮT BUỘC phải là số lượng đã quy đổi về đơn vị lẻ
+    actual_returned_qty = uow.inventory_repo.inventory[100]['quantity']
+
+    assert actual_returned_qty == expected_returned_base_qty, \
+        f"Lỗi! Hủy {sold_qty} {sold_unit} phải trả về {expected_returned_base_qty} Cái, thực tế lại trả về {actual_returned_qty}"
