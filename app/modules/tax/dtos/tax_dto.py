@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Optional
 from decimal import Decimal
 
@@ -36,3 +37,30 @@ class YearlyTaxReportDTO:
     is_over_threshold: bool
     total_tax_amount: Decimal
     monthly_details: list[MonthlyTaxDetailDTO]
+
+@dataclass
+class TaxLedgerDTO:
+    """DTO đại diện cho bản ghi Master Sổ cái lưu vết cả thông số cấu hình của năm đó"""
+    id: Optional[int]
+    apply_year: int
+    total_revenue: Decimal
+    total_cost: Decimal
+    final_vat_amount: Decimal
+    final_pit_amount: Decimal
+    pit_method: str              # 'FLAT_RATE' hoặc 'BOOKKEEPING'
+    status: str              # 'DRAFT' hoặc 'CLOSED'
+    threshold_amount: Decimal
+    vat_percent: Decimal
+    pit_percent: Decimal
+    finalized_at: Optional[datetime] = None
+
+@dataclass
+class TaxLedgerDetailDTO:
+    """DTO đại diện cho chi tiết đóng băng của một tháng cụ thể trong quá khứ"""
+    id: Optional[int]
+    tax_ledger_id: int
+    month: int
+    revenue: Decimal
+    cost: Decimal
+    vat_amount: Decimal
+    pit_amount: Decimal

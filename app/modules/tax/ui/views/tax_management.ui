@@ -7,157 +7,190 @@
     <x>0</x>
     <y>0</y>
     <width>1400</width>
-    <height>950</height>
+    <height>900</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Quản lý Thuế Hộ Kinh Doanh</string>
+   <string>Cấu hình &amp; Quản lý Thuế Hộ Kinh Doanh</string>
   </property>
   <property name="styleSheet">
    <string notr="true">
-    QWidget#TaxManagementWidget { background-color: #f1f5f9;
-    font-family: 'Segoe UI', sans-serif; }
-    QScrollArea { border: none; background-color: transparent;
-    }
-    #scrollContents { background-color: #f1f5f9; }
-
-    QFrame.kpi-card { background-color: #ffffff; border-radius: 12px;
-    }
-    QLabel.kpi-label { font-size: 16px; font-weight: 600; color: #64748b; text-transform: uppercase;
-    }
-    QLabel.kpi-value { font-size: 24px; font-weight: 800; color: #0f172a;
+    /* Hệ thống Stylesheet đồng bộ Enterprise POS */
+    QWidget {
+        background-color: #f8fafc;
+        font-family: 'Segoe UI', 'Roboto', sans-serif;
+        font-size: 13px;
+        color: #334155;
     }
 
-    QProgressBar {
-        border: 1px solid #e2e8f0; border-radius: 10px;
+    QFrame.section-frame, QFrame#frame_tax_history_detail {
         background-color: #ffffff;
-        text-align: center; color: #0f172a; font-weight: bold; height: 28px;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
     }
 
-    QFrame.section-frame { background-color: #ffffff; border-radius: 12px;
+    QFrame.kpi-card {
+        background-color: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
     }
-    QLabel.section-title { font-size: 17px; font-weight: 700; color: #1e293b; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9;
+    QLabel.kpi-label {
+        font-size: 14px;
+        font-weight: 600;
+        color: #64748b;
+        text-transform: uppercase;
+    }
+    QLabel.kpi-value {
+        font-size: 24px;
+        font-weight: 800;
+        color: #0f172a;
     }
 
-    QTableWidget { border: none; gridline-color: #f1f5f9; background-color: white; }
-    QHeaderView::section { background-color: #f8fafc;
-    padding: 10px; font-weight: bold; border: none; border-bottom: 2px solid #e2e8f0; color: #475569;
+    QLabel#lbl_title {
+        font-size: 26px;
+        font-weight: 800;
+        color: #1e293b;
+        padding-bottom: 5px;
+    }
+
+    QLabel.section-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: #475569;
+        text-transform: uppercase;
+        border-bottom: 2px solid #10b981;
+        padding-bottom: 4px;
+    }
+
+    QLabel#lbl_sub_history_tax {
+        font-size: 15px;
+        font-weight: 700;
+        color: #475569;
+        text-transform: uppercase;
+        border-bottom: 2px solid #3b82f6;
+        padding-bottom: 4px;
     }
 
     QDoubleSpinBox, QComboBox {
-        padding: 8px; border: 1px solid #cbd5e1;
-        border-radius: 6px; background: white; font-weight: bold;
+        padding: 8px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        background-color: #ffffff;
+        font-weight: bold;
     }
-    QPushButton#btn_apply_config {
-        background-color: #3b82f6;
-        color: white; border-radius: 6px; padding: 10px; font-weight: 800;
-    }
-    QPushButton#btn_apply_config:hover { background-color: #2563eb;
+    QDoubleSpinBox:focus, QComboBox:focus {
+        border: 2px solid #10b981;
+        background-color: #f0fdf4;
     }
 
-    /* Style cho danh sách xổ xuống của ComboBox */
-    QComboBox QAbstractItemView {
+    QTableWidget {
         background-color: #ffffff;
-        color: #0f172a;
-        selection-background-color: #f1f5f9;
-        selection-color: #0f172a;
-        border: 1px solid #cbd5e1;
+        border: none;
+        gridline-color: #f1f5f9;
         outline: none;
     }
+    QHeaderView::section {
+        background-color: #f1f5f9;
+        color: #475569;
+        font-weight: bold;
+        padding: 6px;
+        border: none;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    QProgressBar {
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        background-color: #ffffff;
+        text-align: center;
+        color: #0f172a;
+        font-weight: bold;
+        height: 28px;
+    }
+
+    QPushButton {
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-weight: bold;
+        border: none;
+    }
+
+    QPushButton#btn_apply_config {
+        background-color: #10b981;
+        color: white;
+    }
+    QPushButton#btn_apply_config:hover {
+        background-color: #059669;
+    }
+
+    QPushButton#btn_close_ledger {
+        background-color: #ef4444;
+        color: white;
+    }
+    QPushButton#btn_close_ledger:hover {
+        background-color: #dc2626;
+    }
+
+    QPushButton#btn_print_ledger { background-color: #0ea5e9; color: white; }
+    QPushButton#btn_export_ledger_excel { background-color: #0f766e; color: white; }
+
+    QTabWidget::tab-bar { alignment: left; }
+    QTabWidget::pane { border: 1px solid #e2e8f0; background: #ffffff; border-radius: 8px; }
+    QTabBar::tab {
+        background: #e2e8f0; color: #475569; padding: 10px 20px; font-weight: bold;
+        border-top-left-radius: 6px; border-top-right-radius: 6px; margin-right: 4px;
+    }
+    QTabBar::tab:selected { background: #ffffff; color: #10b981; border-bottom: 3px solid #10b981; }
    </string>
   </property>
-  <layout class="QVBoxLayout" name="mainLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_main">
+   <property name="spacing">
+    <number>10</number>
+   </property>
    <property name="leftMargin">
-    <number>0</number>
+    <number>15</number>
    </property>
    <property name="topMargin">
-    <number>0</number>
+    <number>15</number>
    </property>
    <property name="rightMargin">
-    <number>0</number>
+    <number>15</number>
    </property>
    <property name="bottomMargin">
-    <number>0</number>
+    <number>15</number>
    </property>
    <item>
-    <widget class="QScrollArea" name="scrollArea">
-     <property name="widgetResizable">
-      <bool>true</bool>
+    <widget class="QLabel" name="lbl_title">
+     <property name="text">
+      <string>Cấu hình &amp; Quản lý Thuế Hộ Kinh Doanh</string>
      </property>
-     <widget class="QWidget" name="scrollContents">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>1400</width>
-        <height>950</height>
-       </rect>
-      </property>
-      <layout class="QVBoxLayout" name="scrollLayout">
+    </widget>
+   </item>
+   <item>
+    <widget class="QTabWidget" name="tabWidget_tax">
+     <property name="currentIndex">
+      <number>1</number>
+     </property>
+     <widget class="QWidget" name="tab_estimation">
+      <attribute name="title">
+       <string>📊 Dự toán &amp;&amp; Quy hoạch Thuế</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_tab1">
        <property name="spacing">
-        <number>25</number>
+        <number>20</number>
        </property>
        <property name="leftMargin">
-        <number>30</number>
+        <number>15</number>
        </property>
        <property name="topMargin">
-        <number>30</number>
+        <number>15</number>
        </property>
        <property name="rightMargin">
-        <number>30</number>
+        <number>15</number>
        </property>
        <property name="bottomMargin">
-        <number>30</number>
+        <number>15</number>
        </property>
-       <item>
-        <layout class="QHBoxLayout" name="layout_header">
-         <item>
-          <widget class="QLabel" name="lbl_title">
-           <property name="styleSheet">
-            <string>font-size: 24px;
-font-weight: 900;</string>
-           </property>
-           <property name="text">
-            <string>Cấu hình &amp; Dự toán thuế HKD</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QLabel" name="lbl_year_text">
-           <property name="styleSheet">
-            <string>font-weight: bold;
-color: #64748b;</string>
-           </property>
-           <property name="text">
-            <string>Chọn năm báo cáo:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="cbo_year">
-           <property name="minimumSize">
-            <size>
-             <width>120</width>
-             <height>40</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
        <item>
         <layout class="QHBoxLayout" name="layout_kpi">
          <property name="spacing">
@@ -168,14 +201,11 @@ color: #64748b;</string>
            <property name="class" stdset="0">
             <string>kpi-card</string>
            </property>
-           <layout class="QVBoxLayout">
+           <layout class="QVBoxLayout" name="vl_card1">
             <item>
-             <widget class="QLabel" name="label">
+             <widget class="QLabel" name="lbl_rev">
               <property name="text">
                <string>Doanh thu năm</string>
-              </property>
-              <property name="class" stdset="0">
-               <string>kpi-label</string>
               </property>
              </widget>
             </item>
@@ -183,9 +213,6 @@ color: #64748b;</string>
              <widget class="QLabel" name="val_total_revenue">
               <property name="text">
                <string>0 VND</string>
-              </property>
-              <property name="class" stdset="0">
-               <string>kpi-value</string>
               </property>
              </widget>
             </item>
@@ -197,14 +224,11 @@ color: #64748b;</string>
            <property name="class" stdset="0">
             <string>kpi-card</string>
            </property>
-           <layout class="QVBoxLayout">
+           <layout class="QVBoxLayout" name="vl_card2">
             <item>
-             <widget class="QLabel" name="label">
+             <widget class="QLabel" name="lbl_status">
               <property name="text">
-               <string>Trạng thái</string>
-              </property>
-              <property name="class" stdset="0">
-               <string>kpi-label</string>
+               <string>Trạng thái phân khúc</string>
               </property>
              </widget>
             </item>
@@ -212,9 +236,6 @@ color: #64748b;</string>
              <widget class="QLabel" name="val_tax_status">
               <property name="text">
                <string>-</string>
-              </property>
-              <property name="class" stdset="0">
-               <string>kpi-value</string>
               </property>
              </widget>
             </item>
@@ -226,14 +247,11 @@ color: #64748b;</string>
            <property name="class" stdset="0">
             <string>kpi-card</string>
            </property>
-           <layout class="QVBoxLayout">
+           <layout class="QVBoxLayout" name="vl_card3">
             <item>
-             <widget class="QLabel" name="label">
+             <widget class="QLabel" name="lbl_tax">
               <property name="text">
-               <string>Thuế dự kiến</string>
-              </property>
-              <property name="class" stdset="0">
-               <string>kpi-label</string>
+               <string>Thuế dự kiến nộp</string>
               </property>
              </widget>
             </item>
@@ -241,9 +259,6 @@ color: #64748b;</string>
              <widget class="QLabel" name="val_total_tax">
               <property name="text">
                <string>0 VND</string>
-              </property>
-              <property name="class" stdset="0">
-               <string>kpi-value</string>
               </property>
              </widget>
             </item>
@@ -254,29 +269,11 @@ color: #64748b;</string>
        </item>
        <item>
         <widget class="QFrame" name="frame_progress">
-         <property name="class" stdset="0">
-          <string>section-frame</string>
-         </property>
-         <layout class="QVBoxLayout">
-          <property name="leftMargin">
-           <number>20</number>
-          </property>
-          <property name="topMargin">
-           <number>20</number>
-          </property>
-          <property name="rightMargin">
-           <number>20</number>
-          </property>
-          <property name="bottomMargin">
-           <number>20</number>
-          </property>
+         <layout class="QVBoxLayout" name="vl_progress">
           <item>
-           <widget class="QLabel" name="label">
+           <widget class="QLabel" name="lbl_progress_title">
             <property name="text">
-             <string>Phân tích ngưỡng miễn thuế</string>
-            </property>
-            <property name="class" stdset="0">
-             <string>section-title</string>
+             <string>Phân tích cảnh báo ngưỡng giới hạn quy mô pháp lý</string>
             </property>
            </widget>
           </item>
@@ -297,90 +294,39 @@ color: #64748b;</string>
          </property>
          <item>
           <widget class="QFrame" name="frame_table">
-           <property name="class" stdset="0">
-            <string>section-frame</string>
-           </property>
-           <layout class="QVBoxLayout">
-            <property name="leftMargin">
-             <number>20</number>
-            </property>
-            <property name="topMargin">
-             <number>20</number>
-            </property>
-            <property name="rightMargin">
-             <number>20</number>
-            </property>
-            <property name="bottomMargin">
-             <number>20</number>
-            </property>
+           <layout class="QVBoxLayout" name="vl_table">
             <item>
-             <widget class="QLabel" name="label">
+             <widget class="QLabel" name="lbl_table_title">
               <property name="text">
-               <string>Chi tiết dự toán từng tháng</string>
-              </property>
-              <property name="class" stdset="0">
-               <string>section-title</string>
+               <string>Bảng phân bổ chi tiết 12 tháng dự toán động</string>
               </property>
              </widget>
             </item>
             <item>
              <widget class="QTableWidget" name="tbl_monthly_tax">
-              <property name="font">
-               <font>
-                <pointsize>15</pointsize>
-               </font>
-              </property>
-              <attribute name="horizontalHeaderMinimumSectionSize">
-               <number>19</number>
-              </attribute>
               <column>
                <property name="text">
                 <string>Tháng</string>
-               </property>
-               <property name="font">
-                <font>
-                 <pointsize>16</pointsize>
-                </font>
                </property>
               </column>
               <column>
                <property name="text">
                 <string>Doanh thu</string>
                </property>
-               <property name="font">
-                <font>
-                 <pointsize>16</pointsize>
-                </font>
-               </property>
               </column>
               <column>
                <property name="text">
                 <string>Thuế GTGT</string>
-               </property>
-               <property name="font">
-                <font>
-                 <pointsize>16</pointsize>
-                </font>
                </property>
               </column>
               <column>
                <property name="text">
                 <string>Thuế TNCN</string>
                </property>
-               <property name="font">
-                <font>
-                 <pointsize>16</pointsize>
-                </font>
-               </property>
               </column>
               <column>
                <property name="text">
-                <string>Tổng cộng</string>
-               </property>
-               <property name="font">
-                <font>
-                 <pointsize>24</pointsize>
-                </font>
+                <string>Tổng nộp</string>
                </property>
               </column>
              </widget>
@@ -390,41 +336,18 @@ color: #64748b;</string>
          </item>
          <item>
           <widget class="QFrame" name="frame_config">
-           <property name="class" stdset="0">
-            <string>section-frame</string>
-           </property>
-           <layout class="QVBoxLayout">
-            <property name="leftMargin">
-             <number>20</number>
-            </property>
-            <property name="topMargin">
-             <number>20</number>
-            </property>
-            <property name="rightMargin">
-             <number>20</number>
-            </property>
-            <property name="bottomMargin">
-             <number>20</number>
-            </property>
+           <layout class="QVBoxLayout" name="vl_config">
             <item>
-             <widget class="QLabel" name="label">
+             <widget class="QLabel" name="lbl_conf_title">
               <property name="text">
-               <string>Cấu hình thông số</string>
-              </property>
-              <property name="class" stdset="0">
-               <string>section-title</string>
+               <string>Mô phỏng thông số cấu hình</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="label">
-              <property name="font">
-               <font>
-                <pointsize>16</pointsize>
-               </font>
-              </property>
+             <widget class="QLabel" name="lbl_th">
               <property name="text">
-               <string>Mức miễn thuế (VND/năm):</string>
+               <string>Mức miễn thuế cơ sở (VND/năm):</string>
               </property>
              </widget>
             </item>
@@ -439,33 +362,12 @@ color: #64748b;</string>
               <property name="singleStep">
                <double>1000000.000000000000000</double>
               </property>
-              <property name="groupSeparatorShown" stdset="0">
-               <bool>true</bool>
-              </property>
              </widget>
             </item>
             <item>
-             <spacer>
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>10</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QLabel" name="lbl_pit_method">
-              <property name="font">
-               <font>
-                <pointsize>16</pointsize>
-               </font>
-              </property>
+             <widget class="QLabel" name="lbl_meth">
               <property name="text">
-               <string>Phương pháp thuế TNCN:</string>
+               <string>Phương pháp tính thuế TNCN:</string>
               </property>
              </widget>
             </item>
@@ -484,27 +386,9 @@ color: #64748b;</string>
              </widget>
             </item>
             <item>
-             <spacer>
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>10</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QLabel" name="label">
-              <property name="font">
-               <font>
-                <pointsize>16</pointsize>
-               </font>
-              </property>
+             <widget class="QLabel" name="lbl_vat">
               <property name="text">
-               <string>Thuế suất GTGT (%):</string>
+               <string>Thuế suất GTGT định biên (%):</string>
               </property>
              </widget>
             </item>
@@ -516,27 +400,22 @@ color: #64748b;</string>
              </widget>
             </item>
             <item>
-             <spacer>
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>10</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QLabel" name="label">
-              <property name="font">
-               <font>
-                <pointsize>16</pointsize>
-               </font>
+             <widget class="QLabel" name="lbl_vat_formula">
+              <property name="styleSheet">
+               <string notr="true">color: #0284c7; font-size: 13px; font-weight: bold; font-style: italic; padding-top: 2px;</string>
               </property>
               <property name="text">
-               <string>Thuế suất TNCN (%):</string>
+               <string>📝 Công thức: Thuế GTGT = Tổng doanh thu × Tỷ lệ %</string>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="lbl_pit">
+              <property name="text">
+               <string>Thuế suất TNCN định biên (%):</string>
               </property>
              </widget>
             </item>
@@ -548,27 +427,33 @@ color: #64748b;</string>
              </widget>
             </item>
             <item>
-             <spacer>
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
+             <widget class="QLabel" name="lbl_pit_formula">
+              <property name="styleSheet">
+               <string notr="true">color: #0284c7; font-size: 13px; font-weight: bold; font-style: italic; padding-top: 2px;</string>
               </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btn_apply_config">
               <property name="text">
-               <string>CẬP NHẬT &amp;&amp; TÍNH TOÁN</string>
+               <string>📝 Công thức: Thuế TNCN = (Doanh thu - Ngưỡng) × Tỷ lệ %</string>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
             <item>
-             <spacer>
+             <widget class="QLabel" name="lbl_disclaimer">
+              <property name="styleSheet">
+               <string notr="true">color: #b45309; font-size: 12px; font-style: italic; padding-top: 10px; border-top: 1px dashed #cbd5e1;</string>
+              </property>
+              <property name="text">
+               <string>⚠️ Lưu ý: Các thông số miễn thuế và thuế suất định biên phải được thiết lập phù hợp với danh mục ngành nghề kinh doanh và văn bản quy định pháp lý hiện hành của Tổng cục Thuế.</string>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="spacer_config_v">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
               </property>
@@ -580,10 +465,261 @@ color: #64748b;</string>
               </property>
              </spacer>
             </item>
+            <item>
+             <widget class="QPushButton" name="btn_apply_config">
+              <property name="text">
+               <string>KẾT XUẤT TẠM THỜI
+VÀO SỔ CÁI</string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </widget>
          </item>
         </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_invoice_history">
+      <attribute name="title">
+       <string>📜 Sổ cái &amp;&amp; Nhật ký khóa sổ</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_tab2">
+       <property name="leftMargin">
+        <number>15</number>
+       </property>
+       <property name="topMargin">
+        <number>15</number>
+       </property>
+       <property name="rightMargin">
+        <number>15</number>
+       </property>
+       <property name="bottomMargin">
+        <number>15</number>
+       </property>
+       <item>
+        <widget class="QSplitter" name="splitter_invoice">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <widget class="QTableWidget" name="tbl_tax_history_master">
+          <property name="selectionBehavior">
+           <enum>QAbstractItemView::SelectRows</enum>
+          </property>
+          <column>
+           <property name="text">
+            <string>Năm
+tài chính</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Tổng
+doanh thu</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Tổng
+chi phí</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Tổng thuế
+đã nộp</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Trạng thái</string>
+           </property>
+          </column>
+         </widget>
+         <widget class="QFrame" name="frame_tax_history_detail">
+          <layout class="QVBoxLayout" name="verticalLayout_history_detail">
+           <property name="leftMargin">
+            <number>15</number>
+           </property>
+           <property name="topMargin">
+            <number>15</number>
+           </property>
+           <property name="rightMargin">
+            <number>15</number>
+           </property>
+           <property name="bottomMargin">
+            <number>15</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="lbl_sub_history_tax">
+             <property name="text">
+              <string>Chi tiết chứng từ đóng băng sổ cái lịch sử</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QGridLayout" name="layout_invoice_meta">
+             <property name="verticalSpacing">
+              <number>8</number>
+             </property>
+             <item row="0" column="0">
+              <widget class="QLabel" name="lbl_md_ledger_year">
+               <property name="text">
+                <string>&lt;b&gt;Năm quyết toán:&lt;/b&gt; --</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QLabel" name="lbl_md_ledger_date">
+               <property name="text">
+                <string>&lt;b&gt;Ngày khóa sổ:&lt;/b&gt; --</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0" colspan="2">
+              <widget class="QLabel" name="lbl_md_ledger_status">
+               <property name="text">
+                <string>&lt;b&gt;Trạng thái bảo mật:&lt;/b&gt; --</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="lbl_md_threshold">
+               <property name="text">
+                <string>&lt;b&gt;Ngưỡng miễn thuế:&lt;/b&gt; --</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QLabel" name="lbl_md_method">
+               <property name="text">
+                <string>&lt;b&gt;Phương pháp TNCN:&lt;/b&gt; --</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="lbl_md_vat_rate">
+               <property name="text">
+                <string>&lt;b&gt;Thuế suất GTGT:&lt;/b&gt; --</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QLabel" name="lbl_md_pit_rate">
+               <property name="text">
+                <string>&lt;b&gt;Thuế suất TNCN:&lt;/b&gt; --</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QTableWidget" name="tbl_ledger_details">
+             <property name="selectionBehavior">
+              <enum>QAbstractItemView::SelectRows</enum>
+             </property>
+             <column>
+              <property name="text">
+               <string>Tháng</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Doanh thu
+chốt</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Chi phí
+chốt</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Thuế GTGT
+nộp</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Thuế TNCN
+nộp</string>
+              </property>
+             </column>
+            </widget>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="layout_detail_total_invoice">
+             <property name="spacing">
+              <number>2</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="lbl_detail_total_label">
+               <property name="styleSheet">
+                <string notr="true">font-weight: bold; color: #64748b;</string>
+               </property>
+               <property name="text">
+                <string>TỔNG NGHĨA VỤ THUẾ THỰC TẾ ĐÃ QUYẾT TOÁN:</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="lbl_detail_total_value">
+               <property name="text">
+                <string>0 VND</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="layout_detail_actions_invoice">
+             <item>
+              <widget class="QPushButton" name="btn_close_ledger">
+               <property name="text">
+                <string>🔒 CHỐT SỔ &amp;&amp; KHÓA KỲ THUẾ NĂM</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="sp_hist">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btn_print_ledger">
+               <property name="text">
+                <string>🖨️ In chứng từ</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btn_export_ledger_excel">
+               <property name="text">
+                <string>Xuất File Excel</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </widget>
        </item>
       </layout>
      </widget>

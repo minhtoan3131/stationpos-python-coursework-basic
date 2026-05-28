@@ -12,287 +12,410 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 class Ui_TaxManagementWidget(object):
     def setupUi(self, TaxManagementWidget):
         TaxManagementWidget.setObjectName("TaxManagementWidget")
-        TaxManagementWidget.resize(1400, 950)
+        TaxManagementWidget.resize(1400, 900)
         TaxManagementWidget.setStyleSheet("\n"
-"    QWidget#TaxManagementWidget { background-color: #f1f5f9;\n"
-"    font-family: \'Segoe UI\', sans-serif; }\n"
-"    QScrollArea { border: none; background-color: transparent;\n"
-"    }\n"
-"    #scrollContents { background-color: #f1f5f9; }\n"
-"\n"
-"    QFrame.kpi-card { background-color: #ffffff; border-radius: 12px;\n"
-"    }\n"
-"    QLabel.kpi-label { font-size: 16px; font-weight: 600; color: #64748b; text-transform: uppercase;\n"
-"    }\n"
-"    QLabel.kpi-value { font-size: 24px; font-weight: 800; color: #0f172a;\n"
+"    /* Hệ thống Stylesheet đồng bộ Enterprise POS */\n"
+"    QWidget {\n"
+"        background-color: #f8fafc;\n"
+"        font-family: \'Segoe UI\', \'Roboto\', sans-serif;\n"
+"        font-size: 13px;\n"
+"        color: #334155;\n"
 "    }\n"
 "\n"
-"    QProgressBar {\n"
-"        border: 1px solid #e2e8f0; border-radius: 10px;\n"
+"    QFrame.section-frame, QFrame#frame_tax_history_detail {\n"
 "        background-color: #ffffff;\n"
-"        text-align: center; color: #0f172a; font-weight: bold; height: 28px;\n"
+"        border: 1px solid #e2e8f0;\n"
+"        border-radius: 10px;\n"
 "    }\n"
 "\n"
-"    QFrame.section-frame { background-color: #ffffff; border-radius: 12px;\n"
+"    QFrame.kpi-card {\n"
+"        background-color: #ffffff;\n"
+"        border: 1px solid #e2e8f0;\n"
+"        border-radius: 12px;\n"
 "    }\n"
-"    QLabel.section-title { font-size: 17px; font-weight: 700; color: #1e293b; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9;\n"
+"    QLabel.kpi-label {\n"
+"        font-size: 14px;\n"
+"        font-weight: 600;\n"
+"        color: #64748b;\n"
+"        text-transform: uppercase;\n"
+"    }\n"
+"    QLabel.kpi-value {\n"
+"        font-size: 24px;\n"
+"        font-weight: 800;\n"
+"        color: #0f172a;\n"
 "    }\n"
 "\n"
-"    QTableWidget { border: none; gridline-color: #f1f5f9; background-color: white; }\n"
-"    QHeaderView::section { background-color: #f8fafc;\n"
-"    padding: 10px; font-weight: bold; border: none; border-bottom: 2px solid #e2e8f0; color: #475569;\n"
+"    QLabel#lbl_title {\n"
+"        font-size: 26px;\n"
+"        font-weight: 800;\n"
+"        color: #1e293b;\n"
+"        padding-bottom: 5px;\n"
+"    }\n"
+"\n"
+"    QLabel.section-title {\n"
+"        font-size: 15px;\n"
+"        font-weight: 700;\n"
+"        color: #475569;\n"
+"        text-transform: uppercase;\n"
+"        border-bottom: 2px solid #10b981;\n"
+"        padding-bottom: 4px;\n"
+"    }\n"
+"\n"
+"    QLabel#lbl_sub_history_tax {\n"
+"        font-size: 15px;\n"
+"        font-weight: 700;\n"
+"        color: #475569;\n"
+"        text-transform: uppercase;\n"
+"        border-bottom: 2px solid #3b82f6;\n"
+"        padding-bottom: 4px;\n"
 "    }\n"
 "\n"
 "    QDoubleSpinBox, QComboBox {\n"
-"        padding: 8px; border: 1px solid #cbd5e1;\n"
-"        border-radius: 6px; background: white; font-weight: bold;\n"
+"        padding: 8px 12px;\n"
+"        border: 1px solid #cbd5e1;\n"
+"        border-radius: 6px;\n"
+"        background-color: #ffffff;\n"
+"        font-weight: bold;\n"
 "    }\n"
-"    QPushButton#btn_apply_config {\n"
-"        background-color: #3b82f6;\n"
-"        color: white; border-radius: 6px; padding: 10px; font-weight: 800;\n"
-"    }\n"
-"    QPushButton#btn_apply_config:hover { background-color: #2563eb;\n"
+"    QDoubleSpinBox:focus, QComboBox:focus {\n"
+"        border: 2px solid #10b981;\n"
+"        background-color: #f0fdf4;\n"
 "    }\n"
 "\n"
-"    /* Style cho danh sách xổ xuống của ComboBox */\n"
-"    QComboBox QAbstractItemView {\n"
+"    QTableWidget {\n"
 "        background-color: #ffffff;\n"
-"        color: #0f172a;\n"
-"        selection-background-color: #f1f5f9;\n"
-"        selection-color: #0f172a;\n"
-"        border: 1px solid #cbd5e1;\n"
+"        border: none;\n"
+"        gridline-color: #f1f5f9;\n"
 "        outline: none;\n"
 "    }\n"
+"    QHeaderView::section {\n"
+"        background-color: #f1f5f9;\n"
+"        color: #475569;\n"
+"        font-weight: bold;\n"
+"        padding: 6px;\n"
+"        border: none;\n"
+"        border-bottom: 1px solid #e2e8f0;\n"
+"    }\n"
+"\n"
+"    QProgressBar {\n"
+"        border: 1px solid #e2e8f0;\n"
+"        border-radius: 10px;\n"
+"        background-color: #ffffff;\n"
+"        text-align: center;\n"
+"        color: #0f172a;\n"
+"        font-weight: bold;\n"
+"        height: 28px;\n"
+"    }\n"
+"\n"
+"    QPushButton {\n"
+"        padding: 10px 20px;\n"
+"        border-radius: 6px;\n"
+"        font-weight: bold;\n"
+"        border: none;\n"
+"    }\n"
+"\n"
+"    QPushButton#btn_apply_config {\n"
+"        background-color: #10b981;\n"
+"        color: white;\n"
+"    }\n"
+"    QPushButton#btn_apply_config:hover {\n"
+"        background-color: #059669;\n"
+"    }\n"
+"\n"
+"    QPushButton#btn_close_ledger {\n"
+"        background-color: #ef4444;\n"
+"        color: white;\n"
+"    }\n"
+"    QPushButton#btn_close_ledger:hover {\n"
+"        background-color: #dc2626;\n"
+"    }\n"
+"\n"
+"    QPushButton#btn_print_ledger { background-color: #0ea5e9; color: white; }\n"
+"    QPushButton#btn_export_ledger_excel { background-color: #0f766e; color: white; }\n"
+"\n"
+"    QTabWidget::tab-bar { alignment: left; }\n"
+"    QTabWidget::pane { border: 1px solid #e2e8f0; background: #ffffff; border-radius: 8px; }\n"
+"    QTabBar::tab {\n"
+"        background: #e2e8f0; color: #475569; padding: 10px 20px; font-weight: bold;\n"
+"        border-top-left-radius: 6px; border-top-right-radius: 6px; margin-right: 4px;\n"
+"    }\n"
+"    QTabBar::tab:selected { background: #ffffff; color: #10b981; border-bottom: 3px solid #10b981; }\n"
 "   ")
-        self.mainLayout = QtWidgets.QVBoxLayout(TaxManagementWidget)
-        self.mainLayout.setContentsMargins(0, 0, 0, 0)
-        self.mainLayout.setObjectName("mainLayout")
-        self.scrollArea = QtWidgets.QScrollArea(parent=TaxManagementWidget)
-        self.scrollArea.setWidgetResizable(True)
-        self.scrollArea.setObjectName("scrollArea")
-        self.scrollContents = QtWidgets.QWidget()
-        self.scrollContents.setGeometry(QtCore.QRect(0, 0, 1400, 950))
-        self.scrollContents.setObjectName("scrollContents")
-        self.scrollLayout = QtWidgets.QVBoxLayout(self.scrollContents)
-        self.scrollLayout.setContentsMargins(30, 30, 30, 30)
-        self.scrollLayout.setSpacing(25)
-        self.scrollLayout.setObjectName("scrollLayout")
-        self.layout_header = QtWidgets.QHBoxLayout()
-        self.layout_header.setObjectName("layout_header")
-        self.lbl_title = QtWidgets.QLabel(parent=self.scrollContents)
+        self.verticalLayout_main = QtWidgets.QVBoxLayout(TaxManagementWidget)
+        self.verticalLayout_main.setContentsMargins(15, 15, 15, 15)
+        self.verticalLayout_main.setSpacing(10)
+        self.verticalLayout_main.setObjectName("verticalLayout_main")
+        self.lbl_title = QtWidgets.QLabel(parent=TaxManagementWidget)
         self.lbl_title.setObjectName("lbl_title")
-        self.layout_header.addWidget(self.lbl_title)
-        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
-        self.layout_header.addItem(spacerItem)
-        self.lbl_year_text = QtWidgets.QLabel(parent=self.scrollContents)
-        self.lbl_year_text.setObjectName("lbl_year_text")
-        self.layout_header.addWidget(self.lbl_year_text)
-        self.cbo_year = QtWidgets.QComboBox(parent=self.scrollContents)
-        self.cbo_year.setMinimumSize(QtCore.QSize(120, 40))
-        self.cbo_year.setObjectName("cbo_year")
-        self.layout_header.addWidget(self.cbo_year)
-        self.scrollLayout.addLayout(self.layout_header)
+        self.verticalLayout_main.addWidget(self.lbl_title)
+        self.tabWidget_tax = QtWidgets.QTabWidget(parent=TaxManagementWidget)
+        self.tabWidget_tax.setObjectName("tabWidget_tax")
+        self.tab_estimation = QtWidgets.QWidget()
+        self.tab_estimation.setObjectName("tab_estimation")
+        self.verticalLayout_tab1 = QtWidgets.QVBoxLayout(self.tab_estimation)
+        self.verticalLayout_tab1.setContentsMargins(15, 15, 15, 15)
+        self.verticalLayout_tab1.setSpacing(20)
+        self.verticalLayout_tab1.setObjectName("verticalLayout_tab1")
         self.layout_kpi = QtWidgets.QHBoxLayout()
         self.layout_kpi.setSpacing(20)
         self.layout_kpi.setObjectName("layout_kpi")
-        self.card1 = QtWidgets.QFrame(parent=self.scrollContents)
+        self.card1 = QtWidgets.QFrame(parent=self.tab_estimation)
         self.card1.setObjectName("card1")
-        self.vboxlayout = QtWidgets.QVBoxLayout(self.card1)
-        self.vboxlayout.setObjectName("vboxlayout")
-        self.label = QtWidgets.QLabel(parent=self.card1)
-        self.label.setObjectName("label")
-        self.vboxlayout.addWidget(self.label)
+        self.vl_card1 = QtWidgets.QVBoxLayout(self.card1)
+        self.vl_card1.setObjectName("vl_card1")
+        self.lbl_rev = QtWidgets.QLabel(parent=self.card1)
+        self.lbl_rev.setObjectName("lbl_rev")
+        self.vl_card1.addWidget(self.lbl_rev)
         self.val_total_revenue = QtWidgets.QLabel(parent=self.card1)
         self.val_total_revenue.setObjectName("val_total_revenue")
-        self.vboxlayout.addWidget(self.val_total_revenue)
+        self.vl_card1.addWidget(self.val_total_revenue)
         self.layout_kpi.addWidget(self.card1)
-        self.card2 = QtWidgets.QFrame(parent=self.scrollContents)
+        self.card2 = QtWidgets.QFrame(parent=self.tab_estimation)
         self.card2.setObjectName("card2")
-        self.vboxlayout1 = QtWidgets.QVBoxLayout(self.card2)
-        self.vboxlayout1.setObjectName("vboxlayout1")
-        self.label1 = QtWidgets.QLabel(parent=self.card2)
-        self.label1.setObjectName("label1")
-        self.vboxlayout1.addWidget(self.label1)
+        self.vl_card2 = QtWidgets.QVBoxLayout(self.card2)
+        self.vl_card2.setObjectName("vl_card2")
+        self.lbl_status = QtWidgets.QLabel(parent=self.card2)
+        self.lbl_status.setObjectName("lbl_status")
+        self.vl_card2.addWidget(self.lbl_status)
         self.val_tax_status = QtWidgets.QLabel(parent=self.card2)
         self.val_tax_status.setObjectName("val_tax_status")
-        self.vboxlayout1.addWidget(self.val_tax_status)
+        self.vl_card2.addWidget(self.val_tax_status)
         self.layout_kpi.addWidget(self.card2)
-        self.card3 = QtWidgets.QFrame(parent=self.scrollContents)
+        self.card3 = QtWidgets.QFrame(parent=self.tab_estimation)
         self.card3.setObjectName("card3")
-        self.vboxlayout2 = QtWidgets.QVBoxLayout(self.card3)
-        self.vboxlayout2.setObjectName("vboxlayout2")
-        self.label2 = QtWidgets.QLabel(parent=self.card3)
-        self.label2.setObjectName("label2")
-        self.vboxlayout2.addWidget(self.label2)
+        self.vl_card3 = QtWidgets.QVBoxLayout(self.card3)
+        self.vl_card3.setObjectName("vl_card3")
+        self.lbl_tax = QtWidgets.QLabel(parent=self.card3)
+        self.lbl_tax.setObjectName("lbl_tax")
+        self.vl_card3.addWidget(self.lbl_tax)
         self.val_total_tax = QtWidgets.QLabel(parent=self.card3)
         self.val_total_tax.setObjectName("val_total_tax")
-        self.vboxlayout2.addWidget(self.val_total_tax)
+        self.vl_card3.addWidget(self.val_total_tax)
         self.layout_kpi.addWidget(self.card3)
-        self.scrollLayout.addLayout(self.layout_kpi)
-        self.frame_progress = QtWidgets.QFrame(parent=self.scrollContents)
+        self.verticalLayout_tab1.addLayout(self.layout_kpi)
+        self.frame_progress = QtWidgets.QFrame(parent=self.tab_estimation)
         self.frame_progress.setObjectName("frame_progress")
-        self.vboxlayout3 = QtWidgets.QVBoxLayout(self.frame_progress)
-        self.vboxlayout3.setContentsMargins(20, 20, 20, 20)
-        self.vboxlayout3.setObjectName("vboxlayout3")
-        self.label3 = QtWidgets.QLabel(parent=self.frame_progress)
-        self.label3.setObjectName("label3")
-        self.vboxlayout3.addWidget(self.label3)
+        self.vl_progress = QtWidgets.QVBoxLayout(self.frame_progress)
+        self.vl_progress.setObjectName("vl_progress")
+        self.lbl_progress_title = QtWidgets.QLabel(parent=self.frame_progress)
+        self.lbl_progress_title.setObjectName("lbl_progress_title")
+        self.vl_progress.addWidget(self.lbl_progress_title)
         self.bar_threshold = QtWidgets.QProgressBar(parent=self.frame_progress)
         self.bar_threshold.setProperty("value", 0)
         self.bar_threshold.setObjectName("bar_threshold")
-        self.vboxlayout3.addWidget(self.bar_threshold)
-        self.scrollLayout.addWidget(self.frame_progress)
+        self.vl_progress.addWidget(self.bar_threshold)
+        self.verticalLayout_tab1.addWidget(self.frame_progress)
         self.layout_body = QtWidgets.QHBoxLayout()
         self.layout_body.setSpacing(20)
         self.layout_body.setObjectName("layout_body")
-        self.frame_table = QtWidgets.QFrame(parent=self.scrollContents)
+        self.frame_table = QtWidgets.QFrame(parent=self.tab_estimation)
         self.frame_table.setObjectName("frame_table")
-        self.vboxlayout4 = QtWidgets.QVBoxLayout(self.frame_table)
-        self.vboxlayout4.setContentsMargins(20, 20, 20, 20)
-        self.vboxlayout4.setObjectName("vboxlayout4")
-        self.label4 = QtWidgets.QLabel(parent=self.frame_table)
-        self.label4.setObjectName("label4")
-        self.vboxlayout4.addWidget(self.label4)
+        self.vl_table = QtWidgets.QVBoxLayout(self.frame_table)
+        self.vl_table.setObjectName("vl_table")
+        self.lbl_table_title = QtWidgets.QLabel(parent=self.frame_table)
+        self.lbl_table_title.setObjectName("lbl_table_title")
+        self.vl_table.addWidget(self.lbl_table_title)
         self.tbl_monthly_tax = QtWidgets.QTableWidget(parent=self.frame_table)
-        font = QtGui.QFont()
-        font.setPointSize(15)
-        self.tbl_monthly_tax.setFont(font)
         self.tbl_monthly_tax.setObjectName("tbl_monthly_tax")
         self.tbl_monthly_tax.setColumnCount(5)
         self.tbl_monthly_tax.setRowCount(0)
         item = QtWidgets.QTableWidgetItem()
-        font = QtGui.QFont()
-        font.setPointSize(16)
-        item.setFont(font)
         self.tbl_monthly_tax.setHorizontalHeaderItem(0, item)
         item = QtWidgets.QTableWidgetItem()
-        font = QtGui.QFont()
-        font.setPointSize(16)
-        item.setFont(font)
         self.tbl_monthly_tax.setHorizontalHeaderItem(1, item)
         item = QtWidgets.QTableWidgetItem()
-        font = QtGui.QFont()
-        font.setPointSize(16)
-        item.setFont(font)
         self.tbl_monthly_tax.setHorizontalHeaderItem(2, item)
         item = QtWidgets.QTableWidgetItem()
-        font = QtGui.QFont()
-        font.setPointSize(16)
-        item.setFont(font)
         self.tbl_monthly_tax.setHorizontalHeaderItem(3, item)
         item = QtWidgets.QTableWidgetItem()
-        font = QtGui.QFont()
-        font.setPointSize(24)
-        item.setFont(font)
         self.tbl_monthly_tax.setHorizontalHeaderItem(4, item)
-        self.tbl_monthly_tax.horizontalHeader().setMinimumSectionSize(19)
-        self.vboxlayout4.addWidget(self.tbl_monthly_tax)
+        self.vl_table.addWidget(self.tbl_monthly_tax)
         self.layout_body.addWidget(self.frame_table)
-        self.frame_config = QtWidgets.QFrame(parent=self.scrollContents)
+        self.frame_config = QtWidgets.QFrame(parent=self.tab_estimation)
         self.frame_config.setObjectName("frame_config")
-        self.vboxlayout5 = QtWidgets.QVBoxLayout(self.frame_config)
-        self.vboxlayout5.setContentsMargins(20, 20, 20, 20)
-        self.vboxlayout5.setObjectName("vboxlayout5")
-        self.label5 = QtWidgets.QLabel(parent=self.frame_config)
-        self.label5.setObjectName("label5")
-        self.vboxlayout5.addWidget(self.label5)
-        self.label6 = QtWidgets.QLabel(parent=self.frame_config)
-        font = QtGui.QFont()
-        font.setPointSize(16)
-        self.label6.setFont(font)
-        self.label6.setObjectName("label6")
-        self.vboxlayout5.addWidget(self.label6)
+        self.vl_config = QtWidgets.QVBoxLayout(self.frame_config)
+        self.vl_config.setObjectName("vl_config")
+        self.lbl_conf_title = QtWidgets.QLabel(parent=self.frame_config)
+        self.lbl_conf_title.setObjectName("lbl_conf_title")
+        self.vl_config.addWidget(self.lbl_conf_title)
+        self.lbl_th = QtWidgets.QLabel(parent=self.frame_config)
+        self.lbl_th.setObjectName("lbl_th")
+        self.vl_config.addWidget(self.lbl_th)
         self.spn_threshold = QtWidgets.QDoubleSpinBox(parent=self.frame_config)
         self.spn_threshold.setDecimals(0)
         self.spn_threshold.setMaximum(100000000000.0)
         self.spn_threshold.setSingleStep(1000000.0)
-        self.spn_threshold.setProperty("groupSeparatorShown", True)
         self.spn_threshold.setObjectName("spn_threshold")
-        self.vboxlayout5.addWidget(self.spn_threshold)
-        spacerItem1 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
-        self.vboxlayout5.addItem(spacerItem1)
-        self.lbl_pit_method = QtWidgets.QLabel(parent=self.frame_config)
-        font = QtGui.QFont()
-        font.setPointSize(16)
-        self.lbl_pit_method.setFont(font)
-        self.lbl_pit_method.setObjectName("lbl_pit_method")
-        self.vboxlayout5.addWidget(self.lbl_pit_method)
+        self.vl_config.addWidget(self.spn_threshold)
+        self.lbl_meth = QtWidgets.QLabel(parent=self.frame_config)
+        self.lbl_meth.setObjectName("lbl_meth")
+        self.vl_config.addWidget(self.lbl_meth)
         self.cbo_pit_method = QtWidgets.QComboBox(parent=self.frame_config)
         self.cbo_pit_method.setObjectName("cbo_pit_method")
         self.cbo_pit_method.addItem("")
         self.cbo_pit_method.addItem("")
-        self.vboxlayout5.addWidget(self.cbo_pit_method)
-        spacerItem2 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
-        self.vboxlayout5.addItem(spacerItem2)
-        self.label7 = QtWidgets.QLabel(parent=self.frame_config)
-        font = QtGui.QFont()
-        font.setPointSize(16)
-        self.label7.setFont(font)
-        self.label7.setObjectName("label7")
-        self.vboxlayout5.addWidget(self.label7)
+        self.vl_config.addWidget(self.cbo_pit_method)
+        self.lbl_vat = QtWidgets.QLabel(parent=self.frame_config)
+        self.lbl_vat.setObjectName("lbl_vat")
+        self.vl_config.addWidget(self.lbl_vat)
         self.spn_vat_rate = QtWidgets.QDoubleSpinBox(parent=self.frame_config)
         self.spn_vat_rate.setDecimals(1)
         self.spn_vat_rate.setObjectName("spn_vat_rate")
-        self.vboxlayout5.addWidget(self.spn_vat_rate)
-        spacerItem3 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
-        self.vboxlayout5.addItem(spacerItem3)
-        self.label8 = QtWidgets.QLabel(parent=self.frame_config)
-        font = QtGui.QFont()
-        font.setPointSize(16)
-        self.label8.setFont(font)
-        self.label8.setObjectName("label8")
-        self.vboxlayout5.addWidget(self.label8)
+        self.vl_config.addWidget(self.spn_vat_rate)
+        self.lbl_vat_formula = QtWidgets.QLabel(parent=self.frame_config)
+        self.lbl_vat_formula.setStyleSheet("color: #0284c7; font-size: 13px; font-weight: bold; font-style: italic; padding-top: 2px;")
+        self.lbl_vat_formula.setWordWrap(True)
+        self.lbl_vat_formula.setObjectName("lbl_vat_formula")
+        self.vl_config.addWidget(self.lbl_vat_formula)
+        self.lbl_pit = QtWidgets.QLabel(parent=self.frame_config)
+        self.lbl_pit.setObjectName("lbl_pit")
+        self.vl_config.addWidget(self.lbl_pit)
         self.spn_pit_rate = QtWidgets.QDoubleSpinBox(parent=self.frame_config)
         self.spn_pit_rate.setDecimals(1)
         self.spn_pit_rate.setObjectName("spn_pit_rate")
-        self.vboxlayout5.addWidget(self.spn_pit_rate)
-        spacerItem4 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
-        self.vboxlayout5.addItem(spacerItem4)
+        self.vl_config.addWidget(self.spn_pit_rate)
+        self.lbl_pit_formula = QtWidgets.QLabel(parent=self.frame_config)
+        self.lbl_pit_formula.setStyleSheet("color: #0284c7; font-size: 13px; font-weight: bold; font-style: italic; padding-top: 2px;")
+        self.lbl_pit_formula.setWordWrap(True)
+        self.lbl_pit_formula.setObjectName("lbl_pit_formula")
+        self.vl_config.addWidget(self.lbl_pit_formula)
+        self.lbl_disclaimer = QtWidgets.QLabel(parent=self.frame_config)
+        self.lbl_disclaimer.setStyleSheet("color: #b45309; font-size: 12px; font-style: italic; padding-top: 10px; border-top: 1px dashed #cbd5e1;")
+        self.lbl_disclaimer.setWordWrap(True)
+        self.lbl_disclaimer.setObjectName("lbl_disclaimer")
+        self.vl_config.addWidget(self.lbl_disclaimer)
+        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
+        self.vl_config.addItem(spacerItem)
         self.btn_apply_config = QtWidgets.QPushButton(parent=self.frame_config)
         self.btn_apply_config.setObjectName("btn_apply_config")
-        self.vboxlayout5.addWidget(self.btn_apply_config)
-        spacerItem5 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
-        self.vboxlayout5.addItem(spacerItem5)
+        self.vl_config.addWidget(self.btn_apply_config)
         self.layout_body.addWidget(self.frame_config)
         self.layout_body.setStretch(0, 7)
         self.layout_body.setStretch(1, 3)
-        self.scrollLayout.addLayout(self.layout_body)
-        self.scrollArea.setWidget(self.scrollContents)
-        self.mainLayout.addWidget(self.scrollArea)
+        self.verticalLayout_tab1.addLayout(self.layout_body)
+        self.tabWidget_tax.addTab(self.tab_estimation, "")
+        self.tab_invoice_history = QtWidgets.QWidget()
+        self.tab_invoice_history.setObjectName("tab_invoice_history")
+        self.verticalLayout_tab2 = QtWidgets.QVBoxLayout(self.tab_invoice_history)
+        self.verticalLayout_tab2.setContentsMargins(15, 15, 15, 15)
+        self.verticalLayout_tab2.setObjectName("verticalLayout_tab2")
+        self.splitter_invoice = QtWidgets.QSplitter(parent=self.tab_invoice_history)
+        self.splitter_invoice.setOrientation(QtCore.Qt.Orientation.Horizontal)
+        self.splitter_invoice.setObjectName("splitter_invoice")
+        self.tbl_tax_history_master = QtWidgets.QTableWidget(parent=self.splitter_invoice)
+        self.tbl_tax_history_master.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.tbl_tax_history_master.setObjectName("tbl_tax_history_master")
+        self.tbl_tax_history_master.setColumnCount(5)
+        self.tbl_tax_history_master.setRowCount(0)
+        item = QtWidgets.QTableWidgetItem()
+        self.tbl_tax_history_master.setHorizontalHeaderItem(0, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tbl_tax_history_master.setHorizontalHeaderItem(1, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tbl_tax_history_master.setHorizontalHeaderItem(2, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tbl_tax_history_master.setHorizontalHeaderItem(3, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tbl_tax_history_master.setHorizontalHeaderItem(4, item)
+        self.frame_tax_history_detail = QtWidgets.QFrame(parent=self.splitter_invoice)
+        self.frame_tax_history_detail.setObjectName("frame_tax_history_detail")
+        self.verticalLayout_history_detail = QtWidgets.QVBoxLayout(self.frame_tax_history_detail)
+        self.verticalLayout_history_detail.setContentsMargins(15, 15, 15, 15)
+        self.verticalLayout_history_detail.setObjectName("verticalLayout_history_detail")
+        self.lbl_sub_history_tax = QtWidgets.QLabel(parent=self.frame_tax_history_detail)
+        self.lbl_sub_history_tax.setObjectName("lbl_sub_history_tax")
+        self.verticalLayout_history_detail.addWidget(self.lbl_sub_history_tax)
+        self.layout_invoice_meta = QtWidgets.QGridLayout()
+        self.layout_invoice_meta.setVerticalSpacing(8)
+        self.layout_invoice_meta.setObjectName("layout_invoice_meta")
+        self.lbl_md_ledger_year = QtWidgets.QLabel(parent=self.frame_tax_history_detail)
+        self.lbl_md_ledger_year.setObjectName("lbl_md_ledger_year")
+        self.layout_invoice_meta.addWidget(self.lbl_md_ledger_year, 0, 0, 1, 1)
+        self.lbl_md_ledger_date = QtWidgets.QLabel(parent=self.frame_tax_history_detail)
+        self.lbl_md_ledger_date.setObjectName("lbl_md_ledger_date")
+        self.layout_invoice_meta.addWidget(self.lbl_md_ledger_date, 0, 1, 1, 1)
+        self.lbl_md_ledger_status = QtWidgets.QLabel(parent=self.frame_tax_history_detail)
+        self.lbl_md_ledger_status.setObjectName("lbl_md_ledger_status")
+        self.layout_invoice_meta.addWidget(self.lbl_md_ledger_status, 1, 0, 1, 2)
+        self.lbl_md_threshold = QtWidgets.QLabel(parent=self.frame_tax_history_detail)
+        self.lbl_md_threshold.setObjectName("lbl_md_threshold")
+        self.layout_invoice_meta.addWidget(self.lbl_md_threshold, 2, 0, 1, 1)
+        self.lbl_md_method = QtWidgets.QLabel(parent=self.frame_tax_history_detail)
+        self.lbl_md_method.setObjectName("lbl_md_method")
+        self.layout_invoice_meta.addWidget(self.lbl_md_method, 2, 1, 1, 1)
+        self.lbl_md_vat_rate = QtWidgets.QLabel(parent=self.frame_tax_history_detail)
+        self.lbl_md_vat_rate.setObjectName("lbl_md_vat_rate")
+        self.layout_invoice_meta.addWidget(self.lbl_md_vat_rate, 3, 0, 1, 1)
+        self.lbl_md_pit_rate = QtWidgets.QLabel(parent=self.frame_tax_history_detail)
+        self.lbl_md_pit_rate.setObjectName("lbl_md_pit_rate")
+        self.layout_invoice_meta.addWidget(self.lbl_md_pit_rate, 3, 1, 1, 1)
+        self.verticalLayout_history_detail.addLayout(self.layout_invoice_meta)
+        self.tbl_ledger_details = QtWidgets.QTableWidget(parent=self.frame_tax_history_detail)
+        self.tbl_ledger_details.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.tbl_ledger_details.setObjectName("tbl_ledger_details")
+        self.tbl_ledger_details.setColumnCount(5)
+        self.tbl_ledger_details.setRowCount(0)
+        item = QtWidgets.QTableWidgetItem()
+        self.tbl_ledger_details.setHorizontalHeaderItem(0, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tbl_ledger_details.setHorizontalHeaderItem(1, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tbl_ledger_details.setHorizontalHeaderItem(2, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tbl_ledger_details.setHorizontalHeaderItem(3, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tbl_ledger_details.setHorizontalHeaderItem(4, item)
+        self.verticalLayout_history_detail.addWidget(self.tbl_ledger_details)
+        self.layout_detail_total_invoice = QtWidgets.QVBoxLayout()
+        self.layout_detail_total_invoice.setSpacing(2)
+        self.layout_detail_total_invoice.setObjectName("layout_detail_total_invoice")
+        self.lbl_detail_total_label = QtWidgets.QLabel(parent=self.frame_tax_history_detail)
+        self.lbl_detail_total_label.setStyleSheet("font-weight: bold; color: #64748b;")
+        self.lbl_detail_total_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight|QtCore.Qt.AlignmentFlag.AlignTrailing|QtCore.Qt.AlignmentFlag.AlignVCenter)
+        self.lbl_detail_total_label.setObjectName("lbl_detail_total_label")
+        self.layout_detail_total_invoice.addWidget(self.lbl_detail_total_label)
+        self.lbl_detail_total_value = QtWidgets.QLabel(parent=self.frame_tax_history_detail)
+        self.lbl_detail_total_value.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight|QtCore.Qt.AlignmentFlag.AlignTrailing|QtCore.Qt.AlignmentFlag.AlignVCenter)
+        self.lbl_detail_total_value.setObjectName("lbl_detail_total_value")
+        self.layout_detail_total_invoice.addWidget(self.lbl_detail_total_value)
+        self.verticalLayout_history_detail.addLayout(self.layout_detail_total_invoice)
+        self.layout_detail_actions_invoice = QtWidgets.QHBoxLayout()
+        self.layout_detail_actions_invoice.setObjectName("layout_detail_actions_invoice")
+        self.btn_close_ledger = QtWidgets.QPushButton(parent=self.frame_tax_history_detail)
+        self.btn_close_ledger.setObjectName("btn_close_ledger")
+        self.layout_detail_actions_invoice.addWidget(self.btn_close_ledger)
+        spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
+        self.layout_detail_actions_invoice.addItem(spacerItem1)
+        self.btn_print_ledger = QtWidgets.QPushButton(parent=self.frame_tax_history_detail)
+        self.btn_print_ledger.setObjectName("btn_print_ledger")
+        self.layout_detail_actions_invoice.addWidget(self.btn_print_ledger)
+        self.btn_export_ledger_excel = QtWidgets.QPushButton(parent=self.frame_tax_history_detail)
+        self.btn_export_ledger_excel.setObjectName("btn_export_ledger_excel")
+        self.layout_detail_actions_invoice.addWidget(self.btn_export_ledger_excel)
+        self.verticalLayout_history_detail.addLayout(self.layout_detail_actions_invoice)
+        self.verticalLayout_tab2.addWidget(self.splitter_invoice)
+        self.tabWidget_tax.addTab(self.tab_invoice_history, "")
+        self.verticalLayout_main.addWidget(self.tabWidget_tax)
 
         self.retranslateUi(TaxManagementWidget)
+        self.tabWidget_tax.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(TaxManagementWidget)
 
     def retranslateUi(self, TaxManagementWidget):
         _translate = QtCore.QCoreApplication.translate
-        TaxManagementWidget.setWindowTitle(_translate("TaxManagementWidget", "Quản lý Thuế Hộ Kinh Doanh"))
-        self.lbl_title.setStyleSheet(_translate("TaxManagementWidget", "font-size: 24px;\n"
-"font-weight: 900;"))
-        self.lbl_title.setText(_translate("TaxManagementWidget", "Cấu hình & Dự toán thuế HKD"))
-        self.lbl_year_text.setStyleSheet(_translate("TaxManagementWidget", "font-weight: bold;\n"
-"color: #64748b;"))
-        self.lbl_year_text.setText(_translate("TaxManagementWidget", "Chọn năm báo cáo:"))
+        TaxManagementWidget.setWindowTitle(_translate("TaxManagementWidget", "Cấu hình & Quản lý Thuế Hộ Kinh Doanh"))
+        self.lbl_title.setText(_translate("TaxManagementWidget", "Cấu hình & Quản lý Thuế Hộ Kinh Doanh"))
         self.card1.setProperty("class", _translate("TaxManagementWidget", "kpi-card"))
-        self.label.setText(_translate("TaxManagementWidget", "Doanh thu năm"))
-        self.label.setProperty("class", _translate("TaxManagementWidget", "kpi-label"))
+        self.lbl_rev.setText(_translate("TaxManagementWidget", "Doanh thu năm"))
         self.val_total_revenue.setText(_translate("TaxManagementWidget", "0 VND"))
-        self.val_total_revenue.setProperty("class", _translate("TaxManagementWidget", "kpi-value"))
         self.card2.setProperty("class", _translate("TaxManagementWidget", "kpi-card"))
-        self.label1.setText(_translate("TaxManagementWidget", "Trạng thái"))
-        self.label1.setProperty("class", _translate("TaxManagementWidget", "kpi-label"))
+        self.lbl_status.setText(_translate("TaxManagementWidget", "Trạng thái phân khúc"))
         self.val_tax_status.setText(_translate("TaxManagementWidget", "-"))
-        self.val_tax_status.setProperty("class", _translate("TaxManagementWidget", "kpi-value"))
         self.card3.setProperty("class", _translate("TaxManagementWidget", "kpi-card"))
-        self.label2.setText(_translate("TaxManagementWidget", "Thuế dự kiến"))
-        self.label2.setProperty("class", _translate("TaxManagementWidget", "kpi-label"))
+        self.lbl_tax.setText(_translate("TaxManagementWidget", "Thuế dự kiến nộp"))
         self.val_total_tax.setText(_translate("TaxManagementWidget", "0 VND"))
-        self.val_total_tax.setProperty("class", _translate("TaxManagementWidget", "kpi-value"))
-        self.frame_progress.setProperty("class", _translate("TaxManagementWidget", "section-frame"))
-        self.label3.setText(_translate("TaxManagementWidget", "Phân tích ngưỡng miễn thuế"))
-        self.label3.setProperty("class", _translate("TaxManagementWidget", "section-title"))
-        self.frame_table.setProperty("class", _translate("TaxManagementWidget", "section-frame"))
-        self.label4.setText(_translate("TaxManagementWidget", "Chi tiết dự toán từng tháng"))
-        self.label4.setProperty("class", _translate("TaxManagementWidget", "section-title"))
+        self.lbl_progress_title.setText(_translate("TaxManagementWidget", "Phân tích cảnh báo ngưỡng giới hạn quy mô pháp lý"))
+        self.lbl_table_title.setText(_translate("TaxManagementWidget", "Bảng phân bổ chi tiết 12 tháng dự toán động"))
         item = self.tbl_monthly_tax.horizontalHeaderItem(0)
         item.setText(_translate("TaxManagementWidget", "Tháng"))
         item = self.tbl_monthly_tax.horizontalHeaderItem(1)
@@ -302,14 +425,59 @@ class Ui_TaxManagementWidget(object):
         item = self.tbl_monthly_tax.horizontalHeaderItem(3)
         item.setText(_translate("TaxManagementWidget", "Thuế TNCN"))
         item = self.tbl_monthly_tax.horizontalHeaderItem(4)
-        item.setText(_translate("TaxManagementWidget", "Tổng cộng"))
-        self.frame_config.setProperty("class", _translate("TaxManagementWidget", "section-frame"))
-        self.label5.setText(_translate("TaxManagementWidget", "Cấu hình thông số"))
-        self.label5.setProperty("class", _translate("TaxManagementWidget", "section-title"))
-        self.label6.setText(_translate("TaxManagementWidget", "Mức miễn thuế (VND/năm):"))
-        self.lbl_pit_method.setText(_translate("TaxManagementWidget", "Phương pháp thuế TNCN:"))
+        item.setText(_translate("TaxManagementWidget", "Tổng nộp"))
+        self.lbl_conf_title.setText(_translate("TaxManagementWidget", "Mô phỏng thông số cấu hình"))
+        self.lbl_th.setText(_translate("TaxManagementWidget", "Mức miễn thuế cơ sở (VND/năm):"))
+        self.lbl_meth.setText(_translate("TaxManagementWidget", "Phương pháp tính thuế TNCN:"))
         self.cbo_pit_method.setItemText(0, _translate("TaxManagementWidget", "Khoán % doanh thu"))
         self.cbo_pit_method.setItemText(1, _translate("TaxManagementWidget", "Sổ sách kế toán"))
-        self.label7.setText(_translate("TaxManagementWidget", "Thuế suất GTGT (%):"))
-        self.label8.setText(_translate("TaxManagementWidget", "Thuế suất TNCN (%):"))
-        self.btn_apply_config.setText(_translate("TaxManagementWidget", "CẬP NHẬT && TÍNH TOÁN"))
+        self.lbl_vat.setText(_translate("TaxManagementWidget", "Thuế suất GTGT định biên (%):"))
+        self.lbl_vat_formula.setText(_translate("TaxManagementWidget", "📝 Công thức: Thuế GTGT = Tổng doanh thu × Tỷ lệ %"))
+        self.lbl_pit.setText(_translate("TaxManagementWidget", "Thuế suất TNCN định biên (%):"))
+        self.lbl_pit_formula.setText(_translate("TaxManagementWidget", "📝 Công thức: Thuế TNCN = (Doanh thu - Ngưỡng) × Tỷ lệ %"))
+        self.lbl_disclaimer.setText(_translate("TaxManagementWidget", "⚠️ Lưu ý: Các thông số miễn thuế và thuế suất định biên phải được thiết lập phù hợp với danh mục ngành nghề kinh doanh và văn bản quy định pháp lý hiện hành của Tổng cục Thuế."))
+        self.btn_apply_config.setText(_translate("TaxManagementWidget", "KẾT XUẤT TẠM THỜI\n"
+"VÀO SỔ CÁI"))
+        self.tabWidget_tax.setTabText(self.tabWidget_tax.indexOf(self.tab_estimation), _translate("TaxManagementWidget", "📊 Dự toán && Quy hoạch Thuế"))
+        item = self.tbl_tax_history_master.horizontalHeaderItem(0)
+        item.setText(_translate("TaxManagementWidget", "Năm\n"
+"tài chính"))
+        item = self.tbl_tax_history_master.horizontalHeaderItem(1)
+        item.setText(_translate("TaxManagementWidget", "Tổng\n"
+"doanh thu"))
+        item = self.tbl_tax_history_master.horizontalHeaderItem(2)
+        item.setText(_translate("TaxManagementWidget", "Tổng\n"
+"chi phí"))
+        item = self.tbl_tax_history_master.horizontalHeaderItem(3)
+        item.setText(_translate("TaxManagementWidget", "Tổng thuế\n"
+"đã nộp"))
+        item = self.tbl_tax_history_master.horizontalHeaderItem(4)
+        item.setText(_translate("TaxManagementWidget", "Trạng thái"))
+        self.lbl_sub_history_tax.setText(_translate("TaxManagementWidget", "Chi tiết chứng từ đóng băng sổ cái lịch sử"))
+        self.lbl_md_ledger_year.setText(_translate("TaxManagementWidget", "<b>Năm quyết toán:</b> --"))
+        self.lbl_md_ledger_date.setText(_translate("TaxManagementWidget", "<b>Ngày khóa sổ:</b> --"))
+        self.lbl_md_ledger_status.setText(_translate("TaxManagementWidget", "<b>Trạng thái bảo mật:</b> --"))
+        self.lbl_md_threshold.setText(_translate("TaxManagementWidget", "<b>Ngưỡng miễn thuế:</b> --"))
+        self.lbl_md_method.setText(_translate("TaxManagementWidget", "<b>Phương pháp TNCN:</b> --"))
+        self.lbl_md_vat_rate.setText(_translate("TaxManagementWidget", "<b>Thuế suất GTGT:</b> --"))
+        self.lbl_md_pit_rate.setText(_translate("TaxManagementWidget", "<b>Thuế suất TNCN:</b> --"))
+        item = self.tbl_ledger_details.horizontalHeaderItem(0)
+        item.setText(_translate("TaxManagementWidget", "Tháng"))
+        item = self.tbl_ledger_details.horizontalHeaderItem(1)
+        item.setText(_translate("TaxManagementWidget", "Doanh thu\n"
+"chốt"))
+        item = self.tbl_ledger_details.horizontalHeaderItem(2)
+        item.setText(_translate("TaxManagementWidget", "Chi phí\n"
+"chốt"))
+        item = self.tbl_ledger_details.horizontalHeaderItem(3)
+        item.setText(_translate("TaxManagementWidget", "Thuế GTGT\n"
+"nộp"))
+        item = self.tbl_ledger_details.horizontalHeaderItem(4)
+        item.setText(_translate("TaxManagementWidget", "Thuế TNCN\n"
+"nộp"))
+        self.lbl_detail_total_label.setText(_translate("TaxManagementWidget", "TỔNG NGHĨA VỤ THUẾ THỰC TẾ ĐÃ QUYẾT TOÁN:"))
+        self.lbl_detail_total_value.setText(_translate("TaxManagementWidget", "0 VND"))
+        self.btn_close_ledger.setText(_translate("TaxManagementWidget", "🔒 CHỐT SỔ && KHÓA KỲ THUẾ NĂM"))
+        self.btn_print_ledger.setText(_translate("TaxManagementWidget", "🖨️ In chứng từ"))
+        self.btn_export_ledger_excel.setText(_translate("TaxManagementWidget", "Xuất File Excel"))
+        self.tabWidget_tax.setTabText(self.tabWidget_tax.indexOf(self.tab_invoice_history), _translate("TaxManagementWidget", "📜 Sổ cái && Nhật ký khóa sổ"))

@@ -1,248 +1,311 @@
 import traceback
 from datetime import datetime
 from decimal import Decimal
-from PyQt6.QtWidgets import QWidget, QHeaderView, QAbstractItemView, QMessageBox, QTableWidgetItem
+from typing import Optional
+from PyQt6.QtWidgets import QWidget, QHeaderView, QAbstractItemView, QMessageBox, QTableWidgetItem, QInputDialog, \
+    QLineEdit
+from PyQt6.QtCore import Qt
 
 from app.modules.tax.ui.generated.ui_tax_management import Ui_TaxManagementWidget
 from app.modules.tax.services.tax_service import ITaxService
-from app.modules.tax.dtos.tax_dto import TaxConfigDTO, YearlyTaxReportDTO
+from app.modules.tax.dtos.tax_dto import YearlyTaxReportDTO
 from app.modules.tax.utils.ui_helper import TaxUIHelper
 
 
 class TaxManagementController(QWidget):
-    def __init__(self, tax_service: ITaxService):
+    def __init__(self, tax_service: ITaxService, setting_service):
         super().__init__()
         self.ui = Ui_TaxManagementWidget()
         self.ui.setupUi(self)
 
-        # Inject Service
         self.tax_service = tax_service
+        self.setting_service = setting_service
+
+        self.selected_ledger_id: Optional[int] = None
+        self.selected_ledger_year: Optional[int] = None
+        self.current_operating_year = datetime.now().year
 
         self.setup_ui_custom()
-        self.setup_year_combobox()
         self.bind_events()
 
-        # Load dữ liệu mặc định của năm hiện tại khi mở màn hình
-        current_year = datetime.now().year
-        self.load_data_for_year(current_year)
+        # Nạp dữ liệu mặc định lúc khởi chạy phân hệ
+        self.load_data_for_year(self.current_operating_year)
+        self.load_history_master_table()
 
     def setup_ui_custom(self):
-        """Cấu hình hành vi hiển thị cho bảng dữ liệu và thiết lập sự kiện mới"""
-        header = self.ui.tbl_monthly_tax.horizontalHeader()
-        header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
-        self.ui.tbl_monthly_tax.verticalHeader().setDefaultSectionSize(45)
-        self.ui.tbl_monthly_tax.verticalHeader().setVisible(False)
-        self.ui.tbl_monthly_tax.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        """Đồng bộ dãn đều kích thước các cột bảng tủ kín màn hình bằng cơ chế Stretch bản địa"""
+        self.ui.tbl_monthly_tax.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        self.ui.tbl_tax_history_master.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        self.ui.tbl_ledger_details.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
 
-        # Bước 5: Kết nối sự kiện thay đổi phương pháp thuế TNCN điện tử
-        self.ui.cbo_pit_method.currentTextChanged.connect(self.handle_pit_method_changed)
+        for tbl in [self.ui.tbl_tax_history_master, self.ui.tbl_ledger_details, self.ui.tbl_monthly_tax]:
+            tbl.verticalHeader().setVisible(False)
+            tbl.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
 
-    def setup_year_combobox(self):
-        """Khởi tạo danh sách các năm trong ComboBox"""
-        current_year = datetime.now().year
-        self.ui.cbo_year.blockSignals(True)  # Chặn sự kiện để không trigger load_data 2 lần
-        self.ui.cbo_year.clear()
+        self.ui.spn_threshold.setGroupSeparatorShown(True)
 
-        # Hiển thị từ 2 năm trước đến 2 năm sau
-        for year in range(current_year - 2, current_year + 3):
-            self.ui.cbo_year.addItem(str(year))
-
-        self.ui.cbo_year.setCurrentText(str(current_year))
-        self.ui.cbo_year.blockSignals(False)
+        # Mở khóa tự do 100% cho mọi ô cấu hình thông số theo ý định của bạn
+        self.ui.frame_config.setEnabled(True)
 
     def bind_events(self):
-        """Đăng ký lắng nghe các sự kiện tương tác trên UI"""
-        self.ui.btn_apply_config.clicked.connect(self.handle_apply_config)
-        self.ui.cbo_year.currentTextChanged.connect(self.handle_year_changed)
+        self.ui.tabWidget_tax.currentChanged.connect(self.handle_tab_changed)
+        self.ui.cbo_pit_method.currentTextChanged.connect(self.handle_live_recalculation)
+        self.ui.spn_threshold.valueChanged.connect(self.handle_live_recalculation)
+        self.ui.spn_vat_rate.valueChanged.connect(self.handle_live_recalculation)
+        self.ui.spn_pit_rate.valueChanged.connect(self.handle_live_recalculation)
 
-    # ==========================================
-    # KHU VỰC XỬ LÝ SỰ KIỆN (EVENT HANDLERS)
-    # ==========================================
+        self.ui.btn_apply_config.clicked.connect(self.handle_stage_temporary_ledger)
+        self.ui.tbl_tax_history_master.itemSelectionChanged.connect(self.handle_master_row_selected)
+        self.ui.btn_close_ledger.clicked.connect(self.handle_finalize_and_lock_ledger)
 
-    def handle_year_changed(self, year_str: str):
-        if not year_str:
-            return
-        year = int(year_str)
-        self.load_data_for_year(year)
+    def handle_tab_changed(self, index: int):
+        if index == 0:
+            self.load_data_for_year(self.current_operating_year)
+        elif index == 1:
+            self.load_history_master_table()
+            # Dọn dẹp sạch sẽ vết dữ liệu hiển thị cũ bên Khung Detail phải
+            self.ui.tbl_ledger_details.setRowCount(0)
+            self.ui.lbl_md_ledger_year.setText("<b>Năm quyết toán:</b> --")
+            self.ui.lbl_detail_total_value.setText("0 VND")
+            self.ui.lbl_md_ledger_status.setText("<b>Trạng thái bảo mật:</b> --")
+            self.ui.lbl_md_threshold.setText("<b>Ngưỡng miễn thuế:</b> --")
+            self.ui.lbl_md_method.setText("<b>Phương pháp TNCN:</b> --")
+            self.ui.lbl_md_vat_rate.setText("<b>Thuế suất GTGT:</b> --")
+            self.ui.lbl_md_pit_rate.setText("<b>Thuế suất TNCN:</b> --")
+            self.ui.btn_close_ledger.setEnabled(False)
 
-    def handle_pit_method_changed(self, text: str):
-        """Luồng 2: Xử lý tương tác tính toán giả định thời gian thực (Interactive Simulator)"""
-        if not text:
-            return
-
+    def handle_live_recalculation(self):
+        """Tính toán live và đồng bộ chuỗi text công thức động lên nhãn chữ (ĐÃ XÓA SỐ CỨNG PHÂN KHÚC)"""
         try:
-            year = int(self.ui.cbo_year.currentText())
+            year = self.current_operating_year
             threshold = Decimal(str(self.ui.spn_threshold.value()))
             vat = Decimal(str(self.ui.spn_vat_rate.value()))
             pit = Decimal(str(self.ui.spn_pit_rate.value()))
-            pit_method = "FLAT_RATE" if text == "Khoán % doanh thu" else "BOOKKEEPING"
+            method_text = self.ui.cbo_pit_method.currentText()
+            pit_method = "FLAT_RATE" if method_text == "Khoán % doanh thu" else "BOOKKEEPING"
 
-            # Đóng gói cấu hình mô phỏng nhanh của người dùng
-            config = TaxConfigDTO(
-                apply_year=year,
-                threshold_amount=threshold,
-                vat_percent=vat,
-                pit_percent=pit,
-                pit_method=pit_method
-            )
+            # Cập nhật chuỗi text công thức động phản ứng theo tương tác thời gian thực
+            self.ui.lbl_vat_formula.setText(f"📝 Công thức: Thuế GTGT = Tổng doanh thu × {vat}%")
+            if pit_method == "FLAT_RATE":
+                self.ui.lbl_pit_formula.setText(f"📝 Công thức: Thuế TNCN = (Doanh thu - {threshold:,.0f}) × {pit}%")
+            else:
+                self.ui.lbl_pit_formula.setText(f"📝 Công thức: Thuế TNCN = (Doanh thu - Chi phí) × {pit}%")
 
-            # Ghi nhận nhanh cấu hình thay đổi tạm thời xuống Service lớp dưới
-            self.tax_service.save_config(config)
+            # Thực thi thuật toán sinh báo cáo live
+            report = self.tax_service.generate_yearly_tax_report_live(year, threshold, vat, pit, pit_method)
 
-            # Đổ lại dữ liệu tính toán mới lên bảng báo cáo và thẻ KPI ngay lập tức
-            report = self.tax_service.generate_yearly_tax_report(year)
-            self.update_kpi_cards(report)
-            self.update_progress_bar(report, config.threshold_amount)
+            self.ui.val_total_revenue.setText(f"{report.total_revenue:,.0f} VND")
+            self.ui.val_total_tax.setText(f"{report.total_tax_amount:,.0f} VND")
+
+            # : Đọc mốc phân khúc quy mô ngầm động từ database, không sử dụng số cứng
+            limit_mid, limit_large = self.tax_service.get_tax_scale_limits()
+
+            # Cập nhật Thẻ trạng thái phân khúc phản ứng theo mốc động hệ thống
+            if report.total_revenue <= threshold:
+                self.ui.val_tax_status.setText("MIỄN THUẾ")
+                self.ui.val_tax_status.setStyleSheet("color: #10b981; font-weight: 800; font-size: 20px;")
+            elif report.total_revenue <= limit_mid:
+                self.ui.val_tax_status.setText("QUY MÔ VỪA - TỰ CHỌN")
+                self.ui.val_tax_status.setStyleSheet("color: #f59e0b; font-weight: 800; font-size: 20px;")
+            else:
+                self.ui.val_tax_status.setText("QUY MÔ LỚN - SỔ SÁCH")
+                self.ui.val_tax_status.setStyleSheet("color: #ef4444; font-weight: 800; font-size: 20px;")
+
+            # Làm mới thanh tiến độ đồ họa
+            self.ui.bar_threshold.setMaximum(100)
+            if report.total_revenue <= threshold:
+                percent = 0 if threshold == 0 else int((report.total_revenue / threshold) * 100)
+                self.ui.bar_threshold.setValue(percent)
+                self.ui.bar_threshold.setFormat(f"Vùng an toàn: {report.total_revenue:,.0f} / {threshold:,.0f} VND")
+            else:
+                self.ui.bar_threshold.setValue(100)
+                self.ui.bar_threshold.setFormat(f"Vượt ngưỡng an toàn: {report.total_revenue:,.0f} VND")
+            self.ui.bar_threshold.setStyleSheet(TaxUIHelper.generate_progress_bar_css(report.total_revenue, threshold))
+
             self.update_monthly_table(report)
 
         except Exception as e:
             traceback.print_exc()
 
-    def handle_apply_config(self):
+
+    def handle_stage_temporary_ledger(self):
         try:
-            year = int(self.ui.cbo_year.currentText())
-            current_year = datetime.now().year
-
-            # Thêm logic cảnh báo nếu cập nhật dữ liệu của năm cũ
-            if year < current_year:
-                reply = QMessageBox.warning(
-                    self,
-                    "Cảnh báo thay đổi dữ liệu lịch sử",
-                    f"Bạn đang điều chỉnh cấu hình thuế cho năm {year} (năm trong quá khứ).\n\n"
-                    f"Hành động này sẽ tính toán lại toàn bộ báo cáo thuế của năm {year}. "
-                    f"Nếu sổ sách kế toán của năm này đã được chốt, việc thay đổi có thể gây ra sự sai lệch số liệu.\n\n"
-                    f"Bạn có chắc chắn muốn ghi đè cấu hình này không?",
-                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-                    QMessageBox.StandardButton.No  # Default focus vào nút No cho an toàn
-                )
-
-                if reply == QMessageBox.StandardButton.No:
-                    return
-
+            year = self.current_operating_year
             threshold = Decimal(str(self.ui.spn_threshold.value()))
             vat = Decimal(str(self.ui.spn_vat_rate.value()))
             pit = Decimal(str(self.ui.spn_pit_rate.value()))
+            method_text = self.ui.cbo_pit_method.currentText()
+            pit_method = "FLAT_RATE" if method_text == "Khoán % doanh thu" else "BOOKKEEPING"
 
-            # Trích xuất phương pháp tính thuế TNCN từ UI ComboBox mới
-            pit_method = "FLAT_RATE" if self.ui.cbo_pit_method.currentText() == "Khoán % doanh thu" else "BOOKKEEPING"
-
-            config = TaxConfigDTO(
-                apply_year=year,
-                threshold_amount=threshold,
-                vat_percent=vat,
-                pit_percent=pit,
-                pit_method=pit_method
+            confirm_msg = (
+                f"<b>XÁC NHẬN KẾT XUẤT CHỨNG TỪ SỔ CÁI (BẢN NHÁP)</b><br><br>"
+                f"Hệ thống sẽ chuyển dữ liệu năm {year} sang Sổ cái lịch sử với các thông số bạn đã cấu hình:<br>"
+                f"• Mức miễn thuế cơ sở: <b>{threshold:,.0f} VND</b><br>"
+                f"• Phương pháp tính thuế TNCN: <b>{method_text}</b><br>"
+                f"• Thuế suất GTGT áp dụng: <b>{vat}%</b><br>"
+                f"• Thuế suất TNCN áp dụng: <b>{pit}%</b><br><br>"
+                f"Bạn có chắc chắn muốn kết xuất dữ liệu này sang Tab Lịch sử không?"
             )
 
-            success = self.tax_service.save_config(config)
-            if success:
-                QMessageBox.information(self, "Thành công", f"Đã cập nhật cấu hình thuế cho năm {year}")
-                self.load_data_for_year(year)
-            else:
-                QMessageBox.warning(self, "Thất bại", "Không thể lưu cấu hình. Vui lòng kiểm tra lại!")
+            reply = QMessageBox.question(
+                self, "Xác nhận kết xuất dữ liệu", confirm_msg,
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.No
+            )
+            if reply == QMessageBox.StandardButton.No: return
 
+            if self.tax_service.stage_temporary_ledger(year, threshold, vat, pit, pit_method):
+                QMessageBox.information(self, "Thành công",
+                                        f"Đã kết xuất dữ liệu và đóng gói cấu hình năm {year} vào Header chứng từ nháp thành công!")
+            else:
+                QMessageBox.warning(self, "Bị từ chối",
+                                    f"Kỳ tính thuế năm {year} đã khóa sổ (CLOSED) bằng mã PIN, không cho phép ghi đè số liệu.")
         except Exception as e:
             traceback.print_exc()
-            QMessageBox.critical(self, "Lỗi Hệ Thống", f"Đã xảy ra lỗi khi lưu cấu hình:\n{str(e)}")
-
-    # ==========================================
-    # CẬP NHẬT DỮ LIỆU LÊN GIAO DIỆN
-    # ==========================================
 
     def load_data_for_year(self, year: int):
         try:
-            # 1. Tải và cấu hình thông số đầu vào cơ sở
-            config = self.tax_service.get_or_create_config(year)
-            self.update_config_inputs(config)
+            ledger_draft = self.tax_service.get_active_draft_ledger_config(year)
 
-            # 2. Tải dữ liệu Báo cáo Thuế tổng quát của năm
-            report: YearlyTaxReportDTO = self.tax_service.generate_yearly_tax_report(year)
+            self.ui.spn_threshold.blockSignals(True)
+            self.ui.spn_vat_rate.blockSignals(True)
+            self.ui.cbo_pit_method.blockSignals(True)
+            self.ui.spn_pit_rate.blockSignals(True)
 
-            # 3. Luồng 1: Kiểm tra phân khúc quy mô doanh thu để điều phối hoạt động Combo-box
-            total_revenue = report.total_revenue
-            self.ui.cbo_pit_method.blockSignals(True)  # Chặn loop signal khi thay đổi chương trình
-
-            if total_revenue > Decimal('3000000000'):
-                self.ui.cbo_pit_method.setCurrentText("Sổ sách kế toán")
-                self.ui.cbo_pit_method.setEnabled(False)
-                # Đóng băng hiển thị thuế suất cố định theo luật quy mô lớn
-                self.ui.spn_pit_rate.setValue(17.0 if total_revenue <= Decimal('50000000000') else 20.0)
-                self.ui.spn_pit_rate.setEnabled(False)
-            elif total_revenue <= Decimal('1000000000'):
-                self.ui.cbo_pit_method.setEnabled(False)
-                self.ui.spn_pit_rate.setValue(0.0)
-                self.ui.spn_pit_rate.setEnabled(False)
+            if ledger_draft:
+                self.ui.spn_threshold.setValue(float(ledger_draft.threshold_amount))
+                self.ui.spn_vat_rate.setValue(float(ledger_draft.vat_percent))
+                self.ui.cbo_pit_method.setCurrentText(
+                    "Khoán % doanh thu" if ledger_draft.pit_method == "FLAT_RATE" else "Sổ sách kế toán")
+                self.ui.spn_pit_rate.setValue(float(ledger_draft.pit_percent))
             else:
-                self.ui.cbo_pit_method.setEnabled(True)
-                self.ui.spn_pit_rate.setEnabled(True)
-                if config.pit_method == "FLAT_RATE":
-                    self.ui.cbo_pit_method.setCurrentText("Khoán % doanh thu")
-                    self.ui.spn_pit_rate.setValue(float(config.pit_percent))
-                else:
-                    self.ui.cbo_pit_method.setCurrentText("Sổ sách kế toán")
-                    self.ui.spn_pit_rate.setValue(15.0)  # Tự nhảy lên 15% trực quan khi sang Sổ sách
+                self.ui.spn_threshold.setValue(1000000000.0)
+                self.ui.spn_vat_rate.setValue(1.0)
+                self.ui.cbo_pit_method.setCurrentText("Khoán % doanh thu")
+                self.ui.spn_pit_rate.setValue(0.5)
 
+            self.ui.spn_threshold.blockSignals(False)
+            self.ui.spn_vat_rate.blockSignals(False)
             self.ui.cbo_pit_method.blockSignals(False)
+            self.ui.spn_pit_rate.blockSignals(False)
 
-            # 4. Đổ dữ liệu đồ họa trực quan lên các thành phần UI còn lại
-            self.update_kpi_cards(report)
-            self.update_progress_bar(report, config.threshold_amount)
-            self.update_monthly_table(report)
-
+            self.handle_live_recalculation()
         except Exception as e:
             traceback.print_exc()
-            QMessageBox.critical(self, "Lỗi Hệ Thống", f"Không thể tải dữ liệu báo cáo thuế:\n{str(e)}")
 
-    def update_config_inputs(self, config: TaxConfigDTO):
-        self.ui.spn_threshold.setValue(float(config.threshold_amount))
-        self.ui.spn_vat_rate.setValue(float(config.vat_percent))
-        self.ui.spn_pit_rate.setValue(float(config.pit_percent))
+    def load_history_master_table(self):
+        try:
+            ledgers = self.tax_service.get_all_ledgers()
+            self.ui.tbl_tax_history_master.setRowCount(len(ledgers))
+            for idx, ledger in enumerate(ledgers):
+                self.ui.tbl_tax_history_master.setItem(idx, 0, QTableWidgetItem(str(ledger.apply_year)))
+                self.ui.tbl_tax_history_master.setItem(idx, 1, TaxUIHelper.create_numeric_item(ledger.total_revenue))
+                self.ui.tbl_tax_history_master.setItem(idx, 2, TaxUIHelper.create_numeric_item(ledger.total_cost))
+                self.ui.tbl_tax_history_master.setItem(idx, 3, TaxUIHelper.create_numeric_item(
+                    ledger.final_vat_amount + ledger.final_pit_amount))
 
-    def update_kpi_cards(self, report: YearlyTaxReportDTO):
-        self.ui.val_total_revenue.setText(f"{report.total_revenue:,.0f} VND")
-        self.ui.val_total_tax.setText(f"{report.total_tax_amount:,.0f} VND")
+                status_item = QTableWidgetItem("Bản nháp" if ledger.status == "DRAFT" else "🔒 Đã khóa sổ")
+                status_item.setForeground(
+                    Qt.GlobalColor.blue if ledger.status == "CLOSED" else Qt.GlobalColor.darkYellow)
+                self.ui.tbl_tax_history_master.setItem(idx, 4, status_item)
 
-        # Nâng cấp 3 trạng thái KPI định vị thương hiệu quy mô của HKD theo luật 2026
-        if report.total_revenue <= Decimal('1000000000'):
-            self.ui.val_tax_status.setText("MIỄN THUẾ")
-            self.ui.val_tax_status.setStyleSheet("color: #10b981; font-weight: 800; font-size: 20px;")
-        elif report.total_revenue <= Decimal('3000000000'):
-            self.ui.val_tax_status.setText("QUY MÔ VỪA - TỰ CHỌN")
-            self.ui.val_tax_status.setStyleSheet("color: #f59e0b; font-weight: 800; font-size: 20px;")
+                # Áp dụng cơ chế Master Cache: Đóng gói toàn bộ thông số cấu hình của Header chứng từ vào các Cell data slot
+                self.ui.tbl_tax_history_master.item(idx, 0).setData(Qt.ItemDataRole.UserRole, ledger.id)
+                self.ui.tbl_tax_history_master.item(idx, 1).setData(Qt.ItemDataRole.UserRole, ledger.threshold_amount)
+                self.ui.tbl_tax_history_master.item(idx, 2).setData(Qt.ItemDataRole.UserRole, ledger.pit_method)
+                self.ui.tbl_tax_history_master.item(idx, 3).setData(Qt.ItemDataRole.UserRole, ledger.vat_percent)
+                self.ui.tbl_tax_history_master.item(idx, 4).setData(Qt.ItemDataRole.UserRole, ledger.pit_percent)
+                self.ui.tbl_tax_history_master.item(idx, 0).setData(Qt.ItemDataRole.UserRole + 1, ledger.finalized_at)
+        except Exception as e:
+            traceback.print_exc()
+
+    def handle_master_row_selected(self):
+        """Luồng tương tác Master-Detail phản ứng nhanh từ Cache, điền thông số cấu hình đóng băng lên Header Tab 2"""
+        selected_rows = self.ui.tbl_tax_history_master.selectedItems()
+        if not selected_rows: return
+        try:
+            row_idx = selected_rows[0].row()
+            self.selected_ledger_id = self.ui.tbl_tax_history_master.item(row_idx, 0).data(Qt.ItemDataRole.UserRole)
+            self.selected_ledger_year = int(self.ui.tbl_tax_history_master.item(row_idx, 0).text())
+
+            # Trích xuất bộ thông số đóng băng từ Cache
+            threshold_val = self.ui.tbl_tax_history_master.item(row_idx, 1).data(Qt.ItemDataRole.UserRole)
+            method_val = self.ui.tbl_tax_history_master.item(row_idx, 2).data(Qt.ItemDataRole.UserRole)
+            vat_val = self.ui.tbl_tax_history_master.item(row_idx, 3).data(Qt.ItemDataRole.UserRole)
+            pit_val = self.ui.tbl_tax_history_master.item(row_idx, 4).data(Qt.ItemDataRole.UserRole)
+            finalized_at = self.ui.tbl_tax_history_master.item(row_idx, 0).data(Qt.ItemDataRole.UserRole + 1)
+            status_text = self.ui.tbl_tax_history_master.item(row_idx, 4).text()
+
+            # Đổ dữ liệu đóng băng cứng lên 4 nhãn thông tin Header mới của Tab 2
+            method_display = "Khoán % doanh thu" if method_val == "FLAT_RATE" else "Sổ sách kế toán"
+            self.ui.lbl_md_threshold.setText(f"<b>Ngưỡng miễn thuế:</b> {threshold_val:,.0f} VND")
+            self.ui.lbl_md_method.setText(f"<b>Phương pháp TNCN:</b> {method_display}")
+            self.ui.lbl_md_vat_rate.setText(f"<b>Thuế suất GTGT:</b> {vat_val}%")
+            self.ui.lbl_md_pit_rate.setText(f"<b>Thuế suất TNCN:</b> {pit_val}%")
+
+            # Đổ dữ liệu bảng chi tiết 12 tháng lịch sử
+            details = self.tax_service.get_ledger_details(self.selected_ledger_id)
+            self.ui.tbl_ledger_details.setRowCount(12)
+            total_tax_frozen = Decimal('0')
+            for idx, detail in enumerate(details):
+                self.ui.tbl_ledger_details.setItem(idx, 0, QTableWidgetItem(f"Tháng {detail.month}"))
+                self.ui.tbl_ledger_details.setItem(idx, 1, TaxUIHelper.create_numeric_item(detail.revenue))
+                self.ui.tbl_ledger_details.setItem(idx, 2, TaxUIHelper.create_numeric_item(detail.cost))
+                self.ui.tbl_ledger_details.setItem(idx, 3, TaxUIHelper.create_numeric_item(detail.vat_amount))
+                self.ui.tbl_ledger_details.setItem(idx, 4, TaxUIHelper.create_numeric_item(detail.pit_amount))
+                total_tax_frozen += (detail.vat_amount + detail.pit_amount)
+
+            self.ui.lbl_md_ledger_year.setText(f"<b>Năm quyết toán:</b> {self.selected_ledger_year}")
+            self.ui.lbl_detail_total_value.setText(f"{total_tax_frozen:,.0f} VND")
+
+            if finalized_at:
+                if isinstance(finalized_at, datetime):
+                    date_str = finalized_at.strftime("%d/%m/%Y %H:%M")
+                else:
+                    date_str = str(finalized_at)
+                self.ui.lbl_md_ledger_date.setText(f"<b>Ngày khóa sổ:</b> {date_str}")
+            else:
+                self.ui.lbl_md_ledger_date.setText("<b>Ngày khóa sổ:</b> Chưa khóa (Bản nháp)")
+
+            if status_text == "🔒 Đã khóa sổ":
+                self.ui.lbl_md_ledger_status.setText(
+                    "<b>Trạng thái bảo mật:</b> <span style='color:green;'>🔒 ĐÃ KHÓA SỔ</span>")
+                self.ui.btn_close_ledger.setEnabled(False)
+            else:
+                self.ui.lbl_md_ledger_status.setText(
+                    "<b>Trạng thái bảo mật:</b> <span style='color:orange;'>⚠️ Bản nháp (Mở duyệt)</span>")
+                self.ui.btn_close_ledger.setEnabled(True)
+        except Exception as e:
+            traceback.print_exc()
+
+    def handle_finalize_and_lock_ledger(self):
+        if not self.selected_ledger_year: return
+        reply = QMessageBox.warning(
+            self, "XÁC NHẬN CHỐT SỔ TÀI CHÍNH",
+            f"BẠN ĐANG THỰC HIỆN KHÓA SỔ THUẾ NĂM {self.selected_ledger_year}.\n\nThao tác này sẽ ĐÓNG BĂNG VĨNH VIỄN toàn bộ số liệu. Không thể điều chỉnh sau khi chốt.\n\nBạn có chắc chắn muốn thực hiện không?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No
+        )
+        if reply == QMessageBox.StandardButton.No: return
+        entered_pin, ok = QInputDialog.getText(self, "Xác thực bảo mật mã PIN", "Nhập mã PIN bảo vệ ứng dụng:",
+                                               QLineEdit.EchoMode.Password)
+        if not ok or not entered_pin: return
+        if self.setting_service.verify_app_pin(entered_pin):
+            if self.tax_service.close_and_freeze_ledger(self.selected_ledger_year):
+                QMessageBox.information(self, "Thành công",
+                                        f"🔒 Kỳ thuế năm {self.selected_ledger_year} đã đóng băng vĩnh viễn.")
+                self.load_history_master_table()
+                self.ui.btn_close_ledger.setEnabled(False)
+                self.ui.lbl_md_ledger_status.setText(
+                    "<b>Trạng thái bảo mật:</b> <span style='color:green;'>🔒 ĐÃ KHÓA SỔ</span>")
+            else:
+                QMessageBox.warning(self, "Thất bại", "Lỗi đóng băng dữ liệu.")
         else:
-            self.ui.val_tax_status.setText("QUY MÔ LỚN - SỔ SÁCH")
-            self.ui.val_tax_status.setStyleSheet("color: #ef4444; font-weight: 800; font-size: 20px;")
-
-    def update_progress_bar(self, report: YearlyTaxReportDTO, threshold: Decimal):
-        bar = self.ui.bar_threshold
-        total = report.total_revenue
-
-        # Nâng cấp hiển thị các vạch mốc cảnh báo giới hạn quy mô pháp lý quan trọng
-        if total <= threshold:
-            percent = 0 if threshold == 0 else int((total / threshold) * 100)
-            bar.setMaximum(100)
-            bar.setValue(percent)
-            bar.setFormat(f"Vùng an toàn: {total:,.0f} / {threshold:,.0f} VND")
-        elif total <= Decimal('3000000000'):
-            bar.setMaximum(100)
-            bar.setValue(100)
-            bar.setFormat(f"Vùng tự chọn thuế: {total:,.0f} VND (Mốc bắt buộc sổ sách: 3 Tỷ)")
-        else:
-            bar.setMaximum(100)
-            bar.setValue(100)
-            bar.setFormat(f"Bắt buộc kế toán sổ sách: Vượt ngưỡng quy mô +{total - Decimal('3000000000'):,.0f} VND")
-
-        # Render CSS bằng Utility class
-        css = TaxUIHelper.generate_progress_bar_css(total, threshold)
-        bar.setStyleSheet(css)
+            QMessageBox.warning(self, "Lỗi bảo mật", "Mã PIN không chính xác!")
 
     def update_monthly_table(self, report: YearlyTaxReportDTO):
         self.ui.tbl_monthly_tax.setRowCount(12)
-
         for idx, month_detail in enumerate(report.monthly_details):
-            month_item = QTableWidgetItem(f"Tháng {month_detail.month}")
-            self.ui.tbl_monthly_tax.setItem(idx, 0, month_item)
-
+            self.ui.tbl_monthly_tax.setItem(idx, 0, QTableWidgetItem(f"Tháng {month_detail.month}"))
             self.ui.tbl_monthly_tax.setItem(idx, 1, TaxUIHelper.create_numeric_item(month_detail.revenue))
             self.ui.tbl_monthly_tax.setItem(idx, 2, TaxUIHelper.create_numeric_item(month_detail.vat_amount))
             self.ui.tbl_monthly_tax.setItem(idx, 3, TaxUIHelper.create_numeric_item(month_detail.pit_amount))

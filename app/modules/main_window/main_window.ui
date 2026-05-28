@@ -28,8 +28,6 @@
         border-right: 1px solid #e1e7ef;
         min-width: 280px;
         max-width: 280px;
-        /* Thêm shadow để hiện đại hơn */
-        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
     }
 
     /* Header Logo Area - Gradient và Modern */

@@ -3,32 +3,19 @@ from typing import List, Tuple
 
 
 class TaxCalculator:
-    # =================================================================
-    # CẤU HÌNH BIỂU THUẾ THEO NGHỊ ĐỊNH 68/2026/NĐ-CP
-    # =================================================================
-    LIMIT_BOOKKEEPING_MANDATORY = Decimal('3000000000')  # Mốc 3 Tỷ bắt buộc sổ sách
-    LIMIT_LARGE_SCALE = Decimal('50000000000')  # Mốc 50 Tỷ quy mô lớn
-
-    RATE_PIT_BOOKKEEPING_BASE = Decimal('0.15')  # 15% cho mốc dưới 3 Tỷ
-    RATE_PIT_BOOKKEEPING_LARGE = Decimal('0.17')  # 17% cho mốc 3 - 50 Tỷ
-    RATE_PIT_BOOKKEEPING_MEGA = Decimal('0.20')  # 20% cho mốc trên 50 Tỷ
-
-    # =================================================================
+    """
+    Bộ lõi tính toán Thuế suất Hộ Kinh Doanh 2026.
+    """
 
     @staticmethod
     def calculate_total_revenue(monthly_revenues: List[Decimal]) -> Decimal:
-        """Tính tổng doanh thu năm."""
+        """Tính tổng doanh thu năm từ mảng phân bổ tháng."""
         return sum(monthly_revenues)
 
     @staticmethod
     def is_over_threshold(total_revenue: Decimal, threshold: Decimal) -> bool:
-        """Kiểm tra doanh thu có vượt ngưỡng miễn thuế hay không."""
+        """Kiểm tra doanh thu năm có vượt ngưỡng chịu thuế hay không."""
         return total_revenue > threshold
-
-    @staticmethod
-    def calculate_taxable_amount(total_revenue: Decimal, threshold: Decimal) -> Decimal:
-        """Tính phần doanh thu phải chịu thuế (chỉ tính phần vượt ngưỡng)."""
-        return max(Decimal('0'), total_revenue - threshold)
 
     @staticmethod
     def calculate_monthly_tax_distribution(
@@ -41,50 +28,41 @@ class TaxCalculator:
             pit_method: str = 'FLAT_RATE'
     ) -> List[Tuple[Decimal, Decimal, Decimal]]:
         """
-        Phân bổ số tiền thuế phải nộp cho từng tháng dựa trên tỷ trọng doanh thu.
-        Áp dụng biểu thuế phân khúc theo Luật sửa đổi và Nghị định 68/2026/NĐ-CP.
+        Phân bổ nghĩa vụ thuế cho từng tháng dựa trên tỷ trọng doanh thu phát sinh thực tế.
+        Thực thi thuật toán dựa TRỰC TIẾP và KHÔNG CAN THIỆP vào bộ tham số định biên truyền vào.
 
-        Trả về List các Tuple: (VAT_Tháng, PIT_Tháng, Tổng_Thuế_Tháng)
+        Trả về List các dòng Tuple: (VAT_Tháng, PIT_Tháng, Tổng_Thuế_Tháng)
         """
-        # CHỐT CHUẨN: Doanh thu từ 1 tỷ trở xuống (<= threshold) được miễn toàn bộ thuế
+        # CHỐT CHUẨN PHÁP LÝ: Nếu tổng doanh thu năm nằm trong vùng an toàn (dưới ngưỡng), miễn thuế hoàn toàn
         if total_revenue <= threshold or total_revenue == Decimal('0'):
             return [(Decimal('0'), Decimal('0'), Decimal('0')) for _ in monthly_revenues]
 
         # -----------------------------------------------------------------
-        # 1. THUẾ GTGT: Tính trực tiếp trên tổng doanh thu từ đồng đầu tiên (Áp dụng cho tất cả các nhóm 2, 3, 4)
+        # 1. TÍNH THUẾ GTGT: Áp dụng trực tiếp tỷ lệ định biên thu từ đồng đầu tiên
         # -----------------------------------------------------------------
         vat_rate = vat_rate_percent / Decimal('100')
         total_vat = total_revenue * vat_rate
 
         # -----------------------------------------------------------------
-        # 2. THUẾ THU NHẬP CÁ NHÂN: Phân cấp theo mốc chặn trên (Sử dụng toán tử <=)
+        # 2. TÍNH THUẾ TNCN: Rẽ nhánh xử lý theo Phương pháp người dùng chọn
         # -----------------------------------------------------------------
-        total_cost = sum(monthly_costs)
         total_pit = Decimal('0')
+        pit_rate = pit_rate_percent / Decimal('100')
 
-        if total_revenue <= TaxCalculator.LIMIT_BOOKKEEPING_MANDATORY:
-            # PHÂN KHÚC VỪA VÀ NHỎ (Từ trên 1 tỷ đến mốc 3 tỷ): Cho phép tự chọn phương pháp
-            if pit_method == 'FLAT_RATE':
-                # Cách 1: Khoán % trên doanh thu chênh lệch vượt ngưỡng (Có trừ ngưỡng)
-                taxable_revenue_pit = total_revenue - threshold
-                total_pit = taxable_revenue_pit * (pit_rate_percent / Decimal('100'))
-            elif pit_method == 'BOOKKEEPING':
-                # Cách 2: Sổ sách kế toán = 15% trên Lợi nhuận thực tế (KHÔNG TRỪ NGƯỠNG)
-                taxable_profit = total_revenue - total_cost
-                total_pit = max(Decimal('0'), taxable_profit) * TaxCalculator.RATE_PIT_BOOKKEEPING_BASE
+        if pit_method == 'FLAT_RATE':
+            # Phương pháp Khoán: Chỉ tính thuế trên phần doanh thu chênh lệch vượt ngưỡng cơ sở
+            taxable_revenue_pit = total_revenue - threshold
+            total_pit = taxable_revenue_pit * pit_rate
 
-        elif total_revenue <= TaxCalculator.LIMIT_LARGE_SCALE:
-            # PHÂN KHÚC QUY MÔ LỚN (Từ trên 3 tỷ đến mốc 50 tỷ): Bắt buộc Sổ sách 17% (KHÔNG TRỪ NGƯỠNG)
+        elif pit_method == 'BOOKKEEPING':
+            # Phương pháp Sổ sách: Tính theo tỷ lệ trực tiếp trên Lợi nhuận kế toán (Doanh thu - Chi phí)
+            total_cost = sum(monthly_costs)
             taxable_profit = total_revenue - total_cost
-            total_pit = max(Decimal('0'), taxable_profit) * TaxCalculator.RATE_PIT_BOOKKEEPING_LARGE
-
-        else:
-            # PHÂN KHÚC ĐẠI QUY MÔ (Từ trên 50 tỷ trở lên): Bắt buộc Sổ sách 20% (KHÔNG TRỪ NGƯỠNG)
-            taxable_profit = total_revenue - total_cost
-            total_pit = max(Decimal('0'), taxable_profit) * TaxCalculator.RATE_PIT_BOOKKEEPING_MEGA
+            # Tiền thuế không được âm nếu cửa hàng kinh doanh thua lỗ ở kỳ quyết toán
+            total_pit = max(Decimal('0'), taxable_profit) * pit_rate
 
         # -----------------------------------------------------------------
-        # 3. PHÂN BỔ TIỀN THUẾ NGƯỢC LẠI CHO 12 THÁNG (Theo tỷ trọng doanh thu)
+        # 3. PHÂN BỔ KẾT QUẢ NGƯỢC LẠI CHO 12 THÁNG (Theo tỷ trọng đóng góp doanh thu)
         # -----------------------------------------------------------------
         results = []
         for rev in monthly_revenues:
@@ -92,6 +70,7 @@ class TaxCalculator:
                 results.append((Decimal('0'), Decimal('0'), Decimal('0')))
                 continue
 
+            # Tính toán tỷ trọng phân phối dòng tiền của tháng so với tổng thể năm
             ratio = rev / total_revenue
             month_vat = total_vat * ratio
             month_pit = total_pit * ratio

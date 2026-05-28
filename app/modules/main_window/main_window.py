@@ -111,7 +111,8 @@ class MainWindow(QMainWindow):
         )
 
         self.page_tax = TaxManagementController(
-            tax_service=self.tax_service
+            tax_service=self.tax_service,
+            setting_service=self.setting_service
         )
 
         self.page_settings = SettingManagementController(
@@ -151,6 +152,8 @@ class MainWindow(QMainWindow):
         elif index == 5:
             current_year = datetime.now().year
             self.page_tax.load_data_for_year(current_year)
+            if hasattr(self.page_tax, 'load_history_master_table'):
+                self.page_tax.load_history_master_table()
         elif index == 6:
             # Sẽ gọi hàm kéo dữ liệu Database lên đây (hiện tại ta cứ gọi sẵn)
             if hasattr(self.page_settings, 'load_current_settings'):

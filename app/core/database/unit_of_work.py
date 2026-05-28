@@ -8,7 +8,8 @@ from app.modules.report.repositories.impl.report_repository_impl import ReportRe
 from app.modules.sale.repositories.impl.invoice_history_repository_impl import InvoiceHistoryRepositoryImpl
 from app.modules.sale.repositories.impl.sale_repository_impl import SaleRepositoryImpl
 from app.modules.setting.repositories.impl.setting_repository_impl import SettingRepositoryImpl
-from app.modules.tax.repositories.impl.tax_repository_impl import TaxConfigRepository, TaxReportRepository
+from app.modules.tax.repositories.impl.tax_repository_impl import TaxReportRepository, \
+    TaxLedgerRepository
 
 
 class UnitOfWork:
@@ -32,8 +33,8 @@ class UnitOfWork:
         self.supplier_repo = SupplierRepositoryImpl(self.connection)
         self.sale_repo = SaleRepositoryImpl(self.connection)
         self.report_repo = ReportRepositoryImpl(self.connection)
-        self.tax_config_repo = TaxConfigRepository(self.connection)
         self.tax_report_repo = TaxReportRepository(self.connection)
+        self.tax_ledger_repo = TaxLedgerRepository(self.connection)
         self.setting_repo = SettingRepositoryImpl(self.connection)
         self.po_history_repo = PurchaseOrderHistoryRepositoryImpl(self.connection)
         self.invoice_history_repo = InvoiceHistoryRepositoryImpl(self.connection)

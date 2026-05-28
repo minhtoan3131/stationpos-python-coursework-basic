@@ -26,6 +26,10 @@ def clean_db(db_test_connection):
 
     # 2. Xóa sạch dữ liệu tất cả các bảng
 
+    # Nhóm Sổ cái và Nhật ký đóng băng Thuế mới (Xóa Detail trước Master vì ràng buộc khóa ngoại)
+    cursor.execute("TRUNCATE TABLE tax_ledger_details;")
+    cursor.execute("TRUNCATE TABLE tax_ledger;")
+
     # Nhóm Bán hàng (Sale)
     cursor.execute("TRUNCATE TABLE invoice_logs;")
     cursor.execute("TRUNCATE TABLE invoice_items;")
@@ -44,8 +48,8 @@ def clean_db(db_test_connection):
     cursor.execute("TRUNCATE TABLE suppliers;")
     cursor.execute("TRUNCATE TABLE units;")
 
-    # Nhóm Cấu hình chung
-    cursor.execute("TRUNCATE TABLE tax_config;")
+    # Cấu hình chung hệ thống
+    cursor.execute("TRUNCATE TABLE system_settings;")
     cursor.execute("TRUNCATE TABLE settings;")
 
     # 3. Bật lại kiểm tra khóa ngoại

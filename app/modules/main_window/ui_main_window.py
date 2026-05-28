@@ -27,8 +27,6 @@ class Ui_MainWindow(object):
 "        border-right: 1px solid #e1e7ef;\n"
 "        min-width: 280px;\n"
 "        max-width: 280px;\n"
-"        /* Thêm shadow để hiện đại hơn */\n"
-"        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);\n"
 "    }\n"
 "\n"
 "    /* Header Logo Area - Gradient và Modern */\n"

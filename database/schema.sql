@@ -154,17 +154,6 @@ CREATE TABLE invoice_logs (
     FOREIGN KEY (invoice_id) REFERENCES invoices(id)
 );
 
-
-CREATE TABLE tax_config (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    apply_year INT UNIQUE NOT NULL,       -- năm áp dụng (để map với cbo_year trên UI)
-    threshold_amount DECIMAL(15,2),       -- mức miễn thuế (VD: 1,000,000,000)
-    vat_percent DECIMAL(5,2),
-    pit_percent DECIMAL(5,2),
-    pit_method ENUM('FLAT_RATE', 'BOOKKEEPING') DEFAULT 'FLAT_RATE', -- Phương pháp tính thuế TNCN mới 2026
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
 CREATE TABLE settings (
     id INT AUTO_INCREMENT PRIMARY KEY,
     shop_name VARCHAR(255),
@@ -177,7 +166,43 @@ CREATE TABLE IF NOT EXISTS system_settings (
     setting_value TEXT,
     description VARCHAR(255)
 );
+INSERT INTO system_settings (setting_key, setting_value, description)
+VALUES
+('TAX_MID_SCALE_LIMIT', '3000000000', 'Mốc giới hạn doanh thu bắt buộc sổ sách kế toán'),
+('TAX_LARGE_SCALE_LIMIT', '50000000000', 'Mốc giới hạn doanh thu lớn nhất');
 
+
+
+-- 1. Bảng Master: Lưu tổng quan năm quyết toán thuế
+CREATE TABLE tax_ledger (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    apply_year INT UNIQUE NOT NULL,           -- Năm chốt sổ
+    total_revenue DECIMAL(15,2) NOT NULL,     -- Doanh thu tổng cả năm tại thời điểm chốt
+    total_cost DECIMAL(15,2) NOT NULL,        -- Chi phí tổng cả năm tại thời điểm chốt
+    final_vat_amount DECIMAL(15,2) NOT NULL,     -- Tổng thuế GTGT của cả năm
+    final_pit_amount DECIMAL(15,2) NOT NULL,     -- Tổng thuế TNCN của cả năm
+    pit_method ENUM('FLAT_RATE', 'BOOKKEEPING') NOT NULL, -- Phương pháp áp dụng cho năm đó
+    threshold_amount DECIMAL(15,2) NOT NULL DEFAULT 1000000000.00,
+    vat_percent DECIMAL(5,2) NOT NULL DEFAULT 1.00,
+    pit_percent DECIMAL(5,2) NOT NULL DEFAULT 0.50,
+    status ENUM('DRAFT', 'CLOSED') DEFAULT 'DRAFT', -- DRAFT: Kết xuất tạm; CLOSED: Khóa sổ vĩnh viễn bằng PIN
+    finalized_at DATETIME DEFAULT NULL,       -- Thời điểm nhập mã PIN khóa sổ thành công
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 2. Bảng Detail: Lưu vết đóng băng chi tiết 12 tháng của năm đó
+CREATE TABLE tax_ledger_details (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tax_ledger_id INT NOT NULL,               -- Foreign Key nối với bảng Master ở trên
+    month INT NOT NULL,                       -- Từ tháng 1 đến tháng 12
+    revenue DECIMAL(15,2) NOT NULL,           -- Doanh thu thực tế đóng băng của tháng đó
+    cost DECIMAL(15,2) NOT NULL,              -- Chi phí thực tế đóng băng của tháng đó
+    vat_amount DECIMAL(15,2) NOT NULL,        -- Thuế GTGT phân bổ của tháng đó
+    pit_amount DECIMAL(15,2) NOT NULL,        -- Thuế TNCN phân bổ của tháng đó
+    
+    FOREIGN KEY (tax_ledger_id) REFERENCES tax_ledger(id) ON DELETE CASCADE,
+    UNIQUE KEY ukey_ledger_month (tax_ledger_id, month)
+);
 
 
 
