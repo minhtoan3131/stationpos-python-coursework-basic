@@ -32,21 +32,28 @@ class TaxService(ITaxService):
         config = self.get_or_create_config(year)
 
         with self.uow_factory() as uow:
+            # Lấy danh sách doanh thu và chi phí gộp từ Repository đã tối ưu ở Bước 2
             revenue_dtos = uow.tax_report_repo.get_monthly_revenue_by_year(year)
 
         monthly_revenues = [Decimal('0') for _ in range(12)]
+        monthly_costs = [Decimal('0') for _ in range(12)]  # Khởi tạo mảng chi phí 12 tháng
+
+        # Bóc tách đồng thời doanh thu và giá vốn từng tháng từ DTO dữ liệu
         for record in revenue_dtos:
             monthly_revenues[record.month - 1] = record.revenue
+            monthly_costs[record.month - 1] = record.total_cost  # Nạp giá vốn (COGS)
 
         total_revenue = TaxCalculator.calculate_total_revenue(monthly_revenues)
         is_over = TaxCalculator.is_over_threshold(total_revenue, config.threshold_amount)
 
         tax_distributions = TaxCalculator.calculate_monthly_tax_distribution(
             monthly_revenues=monthly_revenues,
+            monthly_costs=monthly_costs,          # Truyền mảng chi phí phục vụ Phương pháp Sổ sách
             total_revenue=total_revenue,
             threshold=config.threshold_amount,
             vat_rate_percent=config.vat_percent,
-            pit_rate_percent=config.pit_percent
+            pit_rate_percent=config.pit_percent,
+            pit_method=config.pit_method          # Truyền phương pháp tính thuế (FLAT_RATE / BOOKKEEPING)
         )
 
         monthly_details = []
@@ -84,7 +91,6 @@ class TaxService(ITaxService):
         total_revenue = TaxCalculator.calculate_total_revenue(monthly_revenues)
         threshold = config.threshold_amount
 
-        # Xử lý Business Logic: Ngưỡng & Cảnh báo 85%
         percent = (total_revenue / threshold * Decimal('100')) if threshold > 0 else Decimal('0')
         if percent > Decimal('100'):
             percent = Decimal('100')

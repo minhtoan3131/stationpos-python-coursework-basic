@@ -27,12 +27,15 @@ class TaxManagementController(QWidget):
         self.load_data_for_year(current_year)
 
     def setup_ui_custom(self):
-        """Cấu hình hành vi hiển thị cho bảng dữ liệu"""
+        """Cấu hình hành vi hiển thị cho bảng dữ liệu và thiết lập sự kiện mới"""
         header = self.ui.tbl_monthly_tax.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.ui.tbl_monthly_tax.verticalHeader().setDefaultSectionSize(45)
         self.ui.tbl_monthly_tax.verticalHeader().setVisible(False)
         self.ui.tbl_monthly_tax.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+
+        # Bước 5: Kết nối sự kiện thay đổi phương pháp thuế TNCN điện tử
+        self.ui.cbo_pit_method.currentTextChanged.connect(self.handle_pit_method_changed)
 
     def setup_year_combobox(self):
         """Khởi tạo danh sách các năm trong ComboBox"""
@@ -62,6 +65,39 @@ class TaxManagementController(QWidget):
         year = int(year_str)
         self.load_data_for_year(year)
 
+    def handle_pit_method_changed(self, text: str):
+        """Luồng 2: Xử lý tương tác tính toán giả định thời gian thực (Interactive Simulator)"""
+        if not text:
+            return
+
+        try:
+            year = int(self.ui.cbo_year.currentText())
+            threshold = Decimal(str(self.ui.spn_threshold.value()))
+            vat = Decimal(str(self.ui.spn_vat_rate.value()))
+            pit = Decimal(str(self.ui.spn_pit_rate.value()))
+            pit_method = "FLAT_RATE" if text == "Khoán % doanh thu" else "BOOKKEEPING"
+
+            # Đóng gói cấu hình mô phỏng nhanh của người dùng
+            config = TaxConfigDTO(
+                apply_year=year,
+                threshold_amount=threshold,
+                vat_percent=vat,
+                pit_percent=pit,
+                pit_method=pit_method
+            )
+
+            # Ghi nhận nhanh cấu hình thay đổi tạm thời xuống Service lớp dưới
+            self.tax_service.save_config(config)
+
+            # Đổ lại dữ liệu tính toán mới lên bảng báo cáo và thẻ KPI ngay lập tức
+            report = self.tax_service.generate_yearly_tax_report(year)
+            self.update_kpi_cards(report)
+            self.update_progress_bar(report, config.threshold_amount)
+            self.update_monthly_table(report)
+
+        except Exception as e:
+            traceback.print_exc()
+
     def handle_apply_config(self):
         try:
             year = int(self.ui.cbo_year.currentText())
@@ -80,20 +116,22 @@ class TaxManagementController(QWidget):
                     QMessageBox.StandardButton.No  # Default focus vào nút No cho an toàn
                 )
 
-                # Nếu người dùng chọn No (hoặc tắt hộp thoại), dừng việc lưu lại
                 if reply == QMessageBox.StandardButton.No:
                     return
 
-            # Nếu là năm hiện tại/tương lai, hoặc người dùng đã bấm Yes, tiến hành lưu bình thường
             threshold = Decimal(str(self.ui.spn_threshold.value()))
             vat = Decimal(str(self.ui.spn_vat_rate.value()))
             pit = Decimal(str(self.ui.spn_pit_rate.value()))
+
+            # Trích xuất phương pháp tính thuế TNCN từ UI ComboBox mới
+            pit_method = "FLAT_RATE" if self.ui.cbo_pit_method.currentText() == "Khoán % doanh thu" else "BOOKKEEPING"
 
             config = TaxConfigDTO(
                 apply_year=year,
                 threshold_amount=threshold,
                 vat_percent=vat,
-                pit_percent=pit
+                pit_percent=pit,
+                pit_method=pit_method
             )
 
             success = self.tax_service.save_config(config)
@@ -113,12 +151,40 @@ class TaxManagementController(QWidget):
 
     def load_data_for_year(self, year: int):
         try:
-            # Tải và hiển thị cấu hình (để fill vào các ô SpinBox)
+            # 1. Tải và cấu hình thông số đầu vào cơ sở
             config = self.tax_service.get_or_create_config(year)
             self.update_config_inputs(config)
 
-            # Tải và hiển thị Báo cáo Thuế
+            # 2. Tải dữ liệu Báo cáo Thuế tổng quát của năm
             report: YearlyTaxReportDTO = self.tax_service.generate_yearly_tax_report(year)
+
+            # 3. Luồng 1: Kiểm tra phân khúc quy mô doanh thu để điều phối hoạt động Combo-box
+            total_revenue = report.total_revenue
+            self.ui.cbo_pit_method.blockSignals(True)  # Chặn loop signal khi thay đổi chương trình
+
+            if total_revenue > Decimal('3000000000'):
+                self.ui.cbo_pit_method.setCurrentText("Sổ sách kế toán")
+                self.ui.cbo_pit_method.setEnabled(False)
+                # Đóng băng hiển thị thuế suất cố định theo luật quy mô lớn
+                self.ui.spn_pit_rate.setValue(17.0 if total_revenue <= Decimal('50000000000') else 20.0)
+                self.ui.spn_pit_rate.setEnabled(False)
+            elif total_revenue <= Decimal('1000000000'):
+                self.ui.cbo_pit_method.setEnabled(False)
+                self.ui.spn_pit_rate.setValue(0.0)
+                self.ui.spn_pit_rate.setEnabled(False)
+            else:
+                self.ui.cbo_pit_method.setEnabled(True)
+                self.ui.spn_pit_rate.setEnabled(True)
+                if config.pit_method == "FLAT_RATE":
+                    self.ui.cbo_pit_method.setCurrentText("Khoán % doanh thu")
+                    self.ui.spn_pit_rate.setValue(float(config.pit_percent))
+                else:
+                    self.ui.cbo_pit_method.setCurrentText("Sổ sách kế toán")
+                    self.ui.spn_pit_rate.setValue(15.0)  # Tự nhảy lên 15% trực quan khi sang Sổ sách
+
+            self.ui.cbo_pit_method.blockSignals(False)
+
+            # 4. Đổ dữ liệu đồ họa trực quan lên các thành phần UI còn lại
             self.update_kpi_cards(report)
             self.update_progress_bar(report, config.threshold_amount)
             self.update_monthly_table(report)
@@ -136,30 +202,35 @@ class TaxManagementController(QWidget):
         self.ui.val_total_revenue.setText(f"{report.total_revenue:,.0f} VND")
         self.ui.val_total_tax.setText(f"{report.total_tax_amount:,.0f} VND")
 
-        if report.is_over_threshold:
-            self.ui.val_tax_status.setText("ĐÃ VƯỢT NGƯỠNG")
-            self.ui.val_tax_status.setStyleSheet("color: #ef4444; font-weight: 800; font-size: 24px;")
+        # Nâng cấp 3 trạng thái KPI định vị thương hiệu quy mô của HKD theo luật 2026
+        if report.total_revenue <= Decimal('1000000000'):
+            self.ui.val_tax_status.setText("MIỄN THUẾ")
+            self.ui.val_tax_status.setStyleSheet("color: #10b981; font-weight: 800; font-size: 20px;")
+        elif report.total_revenue <= Decimal('3000000000'):
+            self.ui.val_tax_status.setText("QUY MÔ VỪA - TỰ CHỌN")
+            self.ui.val_tax_status.setStyleSheet("color: #f59e0b; font-weight: 800; font-size: 20px;")
         else:
-            self.ui.val_tax_status.setText("DƯỚI NGƯỠNG")
-            self.ui.val_tax_status.setStyleSheet("color: #10b981; font-weight: 800; font-size: 24px;")
+            self.ui.val_tax_status.setText("QUY MÔ LỚN - SỔ SÁCH")
+            self.ui.val_tax_status.setStyleSheet("color: #ef4444; font-weight: 800; font-size: 20px;")
 
     def update_progress_bar(self, report: YearlyTaxReportDTO, threshold: Decimal):
         bar = self.ui.bar_threshold
         total = report.total_revenue
 
-        # Update text và value (Logic hiển thị)
+        # Nâng cấp hiển thị các vạch mốc cảnh báo giới hạn quy mô pháp lý quan trọng
         if total <= threshold:
-            # Dưới ngưỡng: Quy đổi ra thang 100%
             percent = 0 if threshold == 0 else int((total / threshold) * 100)
             bar.setMaximum(100)
             bar.setValue(percent)
             bar.setFormat(f"Vùng an toàn: {total:,.0f} / {threshold:,.0f} VND")
-        else:
-            # Vượt ngưỡng: Cho thanh full 100%
+        elif total <= Decimal('3000000000'):
             bar.setMaximum(100)
             bar.setValue(100)
-            over_amount = total - threshold
-            bar.setFormat(f"Vượt ngưỡng: +{over_amount:,.0f} VND")
+            bar.setFormat(f"Vùng tự chọn thuế: {total:,.0f} VND (Mốc bắt buộc sổ sách: 3 Tỷ)")
+        else:
+            bar.setMaximum(100)
+            bar.setValue(100)
+            bar.setFormat(f"Bắt buộc kế toán sổ sách: Vượt ngưỡng quy mô +{total - Decimal('3000000000'):,.0f} VND")
 
         # Render CSS bằng Utility class
         css = TaxUIHelper.generate_progress_bar_css(total, threshold)
@@ -169,11 +240,9 @@ class TaxManagementController(QWidget):
         self.ui.tbl_monthly_tax.setRowCount(12)
 
         for idx, month_detail in enumerate(report.monthly_details):
-            # Tháng
             month_item = QTableWidgetItem(f"Tháng {month_detail.month}")
             self.ui.tbl_monthly_tax.setItem(idx, 0, month_item)
 
-            # Sử dụng UI Helper để format tiền
             self.ui.tbl_monthly_tax.setItem(idx, 1, TaxUIHelper.create_numeric_item(month_detail.revenue))
             self.ui.tbl_monthly_tax.setItem(idx, 2, TaxUIHelper.create_numeric_item(month_detail.vat_amount))
             self.ui.tbl_monthly_tax.setItem(idx, 3, TaxUIHelper.create_numeric_item(month_detail.pit_amount))

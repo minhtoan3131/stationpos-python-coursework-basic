@@ -161,6 +161,7 @@ CREATE TABLE tax_config (
     threshold_amount DECIMAL(15,2),       -- mức miễn thuế (VD: 1,000,000,000)
     vat_percent DECIMAL(5,2),
     pit_percent DECIMAL(5,2),
+    pit_method ENUM('FLAT_RATE', 'BOOKKEEPING') DEFAULT 'FLAT_RATE', -- Phương pháp tính thuế TNCN mới 2026
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 

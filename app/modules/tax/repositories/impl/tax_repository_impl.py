@@ -10,7 +10,7 @@ class TaxConfigRepository(BaseRepository, ITaxConfigRepository):
 
     def get_config_by_year(self, year: int) -> Optional[TaxConfigDTO]:
         query = """
-            SELECT id, apply_year, threshold_amount, vat_percent, pit_percent 
+            SELECT id, apply_year, threshold_amount, vat_percent, pit_percent, pit_method 
             FROM tax_config 
             WHERE apply_year = %s
         """
@@ -23,20 +23,20 @@ class TaxConfigRepository(BaseRepository, ITaxConfigRepository):
                 apply_year=row['apply_year'],
                 threshold_amount=Decimal(str(row['threshold_amount'])),
                 vat_percent=Decimal(str(row['vat_percent'])),
-                pit_percent=Decimal(str(row['pit_percent']))
+                pit_percent=Decimal(str(row['pit_percent'])),
+                pit_method=row['pit_method']  # Nạp phương pháp tính thuế TNCN ('FLAT_RATE' / 'BOOKKEEPING') vào DTO
             )
         return None
 
     def save_config(self, config: TaxConfigDTO) -> bool:
-        # Sử dụng cơ chế UPSERT của MySQL (INSERT ... ON DUPLICATE KEY UPDATE)
-        # Giả định cột apply_year đã được set là UNIQUE trong database
         query = """
-            INSERT INTO tax_config (apply_year, threshold_amount, vat_percent, pit_percent)
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO tax_config (apply_year, threshold_amount, vat_percent, pit_percent, pit_method)
+            VALUES (%s, %s, %s, %s, %s)
             ON DUPLICATE KEY UPDATE 
                 threshold_amount = VALUES(threshold_amount),
                 vat_percent = VALUES(vat_percent),
                 pit_percent = VALUES(pit_percent),
+                pit_method = VALUES(pit_method),
                 updated_at = CURRENT_TIMESTAMP
         """
         try:
@@ -44,7 +44,8 @@ class TaxConfigRepository(BaseRepository, ITaxConfigRepository):
                 config.apply_year,
                 config.threshold_amount,
                 config.vat_percent,
-                config.pit_percent
+                config.pit_percent,
+                config.pit_method  # Truyền giá trị enum 'FLAT_RATE' hoặc 'BOOKKEEPING'
             ))
             self.connection.commit()
             return True
@@ -57,11 +58,11 @@ class TaxConfigRepository(BaseRepository, ITaxConfigRepository):
 class TaxReportRepository(BaseRepository, ITaxReportRepository):
 
     def get_monthly_revenue_by_year(self, year: int) -> List[MonthlyRevenueDTO]:
-        # Truy vấn trực tiếp vào View vw_report_invoice_summary đã có sẵn
         query = """
             SELECT 
                 MONTH(sale_date) AS month, 
-                SUM(revenue) AS total_revenue
+                SUM(revenue) AS total_revenue,
+                SUM(total_cost) AS total_cost
             FROM vw_report_invoice_summary
             WHERE YEAR(sale_date) = %s
             GROUP BY MONTH(sale_date)
@@ -74,6 +75,7 @@ class TaxReportRepository(BaseRepository, ITaxReportRepository):
         for row in rows:
             result.append(MonthlyRevenueDTO(
                 month=row['month'],
-                revenue=Decimal(str(row['total_revenue'] or 0))
+                revenue=Decimal(str(row['total_revenue'] or 0)),
+                total_cost=Decimal(str(row['total_cost'] or 0))  # Gán giá vốn hàng bán (COGS) của tháng vào DTO
             ))
         return result

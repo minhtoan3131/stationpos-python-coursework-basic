@@ -9,6 +9,7 @@ class TaxConfigDTO:
     threshold_amount: Decimal
     vat_percent: Decimal
     pit_percent: Decimal
+    pit_method: str = 'FLAT_RATE'  # 'FLAT_RATE' (Khoán) hoặc 'BOOKKEEPING' (Sổ sách)
     id: Optional[int] = None
 
 @dataclass
@@ -16,6 +17,7 @@ class MonthlyRevenueDTO:
     """DTO lưu trữ doanh thu tổng hợp theo từng tháng"""
     month: int
     revenue: Decimal
+    total_cost: Decimal = Decimal('0')  # Trường để lưu giá vốn hàng bán (COGS) của tháng
 
 @dataclass
 class MonthlyTaxDetailDTO:

@@ -14,32 +14,45 @@ class Ui_TaxManagementWidget(object):
         TaxManagementWidget.setObjectName("TaxManagementWidget")
         TaxManagementWidget.resize(1400, 950)
         TaxManagementWidget.setStyleSheet("\n"
-"    QWidget#TaxManagementWidget { background-color: #f1f5f9; font-family: \'Segoe UI\', sans-serif; }\n"
-"    QScrollArea { border: none; background-color: transparent; }\n"
+"    QWidget#TaxManagementWidget { background-color: #f1f5f9;\n"
+"    font-family: \'Segoe UI\', sans-serif; }\n"
+"    QScrollArea { border: none; background-color: transparent;\n"
+"    }\n"
 "    #scrollContents { background-color: #f1f5f9; }\n"
 "\n"
-"    QFrame.kpi-card { background-color: #ffffff; border-radius: 12px; }\n"
-"    QLabel.kpi-label { font-size: 16px; font-weight: 600; color: #64748b; text-transform: uppercase; }\n"
-"    QLabel.kpi-value { font-size: 24px; font-weight: 800; color: #0f172a; }\n"
+"    QFrame.kpi-card { background-color: #ffffff; border-radius: 12px;\n"
+"    }\n"
+"    QLabel.kpi-label { font-size: 16px; font-weight: 600; color: #64748b; text-transform: uppercase;\n"
+"    }\n"
+"    QLabel.kpi-value { font-size: 24px; font-weight: 800; color: #0f172a;\n"
+"    }\n"
 "\n"
 "    QProgressBar {\n"
-"        border: 1px solid #e2e8f0; border-radius: 10px; background-color: #ffffff;\n"
+"        border: 1px solid #e2e8f0; border-radius: 10px;\n"
+"        background-color: #ffffff;\n"
 "        text-align: center; color: #0f172a; font-weight: bold; height: 28px;\n"
 "    }\n"
 "\n"
-"    QFrame.section-frame { background-color: #ffffff; border-radius: 12px; }\n"
-"    QLabel.section-title { font-size: 17px; font-weight: 700; color: #1e293b; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9; }\n"
+"    QFrame.section-frame { background-color: #ffffff; border-radius: 12px;\n"
+"    }\n"
+"    QLabel.section-title { font-size: 17px; font-weight: 700; color: #1e293b; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9;\n"
+"    }\n"
 "\n"
 "    QTableWidget { border: none; gridline-color: #f1f5f9; background-color: white; }\n"
-"    QHeaderView::section { background-color: #f8fafc; padding: 10px; font-weight: bold; border: none; border-bottom: 2px solid #e2e8f0; color: #475569; }\n"
+"    QHeaderView::section { background-color: #f8fafc;\n"
+"    padding: 10px; font-weight: bold; border: none; border-bottom: 2px solid #e2e8f0; color: #475569;\n"
+"    }\n"
 "\n"
 "    QDoubleSpinBox, QComboBox {\n"
-"        padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; background: white; font-weight: bold;\n"
+"        padding: 8px; border: 1px solid #cbd5e1;\n"
+"        border-radius: 6px; background: white; font-weight: bold;\n"
 "    }\n"
 "    QPushButton#btn_apply_config {\n"
-"        background-color: #3b82f6; color: white; border-radius: 6px; padding: 10px; font-weight: 800;\n"
+"        background-color: #3b82f6;\n"
+"        color: white; border-radius: 6px; padding: 10px; font-weight: 800;\n"
 "    }\n"
-"    QPushButton#btn_apply_config:hover { background-color: #2563eb; }\n"
+"    QPushButton#btn_apply_config:hover { background-color: #2563eb;\n"
+"    }\n"
 "\n"
 "    /* Style cho danh sách xổ xuống của ComboBox */\n"
 "    QComboBox QAbstractItemView {\n"
@@ -198,6 +211,19 @@ class Ui_TaxManagementWidget(object):
         self.vboxlayout5.addWidget(self.spn_threshold)
         spacerItem1 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
         self.vboxlayout5.addItem(spacerItem1)
+        self.lbl_pit_method = QtWidgets.QLabel(parent=self.frame_config)
+        font = QtGui.QFont()
+        font.setPointSize(16)
+        self.lbl_pit_method.setFont(font)
+        self.lbl_pit_method.setObjectName("lbl_pit_method")
+        self.vboxlayout5.addWidget(self.lbl_pit_method)
+        self.cbo_pit_method = QtWidgets.QComboBox(parent=self.frame_config)
+        self.cbo_pit_method.setObjectName("cbo_pit_method")
+        self.cbo_pit_method.addItem("")
+        self.cbo_pit_method.addItem("")
+        self.vboxlayout5.addWidget(self.cbo_pit_method)
+        spacerItem2 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
+        self.vboxlayout5.addItem(spacerItem2)
         self.label7 = QtWidgets.QLabel(parent=self.frame_config)
         font = QtGui.QFont()
         font.setPointSize(16)
@@ -208,8 +234,8 @@ class Ui_TaxManagementWidget(object):
         self.spn_vat_rate.setDecimals(1)
         self.spn_vat_rate.setObjectName("spn_vat_rate")
         self.vboxlayout5.addWidget(self.spn_vat_rate)
-        spacerItem2 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
-        self.vboxlayout5.addItem(spacerItem2)
+        spacerItem3 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
+        self.vboxlayout5.addItem(spacerItem3)
         self.label8 = QtWidgets.QLabel(parent=self.frame_config)
         font = QtGui.QFont()
         font.setPointSize(16)
@@ -220,13 +246,13 @@ class Ui_TaxManagementWidget(object):
         self.spn_pit_rate.setDecimals(1)
         self.spn_pit_rate.setObjectName("spn_pit_rate")
         self.vboxlayout5.addWidget(self.spn_pit_rate)
-        spacerItem3 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
-        self.vboxlayout5.addItem(spacerItem3)
+        spacerItem4 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
+        self.vboxlayout5.addItem(spacerItem4)
         self.btn_apply_config = QtWidgets.QPushButton(parent=self.frame_config)
         self.btn_apply_config.setObjectName("btn_apply_config")
         self.vboxlayout5.addWidget(self.btn_apply_config)
-        spacerItem4 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
-        self.vboxlayout5.addItem(spacerItem4)
+        spacerItem5 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
+        self.vboxlayout5.addItem(spacerItem5)
         self.layout_body.addWidget(self.frame_config)
         self.layout_body.setStretch(0, 7)
         self.layout_body.setStretch(1, 3)
@@ -240,9 +266,11 @@ class Ui_TaxManagementWidget(object):
     def retranslateUi(self, TaxManagementWidget):
         _translate = QtCore.QCoreApplication.translate
         TaxManagementWidget.setWindowTitle(_translate("TaxManagementWidget", "Quản lý Thuế Hộ Kinh Doanh"))
-        self.lbl_title.setStyleSheet(_translate("TaxManagementWidget", "font-size: 24px; font-weight: 900;"))
+        self.lbl_title.setStyleSheet(_translate("TaxManagementWidget", "font-size: 24px;\n"
+"font-weight: 900;"))
         self.lbl_title.setText(_translate("TaxManagementWidget", "Cấu hình & Dự toán thuế HKD"))
-        self.lbl_year_text.setStyleSheet(_translate("TaxManagementWidget", "font-weight: bold; color: #64748b;"))
+        self.lbl_year_text.setStyleSheet(_translate("TaxManagementWidget", "font-weight: bold;\n"
+"color: #64748b;"))
         self.lbl_year_text.setText(_translate("TaxManagementWidget", "Chọn năm báo cáo:"))
         self.card1.setProperty("class", _translate("TaxManagementWidget", "kpi-card"))
         self.label.setText(_translate("TaxManagementWidget", "Doanh thu năm"))
@@ -279,6 +307,9 @@ class Ui_TaxManagementWidget(object):
         self.label5.setText(_translate("TaxManagementWidget", "Cấu hình thông số"))
         self.label5.setProperty("class", _translate("TaxManagementWidget", "section-title"))
         self.label6.setText(_translate("TaxManagementWidget", "Mức miễn thuế (VND/năm):"))
+        self.lbl_pit_method.setText(_translate("TaxManagementWidget", "Phương pháp thuế TNCN:"))
+        self.cbo_pit_method.setItemText(0, _translate("TaxManagementWidget", "Khoán % doanh thu"))
+        self.cbo_pit_method.setItemText(1, _translate("TaxManagementWidget", "Sổ sách kế toán"))
         self.label7.setText(_translate("TaxManagementWidget", "Thuế suất GTGT (%):"))
         self.label8.setText(_translate("TaxManagementWidget", "Thuế suất TNCN (%):"))
-        self.btn_apply_config.setText(_translate("TaxManagementWidget", "CẬP NHẬT & TÍNH TOÁN"))
+        self.btn_apply_config.setText(_translate("TaxManagementWidget", "CẬP NHẬT && TÍNH TOÁN"))
