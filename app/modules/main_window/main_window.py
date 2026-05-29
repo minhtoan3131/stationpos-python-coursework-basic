@@ -17,6 +17,7 @@ from app.modules.sale.services.impl.invoice_history_service_impl import InvoiceH
 from app.modules.sale.services.impl.sale_service_impl import SaleServiceImpl
 from app.modules.report.services.impl.report_service_impl import ReportServiceImpl
 from app.modules.setting.services.impl.setting_service_impl import SettingServiceImpl
+from app.modules.setting.services.impl.store_config_service_impl import StoreConfigServiceImpl
 from app.modules.setting.ui.controllers.lock_screen_dialog import LockScreenDialog
 from app.modules.setting.ui.controllers.setting_management_controller import SettingManagementController
 from app.modules.tax.services.impl.tax_service_impl import TaxService
@@ -47,6 +48,7 @@ class MainWindow(QMainWindow):
         self.po_history_service = PurchaseOrderHistoryServiceImpl(uow_factory=UnitOfWork)
 
         self.invoice_history_service = InvoiceHistoryServiceImpl(uow_factory=UnitOfWork)
+        self.store_config_service = StoreConfigServiceImpl(uow_factory=UnitOfWork)
 
         # Xử lý UI cho macOS và Hiệu ứng
         self.fix_macos_font_issue()
@@ -100,10 +102,11 @@ class MainWindow(QMainWindow):
         )
 
         self.page_sales = SalesManagementController(
-            inventory_service=self.inventory_service,  #
-            product_service=self.product_service,  #
-            sale_service=self.sale_service,  #
-            invoice_history_service=self.invoice_history_service
+            inventory_service=self.inventory_service,
+            product_service=self.product_service,
+            sale_service=self.sale_service,
+            invoice_history_service=self.invoice_history_service,
+            store_config_service=self.store_config_service
         )
 
         self.page_reports = ReportManagementController(
@@ -116,7 +119,9 @@ class MainWindow(QMainWindow):
         )
 
         self.page_settings = SettingManagementController(
-            setting_service=self.setting_service
+            store_config_service=self.store_config_service
+            # security_service=self.security_service,
+            # backup_service=self.backup_service
         )
         # Thêm các trang vào content_stack (Thứ tự khớp chính xác 100% với file .ui)
         self.ui.content_stack.addWidget(self.page_home)  # Index 0

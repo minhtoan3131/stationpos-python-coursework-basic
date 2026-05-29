@@ -169,7 +169,12 @@ CREATE TABLE IF NOT EXISTS system_settings (
 INSERT INTO system_settings (setting_key, setting_value, description)
 VALUES
 ('TAX_MID_SCALE_LIMIT', '3000000000', 'Mốc giới hạn doanh thu bắt buộc sổ sách kế toán'),
-('TAX_LARGE_SCALE_LIMIT', '50000000000', 'Mốc giới hạn doanh thu lớn nhất');
+('TAX_LARGE_SCALE_LIMIT', '50000000000', 'Mốc giới hạn doanh thu lớn nhất'),
+('STORE_NAME', 'Văn phòng phẩm', 'Tên cửa hàng hiển thị trên đầu hóa đơn'),
+('STORE_PHONE', '0901 234 567', 'Số điện thoại liên hệ của cửa hàng'),
+('STORE_ADDRESS', 'Hà Nội', 'Địa chỉ chi tiết của cửa hàng'),
+('PRINT_PAPER_SIZE', 'K80', 'Khổ giấy in hóa đơn mặc định (K80 hoặc K58)'),
+('RECEIPT_FOOTER', 'Cảm ơn quý khách, hẹn gặp lại!', 'Lời chúc hoặc thông điệp in cuối hóa đơn');
 
 
 

@@ -16,6 +16,8 @@ from app.modules.product.services.product_service import ProductService
 from app.modules.sale.services.sale_service import SaleService
 
 from app.modules.sale.dtos.sale_dto import CheckoutDTO, CartItemDTO
+from app.modules.setting.dtos.store_config_dto import StoreConfigDTO
+from app.modules.setting.services.StoreConfigService import StoreConfigService
 
 
 class SalesManagementController(QWidget):
@@ -23,7 +25,8 @@ class SalesManagementController(QWidget):
                  inventory_service: InventoryService,
                  product_service: ProductService,
                  sale_service: SaleService,
-                 invoice_history_service: InvoiceHistoryService):
+                 invoice_history_service: InvoiceHistoryService,
+                 store_config_service: StoreConfigService):
         super().__init__()
         self.ui = Ui_SalesManagementWidget()
         self.ui.setupUi(self)
@@ -32,6 +35,7 @@ class SalesManagementController(QWidget):
         self.product_service = product_service
         self.sale_service = sale_service
         self.invoice_history_service = invoice_history_service
+        self.store_config_service = store_config_service
 
         # Dictionary lưu trữ dữ liệu ngầm cho mỗi dòng trên bảng Danh sách sản phẩm
         self.raw_sales_data = {}
@@ -292,7 +296,7 @@ class SalesManagementController(QWidget):
                 product_id=p_id, sku=sku, name=self.ui.tbl_cart.item(r, 1).text(),
                 unit_id=u_id, unit_name=self.ui.tbl_cart.item(r, 2).text(),
                 quantity=qty, price=price, total=line_total,
-                cost_price=cost_price  # ĐÃ BỔ SUNG TRUYỀN VÀO DTO
+                cost_price=cost_price
             ))
 
         # Khởi tạo CheckoutDTO gửi sang Dialog
@@ -306,7 +310,14 @@ class SalesManagementController(QWidget):
             items=cart_items
         )
 
-        dialog = CheckoutDialogController(checkout_dto, self)
+
+        try:
+            store_config = self.store_config_service.get_store_config()
+        except Exception:
+            # Fallback (Dự phòng) tạo DTO rỗng chứa data mặc định nếu xảy ra sự cố DB để không chặn luồng bán hàng
+            store_config = StoreConfigDTO()
+
+        dialog = CheckoutDialogController(checkout_dto, store_config, self)
 
         # Nếu thu ngân bấm Xác nhận thanh toán trên Dialog
         if dialog.exec() == QDialog.DialogCode.Accepted and dialog.is_confirmed:

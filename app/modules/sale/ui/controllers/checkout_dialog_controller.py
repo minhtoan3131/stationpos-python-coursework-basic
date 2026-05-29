@@ -7,15 +7,17 @@ from app.modules.sale.ui.generated.ui_checkout_confirmation import Ui_CheckoutDi
 from app.modules.sale.dtos.sale_dto import CheckoutDTO
 from app.modules.sale.utils.sale_calculator import SaleCalculator
 from app.modules.sale.utils.invoice_code_generator import InvoiceCodeGenerator
+from app.modules.setting.dtos.store_config_dto import StoreConfigDTO
 
 
 class CheckoutDialogController(QDialog):
-    def __init__(self, checkout_dto: CheckoutDTO, parent=None):
+    def __init__(self, checkout_dto: CheckoutDTO, store_config: StoreConfigDTO = None, parent=None):
         super().__init__(parent)
         self.ui = Ui_CheckoutDialog()
         self.ui.setupUi(self)
 
         self.checkout_dto = checkout_dto
+        self.store_config = store_config if store_config else StoreConfigDTO()
 
         # Sinh mã hóa đơn ngay tại đây để hiển thị cho khách xem
         if not self.checkout_dto.code:
@@ -45,6 +47,9 @@ class CheckoutDialogController(QDialog):
         self.ui.lbl_invoice_id.setText(f"Số HĐ: {self.checkout_dto.code}")
         current_time = datetime.now().strftime("%d/%m/%Y %H:%M")
         self.ui.lbl_date.setText(f"Ngày lập: {current_time}")
+
+        store_text = f"Cửa hàng: {self.store_config.name}\nĐT: {self.store_config.phone} - ĐC: {self.store_config.address}"
+        self.ui.lbl_store_info.setText(store_text)
 
         # Điền thông tin tổng tiền
         self.ui.lbl_grand_total.setText(f"{self.checkout_dto.final_amount:,.0f} VND")

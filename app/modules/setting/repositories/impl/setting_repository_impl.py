@@ -9,12 +9,21 @@ class SettingRepositoryImpl(BaseRepository, SettingRepository):
         sql = "SELECT setting_key, setting_value FROM system_settings"
         self.cursor.execute(sql)
         rows = self.cursor.fetchall()
-
-        # Đóng gói thành Dictionary để Controller dễ sử dụng
-        # Ví dụ: settings['STORE_NAME']
         return {row['setting_key']: row['setting_value'] for row in rows}
 
     def update_setting(self, key: str, new_value: str) -> bool:
-        sql = "UPDATE system_settings SET setting_value = %s WHERE setting_key = %s"
-        self.cursor.execute(sql, (new_value, key))
+        sql = """
+            INSERT INTO system_settings (setting_key, setting_value) 
+            VALUES (%s, %s) 
+            ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)
+        """
+        self.cursor.execute(sql, (new_value if key == 'APP_PIN' else key,
+                                  key if key == 'APP_PIN' else new_value))
+
+        sql = """
+            INSERT INTO system_settings (setting_key, setting_value) 
+            VALUES (%s, %s) 
+            ON DUPLICATE KEY UPDATE setting_value = %s
+        """
+        self.cursor.execute(sql, (key, new_value, new_value))
         return self.cursor.rowcount > 0
