@@ -1,6 +1,6 @@
 from app.modules.setting.dtos.store_config_dto import StoreConfigDTO
 from app.modules.setting.constants.setting_key import SettingKey
-from app.modules.setting.services.StoreConfigService import StoreConfigService
+from app.modules.setting.services.store_config_service import StoreConfigService
 
 
 class StoreConfigServiceImpl(StoreConfigService):

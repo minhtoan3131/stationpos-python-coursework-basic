@@ -17,7 +17,7 @@ from app.modules.sale.services.sale_service import SaleService
 
 from app.modules.sale.dtos.sale_dto import CheckoutDTO, CartItemDTO
 from app.modules.setting.dtos.store_config_dto import StoreConfigDTO
-from app.modules.setting.services.StoreConfigService import StoreConfigService
+from app.modules.setting.services.store_config_service import StoreConfigService
 
 
 class SalesManagementController(QWidget):

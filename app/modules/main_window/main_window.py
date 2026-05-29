@@ -16,7 +16,8 @@ from app.modules.inventory.services.impl.inventory_service_impl import Inventory
 from app.modules.sale.services.impl.invoice_history_service_impl import InvoiceHistoryServiceImpl
 from app.modules.sale.services.impl.sale_service_impl import SaleServiceImpl
 from app.modules.report.services.impl.report_service_impl import ReportServiceImpl
-from app.modules.setting.services.impl.setting_service_impl import SettingServiceImpl
+
+from app.modules.setting.services.impl.security_service_impl import SecurityServiceImpl
 from app.modules.setting.services.impl.store_config_service_impl import StoreConfigServiceImpl
 from app.modules.setting.ui.controllers.lock_screen_dialog import LockScreenDialog
 from app.modules.setting.ui.controllers.setting_management_controller import SettingManagementController
@@ -44,7 +45,7 @@ class MainWindow(QMainWindow):
         self.sale_service = SaleServiceImpl(uow_factory=UnitOfWork)
         self.report_service = ReportServiceImpl(uow_factory=UnitOfWork)
         self.tax_service = TaxService(uow_factory=UnitOfWork)
-        self.setting_service = SettingServiceImpl(uow_factory=UnitOfWork)
+        self.security_service = SecurityServiceImpl(uow_factory=UnitOfWork)
         self.po_history_service = PurchaseOrderHistoryServiceImpl(uow_factory=UnitOfWork)
 
         self.invoice_history_service = InvoiceHistoryServiceImpl(uow_factory=UnitOfWork)
@@ -115,12 +116,12 @@ class MainWindow(QMainWindow):
 
         self.page_tax = TaxManagementController(
             tax_service=self.tax_service,
-            setting_service=self.setting_service
+            setting_service=self.security_service
         )
 
         self.page_settings = SettingManagementController(
-            store_config_service=self.store_config_service
-            # security_service=self.security_service,
+            store_config_service=self.store_config_service,
+            security_service=self.security_service
             # backup_service=self.backup_service
         )
         # Thêm các trang vào content_stack (Thứ tự khớp chính xác 100% với file .ui)
@@ -201,7 +202,7 @@ class MainWindow(QMainWindow):
     def handle_startup_lock(self):
         """Xử lý màn hình khóa khi vừa mở phần mềm"""
         # Không cần lệnh self.hide() ở đây vì cửa sổ chính vốn dĩ chưa hề hiện lên
-        dialog = LockScreenDialog(setting_service=self.setting_service)
+        dialog = LockScreenDialog(security_service=self.security_service)
 
         if dialog.exec() == QDialog.DialogCode.Accepted:
             self.showMaximized()  # Đăng nhập đúng mới thực sự vẽ cửa sổ chính ra

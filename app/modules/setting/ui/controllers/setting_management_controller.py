@@ -6,7 +6,7 @@ from app.modules.setting.ui.generated.ui_setting_widget import Ui_SettingWidget
 
 
 class SettingManagementController(QWidget):
-    def __init__(self, store_config_service, security_service=None, backup_service=None):
+    def __init__(self, store_config_service, security_service, backup_service=None):
         """
         Nhận độc lập từng Service xử lý nghiệp vụ riêng biệt.
         Các Service chưa viết (như bảo mật, backup) tạm thời để mặc định là None.
@@ -80,9 +80,29 @@ class SettingManagementController(QWidget):
         if self.store_config_service.save_store_config(config):
             QMessageBox.information(self, "Thành công", "Đã cập nhật thông tin cửa hàng và cấu hình in ấn thành công!")
 
-
     def handle_save_security(self):
-        QMessageBox.information(self, "Thành công", "Đã ghi nhận yêu cầu: Đổi mã PIN.")
+        """Xử lý thu thập thông tin và thực thi đổi mã PIN bảo mật"""
+        current_pin = self.ui.txt_pin_hientai.text().strip()
+        new_pin = self.ui.txt_pin_moi.text().strip()
+        confirm_pin = self.ui.txt_pin_xacnhan.text().strip()
+
+        try:
+            # Gọi tầng nghiệp vụ kiểm tra và xử lý ghi dữ liệu
+            if self.security_service.change_pin(current_pin, new_pin, confirm_pin):
+                QMessageBox.information(self, "Thành công", "Đã cập nhật mã PIN bảo mật hệ thống mới thành công!")
+
+                # Làm sạch form nhập liệu để đảm bảo an toàn sau khi đổi thành công
+                self.ui.txt_pin_hientai.clear()
+                self.ui.txt_pin_moi.clear()
+                self.ui.txt_pin_xacnhan.clear()
+
+        except ValueError as e:
+            # Hứng các lỗi Validation nghiệp vụ bắn lên (Mã PIN sai, không khớp, sai định dạng...)
+            QMessageBox.warning(self, "Lỗi bảo mật", str(e))
+            self.ui.txt_pin_hientai.setFocus()
+        except Exception as e:
+            # Hứng các sự cố kỹ thuật đột xuất (Mất kết nối Database, v.v.)
+            QMessageBox.critical(self, "Lỗi hệ thống", f"Không thể thay đổi mã bảo vệ: {str(e)}")
 
     def handle_save_backup_config(self):
         QMessageBox.information(self, "Thành công", "Đã ghi nhận yêu cầu: Lưu cấu hình sao lưu tự động.")

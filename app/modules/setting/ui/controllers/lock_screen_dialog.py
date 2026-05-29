@@ -6,11 +6,10 @@ from app.modules.setting.ui.generated.ui_lock_screen_dialog import Ui_LockScreen
 
 
 class LockScreenDialog(QDialog):
-    def __init__(self, setting_service, parent=None):
+    def __init__(self, security_service, parent=None):
         # Thiết lập cửa sổ độc lập, luôn nằm trên cùng và giữ thanh tiêu đề hệ thống
         super().__init__(None, Qt.WindowType.WindowStaysOnTopHint)
-        self.setting_service = setting_service
-
+        self.security_service = security_service
         self.ui = Ui_LockScreenDialog()
         self.ui.setupUi(self)
 
@@ -51,7 +50,6 @@ class LockScreenDialog(QDialog):
             super().keyPressEvent(event)
 
     def _apply_modern_msg_style(self, msg: QMessageBox):
-        """Trang trí lại giao diện phẳng hiện đại cho QMessageBox"""
         msg.setStyleSheet("""
             QMessageBox {
                 background-color: #ffffff;
@@ -87,7 +85,7 @@ class LockScreenDialog(QDialog):
         if len(entered_pin) == 0:
             return
 
-        if self.setting_service.verify_app_pin(entered_pin):
+        if self.security_service.verify_app_pin(entered_pin):
             self._is_authenticated = True
             self.accept()
         else:
