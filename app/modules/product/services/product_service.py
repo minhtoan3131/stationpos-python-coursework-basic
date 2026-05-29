@@ -55,3 +55,5 @@ class ProductService(ABC):
     def get_product_sale_list(self, keyword: str = None) -> list:
         """Lấy danh sách sản phẩm và tồn kho tối ưu cho màn hình POS"""
         pass
+    @abstractmethod
+    def update_product_prices(self, product_id: int, retail_price: float, wholesale_price: float) -> bool: pass

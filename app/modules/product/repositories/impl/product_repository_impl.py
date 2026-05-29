@@ -178,3 +178,12 @@ class ProductRepositoryImpl(BaseRepository, ProductRepository):
 
         self.cursor.execute(sql, params)
         return self.cursor.fetchall()
+
+    def update_selling_prices(self, product_id: int, retail_price: float, wholesale_price: float) -> bool:
+        query = """
+            UPDATE products 
+            SET retail_price = %s, wholesale_price = %s 
+            WHERE id = %s
+        """
+        self.cursor.execute(query, (retail_price, wholesale_price, product_id))
+        return self.cursor.rowcount > 0

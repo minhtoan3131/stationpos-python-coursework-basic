@@ -61,6 +61,8 @@ class Ui_ProductManagementWidget(object):
 "QPushButton#btn_update_product:hover { background-color: #e0a800; }\n"
 "QPushButton#btn_delete_product { background-color: #dc3545; }\n"
 "QPushButton#btn_delete_product:hover { background-color: #c82333; }\n"
+"QPushButton#btn_adjust_price { background-color: #28a745; }\n"
+"QPushButton#btn_adjust_price:hover { background-color: #218838; }\n"
 "QPushButton#btn_refresh_products {\n"
 "    background-color: transparent;\n"
 "    color: #6c757d;\n"
@@ -158,6 +160,9 @@ class Ui_ProductManagementWidget(object):
         self.horizontalLayout_bottom.addWidget(self.lbl_total_products)
         spacerItem1 = QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
         self.horizontalLayout_bottom.addItem(spacerItem1)
+        self.btn_adjust_price = QtWidgets.QPushButton(parent=self.frame_bottom_bar)
+        self.btn_adjust_price.setObjectName("btn_adjust_price")
+        self.horizontalLayout_bottom.addWidget(self.btn_adjust_price)
         self.btn_update_product = QtWidgets.QPushButton(parent=self.frame_bottom_bar)
         self.btn_update_product.setObjectName("btn_update_product")
         self.horizontalLayout_bottom.addWidget(self.btn_update_product)
@@ -197,5 +202,6 @@ class Ui_ProductManagementWidget(object):
         item = self.tbl_products.horizontalHeaderItem(8)
         item.setText(_translate("ProductManagementWidget", "Barcode"))
         self.lbl_total_products.setText(_translate("ProductManagementWidget", "Tổng cộng: 0 sản phẩm"))
+        self.btn_adjust_price.setText(_translate("ProductManagementWidget", "Cập nhật giá bán"))
         self.btn_update_product.setText(_translate("ProductManagementWidget", "Chỉnh sửa"))
         self.btn_delete_product.setText(_translate("ProductManagementWidget", "Xóa bỏ"))

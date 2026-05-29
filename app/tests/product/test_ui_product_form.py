@@ -26,7 +26,7 @@ def mock_product_detail():
         id=1, sku="SP001", name="Bút bi Thiên Long", barcode="893123456", description="Bút bi mực xanh",
         category_id=1, category_name="Bút viết", supplier_id=1, supplier_name="Thiên Long",
         base_unit_id=1, base_unit_name="Cây", cost_price=4000, retail_price=5000, wholesale_price=4500,
-        min_stock=10, conversion_unit_id=2, conversion_unit_name="Hộp", conversion_ratio=12, is_active=False,
+        min_stock=10, conversion_unit_id=2, conversion_unit_name="Hộp", conversion_ratio=12, is_active=True,
     )
 
 
@@ -166,8 +166,7 @@ def test_save_new_product_success(qtbot, create_form, mocker):
     form.ui.cbo_category.setCurrentIndex(0)
     form.ui.cbo_supplier.setCurrentIndex(1)
     form.ui.cbo_base_unit.setCurrentIndex(0)
-    form.ui.spn_cost_price.setValue(50000)
-    form.ui.spn_retail_price.setValue(80000)
+    # ĐÃ XÓA: Bỏ hoàn toàn 2 dòng set dữ liệu giá cho spn_cost_price và spn_retail_price
     form.ui.spn_min_stock.setValue(15)
 
     form.mock_prod_service.create_product.return_value = 999
@@ -179,9 +178,11 @@ def test_save_new_product_success(qtbot, create_form, mocker):
     form.mock_prod_service.create_product.assert_called_once()
     dto = form.mock_prod_service.create_product.call_args[0][0]
 
+    # Đảm bảo DTO gửi đi khớp cấu hình định danh thuần túy
     assert isinstance(dto, ProductCreateDTO)
     assert dto.sku == "SP-NEW-01"
-    assert dto.cost_price == 50000
+    assert dto.cost_price == 0.0       Khi tạo mới qua form định danh, giá vốn mặc định nạp bằng 0
+    assert dto.retail_price == 0.0     Giá bán lẻ mặc định nạp bằng 0
     assert dto.conversion_unit_id is None
 
     mock_info.assert_called_once()

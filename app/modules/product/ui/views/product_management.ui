@@ -62,6 +62,8 @@ QPushButton#btn_update_product { background-color: #ffc107; color: #212529; }
 QPushButton#btn_update_product:hover { background-color: #e0a800; }
 QPushButton#btn_delete_product { background-color: #dc3545; }
 QPushButton#btn_delete_product:hover { background-color: #c82333; }
+QPushButton#btn_adjust_price { background-color: #28a745; }
+QPushButton#btn_adjust_price:hover { background-color: #218838; }
 QPushButton#btn_refresh_products {
     background-color: transparent;
     color: #6c757d;
@@ -290,6 +292,13 @@ QHeaderView::section {
             </size>
            </property>
           </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btn_adjust_price">
+           <property name="text">
+            <string>Cập nhật giá bán</string>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="QPushButton" name="btn_update_product">

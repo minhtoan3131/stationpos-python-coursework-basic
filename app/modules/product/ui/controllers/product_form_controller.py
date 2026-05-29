@@ -32,6 +32,10 @@ class ProductFormController(QDialog):
 
         self.product_id = product_id
 
+        self.current_cost_price = 0.0
+        self.current_retail_price = 0.0
+        self.current_wholesale_price = 0.0
+
         self.format_number_inputs()
         self.load_comboboxes()
         self.disable_scroll_hijacking()  # FIX LỖI CUỘN CHUỘT
@@ -94,9 +98,6 @@ class ProductFormController(QDialog):
         self.ui.lbl_main_title.setText("CẬP NHẬT SẢN PHẨM")
         # Khóa SKU (Không cho phép đổi mã SP khi update)
         self.ui.txt_sku.setEnabled(False)
-        self.ui.spn_cost_price.setEnabled(False)
-        self.ui.spn_cost_price.setToolTip(
-            "Giá vốn được hệ thống tự động tính toán (MAC). Không thể sửa thủ công khi cập nhật.")
         self.load_product_detail()
 
     def load_product_detail(self):
@@ -117,9 +118,9 @@ class ProductFormController(QDialog):
             self.ui.cbo_supplier.setCurrentIndex(sup_idx)
 
             # Đổ dữ liệu Giá và Tồn
-            self.ui.spn_cost_price.setValue(float(product.cost_price))
-            self.ui.spn_retail_price.setValue(float(product.retail_price))
-            self.ui.spn_wholesale_price.setValue(float(product.wholesale_price) if product.wholesale_price else 0)
+            self.current_cost_price = float(product.cost_price)
+            self.current_retail_price = float(product.retail_price)
+            self.current_wholesale_price = float(product.wholesale_price) if product.wholesale_price else 0.0
             self.ui.spn_min_stock.setValue(product.min_stock)
 
             # Đổ dữ liệu Đơn vị quy đổi
@@ -168,9 +169,9 @@ class ProductFormController(QDialog):
                     category_id=category_id,
                     supplier_id=supplier_id,
                     base_unit_id=base_unit_id,
-                    cost_price=self.ui.spn_cost_price.value(),
-                    retail_price=self.ui.spn_retail_price.value(),
-                    wholesale_price=self.ui.spn_wholesale_price.value(),
+                    cost_price=0.0,
+                    retail_price=0.0,
+                    wholesale_price=0.0,
                     min_stock=self.ui.spn_min_stock.value(),
                     description=description if description else None,
                     conversion_unit_id=conversion_unit_id,
@@ -190,9 +191,9 @@ class ProductFormController(QDialog):
                     category_id=category_id,
                     supplier_id=supplier_id,
                     base_unit_id=base_unit_id,
-                    cost_price=self.ui.spn_cost_price.value(),
-                    retail_price=self.ui.spn_retail_price.value(),
-                    wholesale_price=self.ui.spn_wholesale_price.value(),
+                    cost_price=self.current_cost_price,
+                    retail_price=self.current_retail_price,
+                    wholesale_price=self.current_wholesale_price,
                     min_stock=self.ui.spn_min_stock.value(),
                     description=description if description else None,
                     conversion_unit_id=conversion_unit_id,
@@ -223,8 +224,7 @@ class ProductFormController(QDialog):
             event.ignore()  # Bỏ qua sự kiện cuộn, trả lại cho QScrollArea
 
         widgets = [
-            self.ui.spn_cost_price, self.ui.spn_retail_price,
-            self.ui.spn_wholesale_price, self.ui.spn_min_stock,
+            self.ui.spn_min_stock,
             self.ui.spn_conversion_ratio,
             self.ui.cbo_category, self.ui.cbo_supplier,
             self.ui.cbo_base_unit, self.ui.cbo_conversion_unit
@@ -239,9 +239,6 @@ class ProductFormController(QDialog):
     def format_number_inputs(self):
         """Xóa phần thập phân (.00) và tự động thêm dấu phẩy hàng nghìn"""
         spinboxes = [
-            self.ui.spn_cost_price,
-            self.ui.spn_retail_price,
-            self.ui.spn_wholesale_price,
             self.ui.spn_conversion_ratio
         ]
 

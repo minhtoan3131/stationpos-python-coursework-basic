@@ -13,16 +13,3 @@ class SaleCalculator:
     def calculate_change(cash_received: Decimal, final_amount: Decimal) -> Decimal:
         """Tính tiền thừa trả khách."""
         return cash_received - final_amount
-
-    @staticmethod
-    def calculate_conversion_details(wholesale_price, cost_price, base_stock: int, ratio) -> tuple:
-        """
-        Tính toán giá bán sỉ, giá vốn sỉ và tồn kho cho đơn vị quy đổi (Sỉ).
-        Trả về tuple: (Giá sỉ thực tế, Giá vốn sỉ thực tế, Tồn kho quy đổi)
-        """
-        safe_ratio = float(ratio) if ratio else 1.0
-        actual_price = float(wholesale_price or 0) * safe_ratio
-        actual_cost = float(cost_price or 0) * safe_ratio  # Tính giá vốn sỉ thực tế
-        converted_stock = int(base_stock // safe_ratio)
-
-        return actual_price, actual_cost, converted_stock

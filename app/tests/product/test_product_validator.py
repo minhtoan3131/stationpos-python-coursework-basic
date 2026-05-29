@@ -1,3 +1,4 @@
+# app/tests/product/test_product_validator.py
 import pytest
 from unittest.mock import MagicMock
 from dataclasses import dataclass
@@ -37,7 +38,7 @@ def validator(mock_product_repo, mock_inventory_repo):
 
 @pytest.fixture
 def valid_create_dto():
-    """Tạo một DTO Create chuẩn, hợp lệ mọi điều kiện"""
+    """Tạo một DTO Create chuẩn, hợp lệ mọi điều kiện (Đã loại bỏ các trường giá)"""
     return ProductCreateDTO(
         sku="SP_001",
         name="Bút bi Thiên Long",
@@ -45,9 +46,6 @@ def valid_create_dto():
         category_id=1,
         supplier_id=1,
         base_unit_id=1,
-        cost_price=3000,
-        retail_price=5000,
-        wholesale_price=4500,
         min_stock=10,
         description="Mô tả",
         conversion_unit_id=2,
@@ -57,7 +55,7 @@ def valid_create_dto():
 
 @pytest.fixture
 def valid_update_dto():
-    """Tạo một DTO Update chuẩn, hợp lệ mọi điều kiện"""
+    """Tạo một DTO Update chuẩn, hợp lệ mọi điều kiện (Đã loại bỏ các trường giá)"""
     return ProductUpdateDTO(
         product_id=1,
         sku="SP_001",
@@ -66,9 +64,6 @@ def valid_update_dto():
         category_id=1,
         supplier_id=1,
         base_unit_id=1,
-        cost_price=3000,
-        retail_price=5000,
-        wholesale_price=4500,
         min_stock=10,
         description="Mô tả",
         conversion_unit_id=2,
@@ -137,71 +132,35 @@ def test_validate_basic_info_no_barcode(validator, valid_create_dto):
 
 
 # ==========================================
-# TESTS: PRICES & CONVERSION
+# TESTS: UNITS & CONVERSION (ĐVT & Quy đổi)
 # ==========================================
-
-def test_validate_prices_out_of_range(validator, valid_create_dto):
-    # Test âm
-    valid_create_dto.cost_price = -1
-    with pytest.raises(ValidationException, match="Giá nhập"):
-        validator._validate_units_and_prices(valid_create_dto)
-
-    # Test vượt quá giới hạn
-    valid_create_dto.cost_price = 1000
-    valid_create_dto.retail_price = 1000000000
-    with pytest.raises(ValidationException, match="Giá bán lẻ"):
-        validator._validate_units_and_prices(valid_create_dto)
-
-    valid_create_dto.retail_price = 2000
-    valid_create_dto.wholesale_price = 1000000000
-    with pytest.raises(ValidationException, match="Giá bán sỉ"):
-        validator._validate_units_and_prices(valid_create_dto)
-
-
-def test_validate_prices_logic_errors(validator, valid_create_dto):
-    valid_create_dto.cost_price = 5000
-
-    # Bán lẻ lỗ
-    valid_create_dto.retail_price = 4000
-    with pytest.raises(ValidationException, match="không được thấp hơn giá nhập"):
-        validator._validate_units_and_prices(valid_create_dto)
-
-    valid_create_dto.retail_price = 6000
-
-    # Bán sỉ lỗ
-    valid_create_dto.wholesale_price = 4500
-    with pytest.raises(ValidationException, match="không được thấp hơn giá nhập"):
-        validator._validate_units_and_prices(valid_create_dto)
-
-    # Sỉ đắt hơn Lẻ
-    valid_create_dto.wholesale_price = 6500
-    with pytest.raises(ValidationException, match="không được cao hơn giá bán lẻ"):
-        validator._validate_units_and_prices(valid_create_dto)
-
 
 def test_validate_conversion_no_conversion(validator, valid_create_dto):
     valid_create_dto.conversion_unit_id = None
-    # Hàm chạy thành công, không làm gì cả
-    validator._validate_units_and_prices(valid_create_dto)
+     Hàm chạy thành công, không phát sinh ngoại lệ
+    validator._validate_units_and_conversions(valid_create_dto)
 
 
 def test_validate_conversion_same_unit(validator, valid_create_dto):
     valid_create_dto.base_unit_id = 1
     valid_create_dto.conversion_unit_id = 1
+     Điều hướng sang hàm kiểm soát đơn vị tính mới
     with pytest.raises(ValidationException, match="KHÔNG ĐƯỢC TRÙNG"):
-        validator._validate_units_and_prices(valid_create_dto)
+        validator._validate_units_and_conversions(valid_create_dto)
 
 
 def test_validate_conversion_missing_ratio(validator, valid_create_dto):
     valid_create_dto.conversion_ratio = None
+     Điều hướng sang hàm kiểm soát đơn vị tính mới
     with pytest.raises(ValidationException, match="phải lớn hơn 1"):
-        validator._validate_units_and_prices(valid_create_dto)
+        validator._validate_units_and_conversions(valid_create_dto)
 
 
 def test_validate_conversion_invalid_ratio(validator, valid_create_dto):
     valid_create_dto.conversion_ratio = 1
+     Điều hướng sang hàm kiểm soát đơn vị tính mới
     with pytest.raises(ValidationException, match="lớn hơn 1"):
-        validator._validate_units_and_prices(valid_create_dto)
+        validator._validate_units_and_conversions(valid_create_dto)
 
 
 # ==========================================
@@ -230,7 +189,6 @@ def test_validate_unique_sku(validator, mock_product_repo):
 
 def test_validate_unique_sku_for_update(validator, mock_product_repo):
     mock_product_repo.exists_by_sku_excluding_id.return_value = True
-    # Cập nhật chữ "sản phẩm khác" thành "mặt hàng khác" cho khớp code
     with pytest.raises(ValidationException, match="đã được sử dụng bởi một mặt hàng khác"):
         validator._validate_unique_sku_for_update("SP_001", 1)
 
@@ -243,7 +201,6 @@ def test_validate_unique_barcode(validator, mock_product_repo):
 
 def test_validate_unique_barcode_for_update(validator, mock_product_repo):
     mock_product_repo.exists_by_barcode_excluding_id.return_value = True
-    # Cập nhật chữ "sử dụng" thành "trùng với một mặt hàng khác" cho khớp code
     with pytest.raises(ValidationException, match="đã bị trùng với một mặt hàng khác"):
         validator._validate_unique_barcode_for_update("123", 1)
 
@@ -253,7 +210,6 @@ def test_validate_unique_barcode_for_update(validator, mock_product_repo):
 # ==========================================
 
 def test_validate_create_success(validator, valid_create_dto, mock_product_repo):
-    # Setup mock DB trả về False (Không trùng)
     mock_product_repo.exists_by_sku.return_value = False
     mock_product_repo.exists_by_barcode.return_value = False
 
@@ -275,7 +231,6 @@ def test_validate_create_success_no_barcode(validator, valid_create_dto, mock_pr
 # ==========================================
 
 def test_validate_update_success(validator, valid_update_dto, mock_product_repo):
-    # Tồn tại và đang active
     mock_product_repo.get_product_by_id.return_value = MockProduct(id=1, is_active=True)
     mock_product_repo.exists_by_sku_excluding_id.return_value = False
     mock_product_repo.exists_by_barcode_excluding_id.return_value = False
@@ -300,10 +255,7 @@ def test_validate_update_product_inactive(validator, valid_update_dto, mock_prod
 # ==========================================
 
 def test_validate_delete_success(validator, valid_delete_dto, mock_product_repo, mock_inventory_repo):
-    # ProductRepo check tồn tại
     mock_product_repo.get_product_by_id.return_value = MockProduct(id=1, is_active=True)
-
-    # InventoryRepo check tồn kho = 0 => Cho xóa
     mock_inventory_repo.get_inventory_quantity.return_value = 0
 
     validator.validate_delete(valid_delete_dto)
@@ -322,19 +274,14 @@ def test_validate_delete_already_inactive(validator, valid_delete_dto, mock_prod
 
 
 def test_validate_delete_inventory_not_empty(validator, valid_delete_dto, mock_product_repo, mock_inventory_repo):
-    # ProductRepo check tồn tại
     mock_product_repo.get_product_by_id.return_value = MockProduct(id=1, is_active=True)
-
-    # InventoryRepo báo đang còn tồn kho
     mock_inventory_repo.get_inventory_quantity.return_value = 50
 
     with pytest.raises(ValidationException, match="vẫn còn 50 đơn vị trong kho"):
         validator.validate_delete(valid_delete_dto)
 
 
-#Test case đảm bảo Validator báo lỗi nếu quên truyền InventoryRepo
 def test_validate_delete_missing_inventory_repo(valid_delete_dto, mock_product_repo):
-    # Cố tình tạo validator thiếu inventory_repo
     bad_validator = ProductValidator(product_repository=mock_product_repo, inventory_repository=None)
     mock_product_repo.get_product_by_id.return_value = MockProduct(id=1, is_active=True)
 

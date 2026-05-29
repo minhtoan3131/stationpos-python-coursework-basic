@@ -79,7 +79,7 @@ class ProductValidator:
     def _validate_pure_logic(self, dto) -> None:
         """Gộp các nhóm hàm kiểm tra logic để code gọn gàng"""
         self._validate_identity_and_classification(dto)
-        self._validate_units_and_prices(dto)
+        self._validate_units_and_conversions(dto)
         self._validate_inventory_and_misc(dto)
 
     def _validate_identity_and_classification(self, dto) -> None:
@@ -114,27 +114,13 @@ class ProductValidator:
         if not dto.category_id or dto.category_id <= 0:
             raise ValidationException("Vui lòng chọn một Danh mục hàng hóa hợp lệ.")
 
-    def _validate_units_and_prices(self, dto) -> None:
-        MAX_PRICE = 999999999
+    def _validate_units_and_conversions(self, dto) -> None:
 
         # 5. Đơn vị cơ bản (Bắt buộc)
         if not dto.base_unit_id or dto.base_unit_id <= 0:
             raise ValidationException("Vui lòng chọn Đơn vị tính cơ bản (Ví dụ: Cái, Cây).")
 
-        # 6. Giá nhập
-        if dto.cost_price is None or not (0 < dto.cost_price <= MAX_PRICE):
-            raise ValidationException("Giá nhập (Giá vốn) phải nằm trong khoảng từ lớn hơn 0 đến 999,999,999 VND.")
-
-        # 7. Giá bán lẻ & Ràng buộc lợi nhuận
-        if dto.retail_price is None or not (0 < dto.retail_price <= MAX_PRICE):
-            raise ValidationException("Giá bán lẻ phải nằm trong khoảng từ lớn hơn 0 đến 999,999,999 VND.")
-
-        if dto.retail_price < dto.cost_price:
-            raise ValidationException(
-                f"Giá bán lẻ ({dto.retail_price:,.0f}đ) không được thấp hơn giá nhập ({dto.cost_price:,.0f}đ).")
-
-        # 8 & 9. Ràng buộc Đơn vị quy đổi (Sỉ)
-        # Nếu trên giao diện có chọn 1 đơn vị Sỉ (id > 0)
+        # 6. Ràng buộc Đơn vị quy đổi (Sỉ)
         if dto.conversion_unit_id is not None and dto.conversion_unit_id > 0:
 
             if dto.base_unit_id == dto.conversion_unit_id:
@@ -143,25 +129,12 @@ class ProductValidator:
             if dto.conversion_ratio is None or dto.conversion_ratio <= 1:
                 raise ValidationException("Tỷ lệ quy đổi phải lớn hơn 1 (Ví dụ: 1 Hộp = 12 Cái).")
 
-            # 10. Giá bán sỉ (Chỉ check khi có Đơn vị sỉ)
-            wholesale = dto.wholesale_price if dto.wholesale_price is not None else 0
-            if not (0 < wholesale <= MAX_PRICE):
-                raise ValidationException("Giá bán sỉ phải nằm trong khoảng từ lớn hơn 0 đến 999,999,999 VND.")
-
-            if wholesale > 0:
-                if wholesale < dto.cost_price:
-                    raise ValidationException(
-                        f"Giá bán sỉ ({wholesale:,.0f}đ) không được thấp hơn giá nhập ({dto.cost_price:,.0f}đ).")
-                if wholesale > dto.retail_price:
-                    raise ValidationException(
-                        f"Giá bán sỉ ({wholesale:,.0f}đ) không được cao hơn giá bán lẻ ({dto.retail_price:,.0f}đ).")
-
     def _validate_inventory_and_misc(self, dto) -> None:
-        # 12. Tồn kho tối thiểu
+        # 7. Tồn kho tối thiểu
         if dto.min_stock is None or not (0 <= dto.min_stock <= 999999):
             raise ValidationException("Ngưỡng cảnh báo tồn kho tối thiểu phải nằm trong khoảng từ 0 đến 999,999.")
 
-        # 13. Mô tả
+        # 8. Mô tả
         if dto.description and len(dto.description) > 1000:
             raise ValidationException("Mô tả sản phẩm quá dài (Tối đa 1000 ký tự).")
 

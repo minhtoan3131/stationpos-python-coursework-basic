@@ -83,7 +83,7 @@ QPushButton#btn_add_category:hover, QPushButton#btn_add_supplier:hover, QPushBut
         <x>0</x>
         <y>0</y>
         <width>765</width>
-        <height>834</height>
+        <height>746</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_scroll">
@@ -264,20 +264,6 @@ QPushButton#btn_add_category:hover, QPushButton#btn_add_supplier:hover, QPushBut
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
-           <widget class="QLabel" name="lbl_cost_price">
-            <property name="text">
-             <string>Giá vốn / nhập (VND) *</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2">
-           <widget class="QLabel" name="lbl_retail_price">
-            <property name="text">
-             <string>Giá bán lẻ (VND) *</string>
-            </property>
-           </widget>
-          </item>
           <item row="1" column="0">
            <layout class="QHBoxLayout" name="horizontalLayout_base_unit">
             <property name="spacing">
@@ -311,42 +297,21 @@ QPushButton#btn_add_category:hover, QPushButton#btn_add_supplier:hover, QPushBut
             </item>
            </layout>
           </item>
-          <item row="1" column="1">
-           <widget class="QDoubleSpinBox" name="spn_cost_price">
-            <property name="maximum">
-             <double>999999999.000000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <widget class="QDoubleSpinBox" name="spn_retail_price">
-            <property name="maximum">
-             <double>999999999.000000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="lbl_conversion_unit">
-            <property name="text">
-             <string>Đơn vị sỉ (VD: Hộp)</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
+          <item row="0" column="2">
            <widget class="QLabel" name="lbl_conversion_ratio">
             <property name="text">
              <string>Tỷ lệ (1 Sỉ = ... Cơ bản)</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="2">
-           <widget class="QLabel" name="lbl_wholesale_price">
+          <item row="0" column="1">
+           <widget class="QLabel" name="lbl_conversion_unit">
             <property name="text">
-             <string>Giá bán sỉ (VND)</string>
+             <string>Đơn vị sỉ (VD: Hộp)</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
+          <item row="1" column="1">
            <layout class="QHBoxLayout" name="horizontalLayout_conv_unit">
             <property name="spacing">
              <number>5</number>
@@ -379,17 +344,10 @@ QPushButton#btn_add_category:hover, QPushButton#btn_add_supplier:hover, QPushBut
             </item>
            </layout>
           </item>
-          <item row="3" column="1">
+          <item row="1" column="2">
            <widget class="QDoubleSpinBox" name="spn_conversion_ratio">
             <property name="maximum">
              <double>99999.000000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="2">
-           <widget class="QDoubleSpinBox" name="spn_wholesale_price">
-            <property name="maximum">
-             <double>999999999.000000000000000</double>
             </property>
            </widget>
           </item>

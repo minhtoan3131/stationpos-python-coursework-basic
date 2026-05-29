@@ -5,6 +5,7 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt
 
+from app.modules.product.ui.controllers.quick_price_controller import QuickPriceDialogController
 from app.modules.product.ui.generated.ui_product_management import Ui_ProductManagementWidget
 from app.modules.product.dtos.product_filter_dto import ProductFilterDTO
 from app.modules.product.dtos.product_delete_dto import ProductDeleteDTO
@@ -55,6 +56,7 @@ class ProductManagementController(QWidget):
         self.ui.txt_search_keyword.returnPressed.connect(self.search_products)
         # Click đúp vào dòng nào thì tự động mở Form Sửa (Xem chi tiết) dòng đó
         self.ui.tbl_products.cellDoubleClicked.connect(self.open_update_dialog)
+        self.ui.btn_adjust_price.clicked.connect(self.open_price_dialog)
 
     def load_products(self):
         try:
@@ -198,3 +200,44 @@ class ProductManagementController(QWidget):
 
         if result:
             self.load_products()
+
+    def open_price_dialog(self):
+        """Trích xuất dữ liệu dòng được chọn và điều hướng mở Popup thay giá"""
+        selected_row = self.ui.tbl_products.currentRow()
+
+        if selected_row < 0:  #
+            QMessageBox.information(self, "Hướng dẫn",
+                                    "Vui lòng chọn một dòng sản phẩm trên bảng để điều chỉnh giá.")  #
+            return
+
+        # Lấy ID sản phẩm từ dòng đang chọn
+        product_id = int(self.ui.tbl_products.item(selected_row, 0).text())  #
+
+        try:
+            # Gọi Service lấy chi tiết thực tế để lấy giá vốn MAC chính xác tuyệt đối
+            product_detail = self.product_service.get_product_by_id(product_id)
+
+            # Trích xuất thông tin ĐVT hiển thị từ bảng cho đồng bộ
+            base_unit = self.ui.tbl_products.item(selected_row, 4).text()  #
+            conv_display = self.ui.tbl_products.item(selected_row, 6).text()  #
+
+            # Mở Dialog và nạp toàn bộ tham số mồi sang
+            product_ratio = float(product_detail.conversion_ratio) if product_detail.conversion_ratio else 1.0
+            dialog = QuickPriceDialogController(
+                product_id=product_id,
+                sku=product_detail.sku,
+                name=product_detail.name,
+                base_unit=base_unit,
+                conv_display=conv_display,
+                ratio=product_ratio,
+                mac_price=float(product_detail.cost_price),
+                retail_price=float(product_detail.retail_price),
+                wholesale_price=float(product_detail.wholesale_price) if product_detail.wholesale_price else 0.0,
+                product_service=self.product_service
+            )
+
+            if dialog.exec():
+                self.load_products()
+
+        except Exception as e:
+            QMessageBox.critical(self, "Lỗi", f"Không thể tải thông tin sản phẩm:\n{str(e)}")

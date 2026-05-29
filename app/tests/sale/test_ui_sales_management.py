@@ -215,3 +215,31 @@ def test_should_show_error_and_preserve_cart_when_checkout_fails_at_backend(qtbo
 
     # Tuyệt đối không được xóa giỏ hàng của thu ngân
     assert sales_window.ui.tbl_cart.rowCount() == 1
+
+
+# ==============================================================================
+# BỔ SUNG: KIỂM THỬ GÁC CỔNG QUY ƯỚC GIÁ BÁN SỈ PHẲNG (CẢ HỘP) KHÔNG NHÂN RATIO
+# ==============================================================================
+def test_should_display_flat_wholesale_price_and_add_box_to_cart_correctly(qtbot, sales_window):
+    """
+    Kiểm chứng quy ước mới:
+    1. Ô đơn giá sỉ của Hộp trên bảng hiển thị đúng con số phẳng từ DB (45,000) thay vì bị nhân lên.
+    2. Khi chọn dòng sỉ (Row 1) đưa vào giỏ, tổng hóa đơn phải tính theo đơn giá cả hộp phẳng.
+    """
+    table = sales_window.ui.tbl_products_sales
+    cart_table = sales_window.ui.tbl_cart
+
+    # 1. Kiểm tra hiển thị trên Grid danh sách sản phẩm (Cột 3 là cột Giá)
+    # Giá mồi dưới DB là 45,000. Code mới phải bê nguyên lên bảng.
+    assert table.item(1, 3).text() == "45,000"
+
+    # 2. Giả lập hành vi Thu ngân chọn dòng số 1 (Dòng Hộp sỉ) và bấm Thêm vào giỏ
+    table.setCurrentCell(1, 0)
+    qtbot.mouseClick(sales_window.ui.btn_add_to_cart, Qt.MouseButton.LeftButton)
+
+    # Khẳng định: Giỏ hàng xuất hiện 1 dòng mua Hộp sỉ
+    assert cart_table.rowCount() == 1
+    assert cart_table.item(0, 2).text() == "Hộp"
+
+    # Khẳng định hệ quả tài chính: Tổng tiền hóa đơn phải ăn theo giá phẳng cả hộp = 45,000 VND
+    assert sales_window.ui.lbl_total_bill.text() == "45,000 VND"

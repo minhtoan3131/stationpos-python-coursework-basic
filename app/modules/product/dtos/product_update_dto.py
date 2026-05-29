@@ -17,10 +17,6 @@ class ProductUpdateDTO:
 
     base_unit_id: int
 
-    retail_price: float
-    wholesale_price: float
-    cost_price: float
-
     min_stock: int
 
     description: Optional[str]
@@ -29,3 +25,7 @@ class ProductUpdateDTO:
     conversion_ratio: Optional[float]
 
     is_active: bool
+
+    cost_price: float = 0.0
+    retail_price: float = 0.0
+    wholesale_price: float = 0.0

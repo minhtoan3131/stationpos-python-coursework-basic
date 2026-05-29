@@ -63,3 +63,8 @@ class ProductRepository(ABC):
 
     @abstractmethod
     def get_product_sale_list(self, keyword: str = None) -> List[dict]: pass
+
+    @abstractmethod
+    def update_selling_prices(self, product_id: int, retail_price: float, wholesale_price: float) -> bool:
+        """Cập nhật giá bán lẻ và giá sỉ của sản phẩm dưới database."""
+        pass

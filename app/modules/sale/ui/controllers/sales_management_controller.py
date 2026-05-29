@@ -110,7 +110,7 @@ class SalesManagementController(QWidget):
         for p in data_list:
             # Lấy số lượng tồn kho cơ bản
             stock_qty = p.get('stock_qty') or 0
-            base_cost = p.get('cost_price') or 0  # Lấy giá vốn cơ bản
+            base_cost = p.get('cost_price') or 0
 
             # DÒNG ĐƠN VỊ CƠ BẢN (Ví dụ: Cái)
             # --> CHỈ HIỂN THỊ NẾU TỒN KHO > 0
@@ -134,16 +134,15 @@ class SalesManagementController(QWidget):
                 self.ui.tbl_products_sales.setItem(row_index, 4, QTableWidgetItem(str(stock_qty)))
                 row_index += 1
 
-            # 2. DÒNG ĐƠN VỊ QUY ĐỔI (Ví dụ: Hộp, Thùng)
+            #  DÒNG ĐƠN VỊ QUY ĐỔI (Ví dụ: Hộp, Thùng)
             if p.get('conversion_unit_id') and p['conversion_unit_id'] != p['base_unit_id']:
 
-                # Gọi Util để tính giá sỉ thực tế và số lượng quy đổi (Số hộp)
-                actual_wholesale_price, actual_cost, conv_stock = SaleCalculator.calculate_conversion_details(
-                    wholesale_price=p['wholesale_price'],
-                    cost_price=base_cost,
-                    base_stock=stock_qty,
-                    ratio=p.get('ratio')
-                )
+                # Quy ước mới: wholesale_price dưới DB đã là giá trọn vẹn của cả hộp sỉ, lấy luôn không nhân hệ số
+                ratio = float(p.get('ratio') or 1.0)
+                actual_wholesale_price = float(p['wholesale_price']) if p['wholesale_price'] else 0.0
+
+                # Số lượng hộp sỉ tồn kho thực tế = Tổng lượng tồn lẻ // Tỷ lệ quy đổi
+                conv_stock = int(stock_qty // ratio)
 
                 # --> CHỈ HIỂN THỊ NẾU CÒN ĐỦ HÀNG ĐỂ TẠO THÀNH ĐƠN VỊ SỈ (conv_stock > 0)
                 if conv_stock > 0:
@@ -153,7 +152,9 @@ class SalesManagementController(QWidget):
                         'product_id': p['id'], 'sku': p['sku'], 'name': p['name'],
                         'unit_id': p['conversion_unit_id'], 'unit_name': p['conversion_unit_name'],
                         'price': actual_wholesale_price,
-                        'cost_price': actual_cost,  # Lưu giá vốn sỉ đã nhân ratio
+
+                        # Giữ nguyên gốc đơn giá vốn MAC (Không nhân ratio ở UI nữa) theo đúng Luồng 2
+                        'cost_price': base_cost,
                     }
 
                     self.ui.tbl_products_sales.setItem(row_index, 0, QTableWidgetItem(p['sku']))

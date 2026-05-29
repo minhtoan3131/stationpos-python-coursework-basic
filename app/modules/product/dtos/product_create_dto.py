@@ -15,13 +15,14 @@ class ProductCreateDTO:
 
     base_unit_id: int
 
-    retail_price: float
-    wholesale_price: float
-    cost_price: float
-
     min_stock: int
 
     description: Optional[str]
 
     conversion_unit_id: Optional[int]
     conversion_ratio: Optional[float]
+
+    # GIÁ TRỊ MẶC ĐỊNH
+    cost_price: float = 0.0
+    retail_price: float = 0.0
+    wholesale_price: float = 0.0
