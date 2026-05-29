@@ -16,6 +16,7 @@ from app.modules.inventory.services.impl.inventory_service_impl import Inventory
 from app.modules.sale.services.impl.invoice_history_service_impl import InvoiceHistoryServiceImpl
 from app.modules.sale.services.impl.sale_service_impl import SaleServiceImpl
 from app.modules.report.services.impl.report_service_impl import ReportServiceImpl
+from app.modules.setting.services.impl.backup_service_impl import BackupServiceImpl
 
 from app.modules.setting.services.impl.security_service_impl import SecurityServiceImpl
 from app.modules.setting.services.impl.store_config_service_impl import StoreConfigServiceImpl
@@ -50,6 +51,12 @@ class MainWindow(QMainWindow):
 
         self.invoice_history_service = InvoiceHistoryServiceImpl(uow_factory=UnitOfWork)
         self.store_config_service = StoreConfigServiceImpl(uow_factory=UnitOfWork)
+        self.backup_service = BackupServiceImpl(uow_factory=UnitOfWork)
+
+        # Quản lý trạng thái ngăn chặn lặp lệnh trong cùng một phút
+        self.last_backup_date = ""
+        # KHỞI CHẠY TIMER CHẠY NGẦM KIỂM TRA LỊCH AUTO BACKUP
+        self.setup_auto_backup_worker()
 
         # Xử lý UI cho macOS và Hiệu ứng
         self.fix_macos_font_issue()
@@ -121,8 +128,8 @@ class MainWindow(QMainWindow):
 
         self.page_settings = SettingManagementController(
             store_config_service=self.store_config_service,
-            security_service=self.security_service
-            # backup_service=self.backup_service
+            security_service=self.security_service,
+            backup_service=self.backup_service
         )
         # Thêm các trang vào content_stack (Thứ tự khớp chính xác 100% với file .ui)
         self.ui.content_stack.addWidget(self.page_home)  # Index 0
@@ -213,3 +220,31 @@ class MainWindow(QMainWindow):
         """Xử lý khi người dùng bấm nút 'Khóa màn hình' ở thanh Menu bên trái"""
         self.hide()  # Lúc này app đang mở, nên phải ẩn đi
         self.handle_startup_lock()  # Tái sử dụng lại logic xác thực ở trên
+
+    def setup_auto_backup_worker(self):
+        """Khởi động bộ định thời quét lịch chạy sao lưu ngầm"""
+        self.backup_timer = QTimer(self)
+        self.backup_timer.timeout.connect(self.check_auto_backup_schedule)
+        self.backup_timer.start(60000)  # Tần suất quét định kỳ: 60 giây / lần
+
+    def check_auto_backup_schedule(self):
+        """Kiểm tra thời gian hệ thống thực tế phối hợp kích hoạt sao lưu lên mây"""
+        now = datetime.now()
+        current_time_str = now.strftime("%H:%M")
+        current_date_str = now.strftime("%Y-%m-%d")
+
+        # Đọc cấu hình realtime từ Database lên kiểm tra công khai
+        config = self.backup_service.get_backup_config()
+
+        if not config.auto_enabled:
+            return
+
+        # Khớp cấu hình khung giờ đóng cửa VÀ kiểm tra xem ngày hôm nay đã chạy lệnh chưa
+        if current_time_str == config.backup_time and self.last_backup_date != current_date_str:
+            self.last_backup_date = current_date_str  # Đánh dấu khóa sổ lịch ngày hôm nay lập tức
+            try:
+                # Thực thi xuất file ném vào folder đồng bộ của Google Drive / OneDrive
+                saved_file = self.backup_service.execute_backup()
+                print(f"[Auto Backup] Xuất dữ liệu tự động thành công: {saved_file}")
+            except Exception as e:
+                print(f"[Auto Backup Lỗi] Không thể sao lưu tự động: {str(e)}")

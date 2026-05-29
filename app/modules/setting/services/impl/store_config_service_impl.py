@@ -22,6 +22,8 @@ class StoreConfigServiceImpl(StoreConfigService):
             )
 
     def save_store_config(self, config: StoreConfigDTO) -> bool:
+        if not config.name or not config.name.strip():
+            raise ValueError("Tên cửa hàng không được để trống!")
         with self.uow_factory() as uow:
             # Ép chặt Key thông qua Enum khi gọi tầng Repo cập nhật dữ liệu dưới DB
             uow.setting_repo.update_setting(SettingKey.STORE_NAME.value, config.name)
