@@ -1,4 +1,5 @@
 import platform
+from unittest.mock import MagicMock
 
 import pytest
 import os
@@ -31,6 +32,7 @@ class FakeUnitOfWork:
     def __init__(self, shared_db: dict):
         self.shared_db = shared_db
         self.snapshot = None
+        self.activity_log_repo = MagicMock()
 
     def __enter__(self):
         self.snapshot = copy.deepcopy(self.shared_db)

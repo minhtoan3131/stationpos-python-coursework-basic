@@ -3,20 +3,21 @@ import traceback
 from PyQt6.QtWidgets import QWidget, QListWidgetItem
 from PyQt6.QtCore import Qt, pyqtSignal
 
-from app.modules.dashboard.ui.generated.ui_home_wellcome import Ui_HomeWelcomeWidget
+from app.modules.dashboard.ui.generated.ui_dashboard import Ui_DashboardWidget
 
 
 class HomeWelcomeController(QWidget):
     navigation_requested = pyqtSignal(int, str)
 
-    def __init__(self, report_service, inventory_service, tax_service):
+    def __init__(self, report_service, inventory_service, tax_service, activity_log_service):
         super().__init__()
-        self.ui = Ui_HomeWelcomeWidget()
+        self.ui = Ui_DashboardWidget()
         self.ui.setupUi(self)
 
         self.report_service = report_service
         self.inventory_service = inventory_service
         self.tax_service = tax_service
+        self.activity_log_service = activity_log_service
 
         self.setup_ui_custom()
         self.bind_events()
@@ -35,34 +36,28 @@ class HomeWelcomeController(QWidget):
             current_year = datetime.datetime.now().year
 
             # =========================================================================
-            # REPORT SERVICE: Badge đơn hàng & Nhật ký hoạt động
+            # REPORT SERVICE: Chỉ lấy KPI Badge đơn hàng
             # =========================================================================
             report_data = self.report_service.get_dashboard_report(current_date_str, current_date_str)
-
-             Thay thế 'total_orders' thành 'total_orders_completed' để khớp với 8 chỉ số mới
             total_orders = report_data.kpis.total_orders_completed if report_data and report_data.kpis else 0
             self.ui.val_badge_orders.setText(f'{total_orders:,} hóa đơn')
 
-            activities = self.report_service.get_daily_activity_feed(current_date_str)
+            # =========================================================================
+            # DÁNH RIÊNG CHO SỔ EVENT: Đọc dữ liệu Timeline từ dịch vụ kiểm toán mới
+            # =========================================================================
             self.ui.list_live_feed.clear()
+            activities_feed = self.activity_log_service.get_daily_activity_feed(current_date_str)
 
-            if activities:
-                for act in activities:
-                    time_part = act['created_at'].split(' ')[1] if ' ' in act['created_at'] else ''
-                    time_display = f'[{time_part}] ' if time_part else ''
-
-                    if act['type'] == 'SALE':
-                        feed_text = f'{time_display}🛒 Hóa đơn #{act["code"]} hoàn tất: {act["amount"]:,.0f} VND ({act["detail"]})'
-                    else:
-                        feed_text = f'{time_display}📦 Phiếu nhập #{act["code"]} từ NCC {act["detail"]}: {act["amount"]:,.0f} VND'
-
+            if activities_feed:
+                for feed_text in activities_feed:
+                    # Tầng Service/Formatter đã chuẩn hóa chuỗi text hoàn chỉnh kèm biểu tượng thích hợp
                     self.ui.list_live_feed.addItem(QListWidgetItem(feed_text))
             else:
                 self.ui.list_live_feed.addItem(
-                    QListWidgetItem('Chưa có hoạt động giao dịch hoặc nhập kho nào phát sinh hôm nay.'))
+                    QListWidgetItem('Hôm nay hệ thống chưa ghi nhận biến động sự kiện nào.'))
 
             # =========================================================================
-            # INVENTORY SERVICE: Cảnh báo kho
+            # INVENTORY SERVICE: Cảnh báo kho (Giữ nguyên gốc hệ thống cũ)
             # =========================================================================
             inventory_list = self.inventory_service.get_inventory_list()
             low_stock_count = 0
@@ -79,20 +74,17 @@ class HomeWelcomeController(QWidget):
             self.ui.val_badge_stock.setText(f'{low_stock_count} sản phẩm')
 
             # =========================================================================
-            # TAX SERVICE: Cảnh báo thuế
+            # TAX SERVICE: Cảnh báo thuế (Giữ nguyên gốc hệ thống cũ)
             # =========================================================================
             tax_status = self.tax_service.get_tax_warning_status(current_year)
-
             self.ui.val_badge_tax.setText(f"{tax_status['percent']:.1f}%")
 
-            # Chỉ cần kiểm tra cờ Boolean
             if tax_status['is_near_threshold']:
                 tax_alert_text = f"⚠️ Cảnh báo Thuế: Doanh thu tích lũy năm ({tax_status['revenue']:,.0f} VND) dự đoán đã tiệm cận hoặc vượt mức miễn thuế ({tax_status['threshold']:,.0f} VND)!"
                 tax_item = QListWidgetItem(tax_alert_text)
                 tax_item.setData(Qt.ItemDataRole.UserRole, {'target_tab': 5, 'search_key': ''})
                 self.ui.list_actionable_alerts.insertItem(0, tax_item)
 
-            # Tổng kết an toàn
             if self.ui.list_actionable_alerts.count() == 0:
                 self.ui.list_actionable_alerts.addItem(
                     QListWidgetItem('✅ Hệ thống vận hành an toàn: Hiện kho đầy đủ định mức và dòng tiền ổn định.'))

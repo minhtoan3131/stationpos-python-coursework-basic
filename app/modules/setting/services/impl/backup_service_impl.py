@@ -38,6 +38,11 @@ class BackupServiceImpl(BackupService):
             uow.setting_repo.update_setting(SettingKey.BACKUP_AUTO_ENABLED.value, enabled_str)
             uow.setting_repo.update_setting(SettingKey.BACKUP_TIME.value, config.backup_time)
             uow.setting_repo.update_setting(SettingKey.BACKUP_FOLDER_PATH.value, config.folder_path)
+
+            status_text = "Bật" if config.auto_enabled else "Tắt"
+            log_desc = f"Tự động: {status_text} | Giờ quét: {config.backup_time}"
+            uow.activity_log_repo.add_log(action_type='SYSTEM', reference_code='BACKUP', description=log_desc)
+
             return True
 
     def execute_backup(self) -> str:
@@ -63,6 +68,10 @@ class BackupServiceImpl(BackupService):
         if result.returncode != 0:
             raise RuntimeError(f"Lỗi thực thi mysqldump: {result.stderr}")
 
+        with self.uow_factory() as uow:
+            log_desc = f"Sao lưu dữ liệu thành công | Tệp: {file_name}"
+            uow.activity_log_repo.add_log(action_type='SYSTEM', reference_code='BACKUP', description=log_desc)
+
         return dest_file_path
 
     def execute_restore(self, file_path: str) -> bool:
@@ -80,5 +89,10 @@ class BackupServiceImpl(BackupService):
 
         if result.returncode != 0:
             raise RuntimeError(f"Lỗi thực thi khôi phục cơ sở dữ liệu: {result.stderr}")
+
+        with self.uow_factory() as uow:
+            base_name = os.path.basename(file_path)
+            log_desc = f"Phục hồi dữ liệu thành công | Tệp: {base_name}"
+            uow.activity_log_repo.add_log(action_type='SYSTEM', reference_code='RESTORE', description=log_desc)
 
         return True

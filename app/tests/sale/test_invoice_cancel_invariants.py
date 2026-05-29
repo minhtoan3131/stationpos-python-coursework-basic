@@ -1,8 +1,11 @@
+from unittest.mock import MagicMock
+
 import pytest
 import copy
 from decimal import Decimal
 from datetime import datetime
 from app.modules.sale.services.impl.invoice_history_service_impl import InvoiceHistoryServiceImpl
+from app.tests.dashboard.test_activity_log_service import FakeActivityLogRepository
 
 
 # ==========================================
@@ -58,6 +61,7 @@ class FakeUnitOfWork:
         self.inventory_repo = FakeInventoryRepo()
         self.sale_repo = FakeSaleRepo()
         self.invoice_history_repo = FakeInvoiceHistoryRepository()
+        self.activity_log_repo = MagicMock()
         self._snapshot = None
 
     def __enter__(self):

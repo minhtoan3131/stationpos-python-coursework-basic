@@ -31,4 +31,11 @@ class StoreConfigServiceImpl(StoreConfigService):
             uow.setting_repo.update_setting(SettingKey.STORE_ADDRESS.value, config.address)
             uow.setting_repo.update_setting(SettingKey.PRINT_PAPER_SIZE.value, config.paper_size)
             uow.setting_repo.update_setting(SettingKey.RECEIPT_FOOTER.value, config.footer)
+
+            log_desc = f"Tên: {config.name} | SĐT: {config.phone} | Khổ in: {config.paper_size}"
+            uow.activity_log_repo.add_log(
+                action_type='SYSTEM',
+                reference_code='STORE_INFO',
+                description=log_desc
+            )
             return True

@@ -105,10 +105,20 @@ class InvoiceHistoryServiceImpl(InvoiceHistoryService):
                     'ref_id': invoice_id
                 })
 
-            # Cập nhật trạng thái Master hóa đơn sang CANCELLED và lưu nhật ký logs hành động
+            # Cập nhật trạng thái Master hóa đơn sang CANCELLED và lưu sổ kho
             uow.invoice_history_repo.update_invoice_status(invoice_code, 'CANCELLED', reason)
             uow.sale_repo.add_invoice_log(invoice_id, 'CANCEL', f"Hủy hóa đơn tại Nhật ký. Lý do: {reason}")
 
+            # Luu log hệ thống
+            total_qty = sum(item['quantity'] for item in invoice_items)
+            invoice_amount = float(metadata.get('final_amount', metadata.get('total_amount', 0)))
+            log_description = f"SL: {total_qty:,} | Tổng: {invoice_amount:,.0f} VND"
+
+            uow.activity_log_repo.add_log(
+                action_type='CANCEL_SALE',
+                reference_code=invoice_code,
+                description=log_description
+            )
         return True
 
     def process_reprint_invoice(self, invoice_code: str) -> bool:

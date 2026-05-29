@@ -4,7 +4,8 @@ from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QFont, QColor
 
 from app.core.database.unit_of_work import UnitOfWork
-from app.modules.dashboard.ui.controllers.home_welcome_controller import HomeWelcomeController
+from app.modules.dashboard.services.impl.activity_log_service_impl import ActivityLogServiceImpl
+from app.modules.dashboard.ui.controllers.dashboard_controller import HomeWelcomeController
 from app.modules.inventory.services.impl.po_history_service_impl import PurchaseOrderHistoryServiceImpl
 from app.modules.main_window.ui_main_window import Ui_MainWindow
 
@@ -52,6 +53,7 @@ class MainWindow(QMainWindow):
         self.invoice_history_service = InvoiceHistoryServiceImpl(uow_factory=UnitOfWork)
         self.store_config_service = StoreConfigServiceImpl(uow_factory=UnitOfWork)
         self.backup_service = BackupServiceImpl(uow_factory=UnitOfWork)
+        self.activity_log_service = ActivityLogServiceImpl(uow_factory=UnitOfWork)
 
         # Quản lý trạng thái ngăn chặn lặp lệnh trong cùng một phút
         self.last_backup_date = ""
@@ -87,11 +89,11 @@ class MainWindow(QMainWindow):
         self.ui.sidebar_menu.setFont(mac_font)
 
     def init_pages(self):
-        # Khởi tạo trang Home điều phối hành động mới
         self.page_home = HomeWelcomeController(
             report_service=self.report_service,
             inventory_service=self.inventory_service,
-            tax_service=self.tax_service
+            tax_service=self.tax_service,
+            activity_log_service=self.activity_log_service  # <--- Bơm vào đây
         )
         # Kết nối sự kiện liên kết sâu (Deep-linking Macro) bắn ra từ trang chủ
         self.page_home.navigation_requested.connect(self.handle_home_deep_linking)

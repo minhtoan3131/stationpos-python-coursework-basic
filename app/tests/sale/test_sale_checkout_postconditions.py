@@ -1,4 +1,5 @@
 import copy
+from unittest.mock import MagicMock
 
 import pytest
 from decimal import Decimal
@@ -89,6 +90,8 @@ class FakeUnitOfWork:
         self.product_repo = FakeProductRepo()
         self.inventory_repo = FakeInventoryRepo()
         self.sale_repo = FakeSaleRepo()
+        self.activity_log_repo = MagicMock()
+
 
     def __enter__(self): return self
     def __exit__(self, exc_type, exc_val, exc_tb): pass

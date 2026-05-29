@@ -37,4 +37,10 @@ class SecurityServiceImpl(SecurityService):
 
             # Tầng 5: Ghi nhận mã PIN mới xuống cơ sở dữ liệu
             uow.setting_repo.update_setting(SettingKey.APP_PIN.value, new_pin)
+
+            uow.activity_log_repo.add_log(
+                action_type='SYSTEM',
+                reference_code='SECURITY',
+                description="Thay đổi mã PIN bảo mật hệ thống thành công"
+            )
             return True

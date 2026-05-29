@@ -1,5 +1,6 @@
 # app/core/database/unit_of_work.py
 from app.core.database.connection import DatabaseConnection
+from app.modules.dashboard.repositories.impl.activity_log_repository_impl import ActivityLogRepositoryImpl
 from app.modules.inventory.repositories.impl.inventory_repository_impl import InventoryRepositoryImpl
 from app.modules.inventory.repositories.impl.po_history_repository_impl import PurchaseOrderHistoryRepositoryImpl
 from app.modules.product.repositories.impl.product_repository_impl import ProductRepositoryImpl
@@ -38,6 +39,7 @@ class UnitOfWork:
         self.setting_repo = SettingRepositoryImpl(self.connection)
         self.po_history_repo = PurchaseOrderHistoryRepositoryImpl(self.connection)
         self.invoice_history_repo = InvoiceHistoryRepositoryImpl(self.connection)
+        self.activity_log_repo = ActivityLogRepositoryImpl(self.connection)
 
         return self
 

@@ -1,3 +1,5 @@
+from unittest.mock import MagicMock
+
 import pytest
 import copy
 from decimal import Decimal
@@ -36,7 +38,7 @@ class FakeInventoryRepo:
 class FakePOHistoryRepo:
     def __init__(self):
         self.po_master_table = {1: {'id': 1, 'code': 'PO-001', 'status': 'COMPLETED', 'cancel_reason': None,
-                                    'created_at': '2023-10-01 10:00:00'}}
+                                    'created_at': '2023-10-01 10:00:00', 'total_amount': Decimal('250000.0000')}}
         self.po_items_table = {
             1: [{'product_id': 100, 'sku': 'SP01', 'quantity': 50, 'unit_id': 1, 'total_price': Decimal('250000.0000')}]
         }
@@ -51,12 +53,12 @@ class FakePOHistoryRepo:
 
     def has_subsequent_delivery_transactions(self, product_id, po_created_at): return False
 
-
 class FakeUnitOfWork:
     def __init__(self):
         self.product_repo = FakeProductRepo()
         self.inventory_repo = FakeInventoryRepo()
         self.po_history_repo = FakePOHistoryRepo()
+        self.activity_log_repo = MagicMock()
         self._snapshot = None
 
     def __enter__(self):

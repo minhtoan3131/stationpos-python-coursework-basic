@@ -98,6 +98,16 @@ class SaleServiceImpl(SaleService):
             uow.sale_repo.add_invoice_log(invoice_id, 'CREATE',
                                           'Tạo mới hóa đơn bán hàng tại POS - Đã chốt COGS an toàn bằng danh sách ID.')
 
+            total_qty = sum(item.quantity for item in checkout_data.items)
+            final_amount = float(checkout_data.final_amount) if checkout_data.final_amount else 0.0
+            log_description = f"SL: {total_qty:,} | Tổng: {final_amount:,.0f} VND"
+
+            uow.activity_log_repo.add_log(
+                action_type='SALE',
+                reference_code=checkout_data.code,
+                description=log_description
+            )
+
             return checkout_data.code
 
     # ==========================================

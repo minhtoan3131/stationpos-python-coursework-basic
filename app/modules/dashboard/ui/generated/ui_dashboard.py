@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'app/modules/dashboard/ui/views/home_welcome.ui'
+# Form implementation generated from reading ui file 'app/modules/dashboard/ui/views/dashboard.ui'
 #
 # Created by: PyQt6 UI code generator 6.11.0
 #
@@ -9,11 +9,11 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 
-class Ui_HomeWelcomeWidget(object):
-    def setupUi(self, HomeWelcomeWidget):
-        HomeWelcomeWidget.setObjectName("HomeWelcomeWidget")
-        HomeWelcomeWidget.resize(1400, 800)
-        HomeWelcomeWidget.setStyleSheet("\n"
+class Ui_DashboardWidget(object):
+    def setupUi(self, DashboardWidget):
+        DashboardWidget.setObjectName("DashboardWidget")
+        DashboardWidget.resize(1400, 800)
+        DashboardWidget.setStyleSheet("\n"
 "    /* Thiết kế Enterprise hiện đại và đồng bộ toàn hệ thống */\n"
 "    QWidget#HomeWelcomeWidget {\n"
 "        background-color: #f8fafc;\n"
@@ -99,18 +99,18 @@ class Ui_HomeWelcomeWidget(object):
 "        background-color: #f1f5f9;\n"
 "    }\n"
 "   ")
-        self.main_layout = QtWidgets.QVBoxLayout(HomeWelcomeWidget)
+        self.main_layout = QtWidgets.QVBoxLayout(DashboardWidget)
         self.main_layout.setContentsMargins(30, 25, 30, 30)
         self.main_layout.setSpacing(20)
         self.main_layout.setObjectName("main_layout")
         self.layout_header = QtWidgets.QVBoxLayout()
         self.layout_header.setSpacing(4)
         self.layout_header.setObjectName("layout_header")
-        self.lbl_welcome_title = QtWidgets.QLabel(parent=HomeWelcomeWidget)
+        self.lbl_welcome_title = QtWidgets.QLabel(parent=DashboardWidget)
         self.lbl_welcome_title.setStyleSheet("font-size: 26px; font-weight: 800; color: #0f172a;")
         self.lbl_welcome_title.setObjectName("lbl_welcome_title")
         self.layout_header.addWidget(self.lbl_welcome_title)
-        self.lbl_welcome_sub = QtWidgets.QLabel(parent=HomeWelcomeWidget)
+        self.lbl_welcome_sub = QtWidgets.QLabel(parent=DashboardWidget)
         self.lbl_welcome_sub.setStyleSheet("font-size: 14px; color: #64748b;")
         self.lbl_welcome_sub.setObjectName("lbl_welcome_sub")
         self.layout_header.addWidget(self.lbl_welcome_sub)
@@ -118,7 +118,7 @@ class Ui_HomeWelcomeWidget(object):
         self.layout_live_badges = QtWidgets.QHBoxLayout()
         self.layout_live_badges.setSpacing(20)
         self.layout_live_badges.setObjectName("layout_live_badges")
-        self.badge_stock = QtWidgets.QFrame(parent=HomeWelcomeWidget)
+        self.badge_stock = QtWidgets.QFrame(parent=DashboardWidget)
         self.badge_stock.setObjectName("badge_stock")
         self.vbox_badge1 = QtWidgets.QVBoxLayout(self.badge_stock)
         self.vbox_badge1.setObjectName("vbox_badge1")
@@ -129,7 +129,7 @@ class Ui_HomeWelcomeWidget(object):
         self.val_badge_stock.setObjectName("val_badge_stock")
         self.vbox_badge1.addWidget(self.val_badge_stock)
         self.layout_live_badges.addWidget(self.badge_stock)
-        self.badge_tax = QtWidgets.QFrame(parent=HomeWelcomeWidget)
+        self.badge_tax = QtWidgets.QFrame(parent=DashboardWidget)
         self.badge_tax.setObjectName("badge_tax")
         self.vbox_badge2 = QtWidgets.QVBoxLayout(self.badge_tax)
         self.vbox_badge2.setObjectName("vbox_badge2")
@@ -140,7 +140,7 @@ class Ui_HomeWelcomeWidget(object):
         self.val_badge_tax.setObjectName("val_badge_tax")
         self.vbox_badge2.addWidget(self.val_badge_tax)
         self.layout_live_badges.addWidget(self.badge_tax)
-        self.badge_orders = QtWidgets.QFrame(parent=HomeWelcomeWidget)
+        self.badge_orders = QtWidgets.QFrame(parent=DashboardWidget)
         self.badge_orders.setObjectName("badge_orders")
         self.vbox_badge3 = QtWidgets.QVBoxLayout(self.badge_orders)
         self.vbox_badge3.setObjectName("vbox_badge3")
@@ -155,7 +155,7 @@ class Ui_HomeWelcomeWidget(object):
         self.layout_body = QtWidgets.QHBoxLayout()
         self.layout_body.setSpacing(20)
         self.layout_body.setObjectName("layout_body")
-        self.frame_left_panel = QtWidgets.QFrame(parent=HomeWelcomeWidget)
+        self.frame_left_panel = QtWidgets.QFrame(parent=DashboardWidget)
         self.frame_left_panel.setObjectName("frame_left_panel")
         self.vbox_left = QtWidgets.QVBoxLayout(self.frame_left_panel)
         self.vbox_left.setContentsMargins(20, 20, 20, 20)
@@ -169,7 +169,7 @@ class Ui_HomeWelcomeWidget(object):
         self.list_actionable_alerts.setObjectName("list_actionable_alerts")
         self.vbox_left.addWidget(self.list_actionable_alerts)
         self.layout_body.addWidget(self.frame_left_panel)
-        self.frame_right_panel = QtWidgets.QFrame(parent=HomeWelcomeWidget)
+        self.frame_right_panel = QtWidgets.QFrame(parent=DashboardWidget)
         self.frame_right_panel.setObjectName("frame_right_panel")
         self.vbox_right = QtWidgets.QVBoxLayout(self.frame_right_panel)
         self.vbox_right.setContentsMargins(20, 20, 20, 20)
@@ -187,32 +187,32 @@ class Ui_HomeWelcomeWidget(object):
         self.layout_body.setStretch(1, 4)
         self.main_layout.addLayout(self.layout_body)
 
-        self.retranslateUi(HomeWelcomeWidget)
-        QtCore.QMetaObject.connectSlotsByName(HomeWelcomeWidget)
+        self.retranslateUi(DashboardWidget)
+        QtCore.QMetaObject.connectSlotsByName(DashboardWidget)
 
-    def retranslateUi(self, HomeWelcomeWidget):
+    def retranslateUi(self, DashboardWidget):
         _translate = QtCore.QCoreApplication.translate
-        HomeWelcomeWidget.setWindowTitle(_translate("HomeWelcomeWidget", "Trung tâm Điều phối Hành động"))
-        self.lbl_welcome_title.setText(_translate("HomeWelcomeWidget", "Bảng Điều Phối Trung Tâm"))
-        self.lbl_welcome_sub.setText(_translate("HomeWelcomeWidget", "Giám sát vận hành thời gian thực & Liên kết xử lý nhanh sự cố"))
-        self.badge_stock.setProperty("class", _translate("HomeWelcomeWidget", "live-badge"))
-        self.lbl_badge_stock_title.setText(_translate("HomeWelcomeWidget", "Hàng cần nhập (Dưới định mức)"))
-        self.lbl_badge_stock_title.setProperty("class", _translate("HomeWelcomeWidget", "badge-title"))
-        self.val_badge_stock.setText(_translate("HomeWelcomeWidget", "0 sản phẩm"))
-        self.val_badge_stock.setProperty("class", _translate("HomeWelcomeWidget", "badge-value"))
-        self.badge_tax.setProperty("class", _translate("HomeWelcomeWidget", "live-badge"))
-        self.lbl_badge_tax_title.setText(_translate("HomeWelcomeWidget", "Tiến độ ngưỡng doanh thu miễn thuế"))
-        self.lbl_badge_tax_title.setProperty("class", _translate("HomeWelcomeWidget", "badge-title"))
-        self.val_badge_tax.setText(_translate("HomeWelcomeWidget", "0.0%"))
-        self.val_badge_tax.setProperty("class", _translate("HomeWelcomeWidget", "badge-value"))
-        self.badge_orders.setProperty("class", _translate("HomeWelcomeWidget", "live-badge"))
-        self.lbl_badge_orders_title.setText(_translate("HomeWelcomeWidget", "Đơn hàng hoàn tất hôm nay"))
-        self.lbl_badge_orders_title.setProperty("class", _translate("HomeWelcomeWidget", "badge-title"))
-        self.val_badge_orders.setText(_translate("HomeWelcomeWidget", "0 hóa đơn"))
-        self.val_badge_orders.setProperty("class", _translate("HomeWelcomeWidget", "badge-value"))
-        self.frame_left_panel.setProperty("class", _translate("HomeWelcomeWidget", "panel-container"))
-        self.lbl_title_alerts.setText(_translate("HomeWelcomeWidget", "⚠️ Nhiệm vụ vận hành cần xử lý (Click để đi đến vị trí)"))
-        self.lbl_title_alerts.setProperty("class", _translate("HomeWelcomeWidget", "block-title"))
-        self.frame_right_panel.setProperty("class", _translate("HomeWelcomeWidget", "panel-container"))
-        self.lbl_title_feed.setText(_translate("HomeWelcomeWidget", "⚡ Nhật ký hoạt động vừa diễn ra"))
-        self.lbl_title_feed.setProperty("class", _translate("HomeWelcomeWidget", "block-title"))
+        DashboardWidget.setWindowTitle(_translate("DashboardWidget", "Trung tâm Điều phối Hành động"))
+        self.lbl_welcome_title.setText(_translate("DashboardWidget", "Bảng Điều Phối Trung Tâm"))
+        self.lbl_welcome_sub.setText(_translate("DashboardWidget", "Giám sát vận hành thời gian thực & Liên kết xử lý nhanh sự cố"))
+        self.badge_stock.setProperty("class", _translate("DashboardWidget", "live-badge"))
+        self.lbl_badge_stock_title.setText(_translate("DashboardWidget", "Hàng cần nhập (Dưới định mức)"))
+        self.lbl_badge_stock_title.setProperty("class", _translate("DashboardWidget", "badge-title"))
+        self.val_badge_stock.setText(_translate("DashboardWidget", "0 sản phẩm"))
+        self.val_badge_stock.setProperty("class", _translate("DashboardWidget", "badge-value"))
+        self.badge_tax.setProperty("class", _translate("DashboardWidget", "live-badge"))
+        self.lbl_badge_tax_title.setText(_translate("DashboardWidget", "Tiến độ ngưỡng doanh thu miễn thuế"))
+        self.lbl_badge_tax_title.setProperty("class", _translate("DashboardWidget", "badge-title"))
+        self.val_badge_tax.setText(_translate("DashboardWidget", "0.0%"))
+        self.val_badge_tax.setProperty("class", _translate("DashboardWidget", "badge-value"))
+        self.badge_orders.setProperty("class", _translate("DashboardWidget", "live-badge"))
+        self.lbl_badge_orders_title.setText(_translate("DashboardWidget", "Đơn hàng hoàn tất hôm nay"))
+        self.lbl_badge_orders_title.setProperty("class", _translate("DashboardWidget", "badge-title"))
+        self.val_badge_orders.setText(_translate("DashboardWidget", "0 hóa đơn"))
+        self.val_badge_orders.setProperty("class", _translate("DashboardWidget", "badge-value"))
+        self.frame_left_panel.setProperty("class", _translate("DashboardWidget", "panel-container"))
+        self.lbl_title_alerts.setText(_translate("DashboardWidget", "⚠️ Nhiệm vụ vận hành cần xử lý (Click để đi đến vị trí)"))
+        self.lbl_title_alerts.setProperty("class", _translate("DashboardWidget", "block-title"))
+        self.frame_right_panel.setProperty("class", _translate("DashboardWidget", "panel-container"))
+        self.lbl_title_feed.setText(_translate("DashboardWidget", "⚡ Nhật ký hoạt động vừa diễn ra"))
+        self.lbl_title_feed.setProperty("class", _translate("DashboardWidget", "block-title"))

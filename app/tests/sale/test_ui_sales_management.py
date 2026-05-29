@@ -14,6 +14,13 @@ def sales_window(qtbot, mocker):
     mock_product_service = mocker.Mock()
     mock_sale_service = mocker.Mock()
     mock_invoice_history_service = mocker.Mock()
+    mock_store_config_service = mocker.Mock()
+
+    # Giả lập giá trị trả về mặc định phòng trường hợp UI gọi lấy khổ in hoặc tên cửa hàng lúc khởi tạo
+    mock_config_dto = mocker.Mock()
+    mock_config_dto.paper_size = "K80"
+    mock_config_dto.name = "Văn phòng phẩm Test"
+    mock_store_config_service.get_store_config.return_value = mock_config_dto
 
     # Mồi sẵn dữ liệu: 1 sản phẩm còn tồn kho, 1 sản phẩm hết tồn kho
     mock_product_service.get_product_sale_list.return_value = [
@@ -33,20 +40,20 @@ def sales_window(qtbot, mocker):
             'conversion_unit_id': 12, 'conversion_unit_name': 'Quyển',
             'wholesale_price': None, 'ratio': None
         }
-    ]
+    ]  #
 
     window = SalesManagementController(
         inventory_service=mock_inventory_service,
         product_service=mock_product_service,
         sale_service=mock_sale_service,
-        invoice_history_service=mock_invoice_history_service
+        invoice_history_service=mock_invoice_history_service,
+        store_config_service=mock_store_config_service
     )
     qtbot.addWidget(window)
 
     window.mock_product_service = mock_product_service
     window.mock_sale_service = mock_sale_service
     return window
-
 
 def seed_cart_data(window, qtbot):
     """Hàm phụ trợ: Giả lập thao tác thu ngân click đưa sản phẩm vào giỏ hàng"""

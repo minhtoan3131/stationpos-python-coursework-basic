@@ -314,7 +314,7 @@ class Ui_SettingWidget(object):
 "    color: #334155;\n"
 "}\n"
 "\n"
-"/* Các tiêu đề được đồng bộ hóa từ home_welcome.ui */\n"
+"/* Các tiêu đề được đồng bộ hóa từ dashboard.ui */\n"
 "QLabel#label_title {\n"
 "    font-size: 26px;\n"
 "    font-weight: 800;\n"

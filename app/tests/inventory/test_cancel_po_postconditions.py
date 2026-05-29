@@ -1,3 +1,5 @@
+from unittest.mock import MagicMock
+
 import pytest
 from decimal import Decimal
 from app.modules.inventory.services.impl.po_history_service_impl import PurchaseOrderHistoryServiceImpl
@@ -26,7 +28,16 @@ class FakeInventoryRepo:
 
 class FakePOHistoryRepo:
     def __init__(self):
-        self.po_master_table = {1: {'id': 1, 'code': 'PO-123', 'status': 'COMPLETED', 'cancel_reason': None, 'created_at': '2023-10-01 12:00:00'}}
+        self.po_master_table = {
+            1: {
+                'id': 1,
+                'code': 'PO-123',
+                'status': 'COMPLETED',
+                'cancel_reason': None,
+                'created_at': '2023-10-01 12:00:00',
+                'total_amount': Decimal('120000.0000')
+            }
+        }
         # Phiếu nhập 20 cây x giá 6k = 120k tổng tiền nhập
         self.po_items_table = {
             1: [{'product_id': 100, 'sku': 'SP01', 'quantity': 20, 'unit_id': 1, 'total_price': Decimal('120000.0000')}]
@@ -45,6 +56,7 @@ class FakeUnitOfWork:
         self.product_repo = FakeProductRepo()
         self.inventory_repo = FakeInventoryRepo()
         self.po_history_repo = FakePOHistoryRepo()
+        self.activity_log_repo = MagicMock()
 
     def __enter__(self): return self
     def __exit__(self, exc_type, exc_val, exc_tb): pass

@@ -1,3 +1,5 @@
+from unittest.mock import MagicMock
+
 import pytest
 from decimal import Decimal
 from datetime import datetime
@@ -115,6 +117,7 @@ class FakeUnitOfWork:
         self.inventory_repo = FakeInventoryRepo()
         self.sale_repo = FakeSaleRepo()
         self.invoice_history_repo = FakeInvoiceHistoryRepository()
+        self.activity_log_repo = MagicMock()
 
     def __enter__(self):
         return self

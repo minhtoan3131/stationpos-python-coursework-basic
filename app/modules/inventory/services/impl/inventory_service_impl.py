@@ -71,6 +71,7 @@ class InventoryServiceImpl(InventoryService):
 
             # Tính toán tổng giá trị hóa đơn (Line Total) để lưu Master Header
             total_amount = 0
+            total_qty = 0
             calculated_items = []
 
             for item in dto.items:
@@ -82,6 +83,7 @@ class InventoryServiceImpl(InventoryService):
                 base_qty = item.quantity * int(ratio)
                 import_total_val = Decimal(str(item.quantity)) * Decimal(str(item.unit_price))
                 total_amount += float(import_total_val)
+                total_qty += item.quantity
 
                 calculated_items.append((item, base_qty, import_total_val))
 
@@ -144,6 +146,7 @@ class InventoryServiceImpl(InventoryService):
                         'ref_id': po_id
                     })
 
+
                 except ValueError as ve:
                     # Bắt lỗi từ chốt chặn kho âm của MACCalculator để đẩy lên UI cảnh báo
                     error_key = str(ve)
@@ -153,6 +156,13 @@ class InventoryServiceImpl(InventoryService):
                             f"Phát hiện trạng thái kho âm bất hợp lệ (Mô hình bán khống chưa được kích hoạt)."
                         )
                     raise ve
+            log_description = f"SL: {total_qty:,} | Tổng: {total_amount:,.0f} VND"
+
+            db.activity_log_repo.add_log(
+                action_type='IMPORT',
+                reference_code=po_code,
+                description=log_description
+            )
 
             return po_id
     # ==========================================

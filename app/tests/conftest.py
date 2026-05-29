@@ -51,6 +51,7 @@ def clean_db(db_test_connection):
     # Cấu hình chung hệ thống
     cursor.execute("TRUNCATE TABLE system_settings;")
     cursor.execute("TRUNCATE TABLE settings;")
+    cursor.execute("TRUNCATE TABLE activity_logs;")
 
     # 3. Bật lại kiểm tra khóa ngoại
     cursor.execute("SET FOREIGN_KEY_CHECKS = 1")

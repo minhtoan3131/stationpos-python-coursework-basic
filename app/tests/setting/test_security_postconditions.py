@@ -1,3 +1,5 @@
+from unittest.mock import MagicMock
+
 import pytest
 import copy
 from app.modules.setting.services.impl.security_service_impl import SecurityServiceImpl
@@ -27,6 +29,8 @@ class FakeUnitOfWork:
         self.shared_db = shared_db
         self._snapshot = None
         self.setting_repo = None
+        self.activity_log_repo = MagicMock()
+
 
     def __enter__(self):
         self._snapshot = copy.deepcopy(self.shared_db)

@@ -105,12 +105,15 @@ class PurchaseOrderHistoryServiceImpl(PurchaseOrderHistoryService):
                         f"Sản phẩm [{item['sku']}] không đủ lượng tồn. (Tồn hiện tại: {current_qty}, Cần trừ: {base_qty_to_deduct})"
                     )
 
-            # Bước 2 & 3 & 4: Thực thi biến động dữ liệu khi các chốt chặn đã an toàn vượt qua
+            # Thực thi biến động dữ liệu khi các chốt chặn đã an toàn vượt qua
+            total_qty = 0
             for item in po_items:
                 product_id = item['product_id']
                 imported_qty = item['quantity']
                 imported_unit_id = item['unit_id']
                 imported_total_price = Decimal(str(item['total_price']))
+
+                total_qty += imported_qty
 
                 product_data = db.product_repo.get_product_detail_for_import(product_id)
                 base_qty_to_deduct = imported_qty
@@ -171,3 +174,12 @@ class PurchaseOrderHistoryServiceImpl(PurchaseOrderHistoryService):
 
             # Bước 2: Cập nhật Master Header của Phiếu nhập sang trạng thái hủy và ghi lý do
             db.po_history_repo.update_purchase_order_status(po_id, 'CANCELLED', cancel_reason)
+
+            total_amount = float(po_master['total_amount'])
+            log_description = f"SL: {total_qty:,} | Tổng: {total_amount:,.0f} VND"
+
+            db.activity_log_repo.add_log(
+                action_type='CANCEL_IMPORT',
+                reference_code=po_master['code'],
+                description=log_description
+            )

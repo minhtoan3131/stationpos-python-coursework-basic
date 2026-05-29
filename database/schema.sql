@@ -176,7 +176,13 @@ VALUES
 ('PRINT_PAPER_SIZE', 'K80', 'Khổ giấy in hóa đơn mặc định (K80 hoặc K58)'),
 ('RECEIPT_FOOTER', 'Cảm ơn quý khách, hẹn gặp lại!', 'Lời chúc hoặc thông điệp in cuối hóa đơn');
 
-
+CREATE TABLE IF NOT EXISTS activity_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    action_type VARCHAR(50) NOT NULL,       -- 'SALE', 'CANCEL_SALE', 'IMPORT', 'CANCEL_IMPORT', 'ADJUST', etc.
+    reference_code VARCHAR(50) NULL,       -- Mã hóa đơn, mã phiếu nhập,... liên quan
+    description TEXT NOT NULL,             -- Nội dung text chi tiết mô tả hành động
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
 
 -- 1. Bảng Master: Lưu tổng quan năm quyết toán thuế
 CREATE TABLE tax_ledger (

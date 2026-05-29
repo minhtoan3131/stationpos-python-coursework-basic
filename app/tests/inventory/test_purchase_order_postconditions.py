@@ -1,3 +1,5 @@
+from unittest.mock import MagicMock
+
 import pytest
 from decimal import Decimal
 from app.modules.inventory.dtos.inventory_dto import PurchaseOrderCreateDTO, PurchaseOrderItemDTO
@@ -74,6 +76,7 @@ class FakeUnitOfWork:
         self.supplier_repo = FakeSupplierRepo()
         self.product_repo = FakeProductRepo()
         self.inventory_repo = FakeInventoryRepo()
+        self.activity_log_repo = MagicMock()
 
     def __enter__(self):
         return self
