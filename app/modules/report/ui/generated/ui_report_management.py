@@ -415,6 +415,20 @@ class Ui_ReportManagementWidget(object):
         self.label4 = QtWidgets.QLabel(parent=self.frame_inventory)
         self.label4.setObjectName("label4")
         self.vboxlayout11.addWidget(self.label4)
+        self.horizontalLayout_inventory_footer = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_inventory_footer.setContentsMargins(15, 10, 15, 15)
+        self.horizontalLayout_inventory_footer.setObjectName("horizontalLayout_inventory_footer")
+        self.lbl_total_inventory_value = QtWidgets.QLabel(parent=self.frame_inventory)
+        self.lbl_total_inventory_value.setStyleSheet("\n"
+"                font-size: 15px;\n"
+"                font-weight: 700;\n"
+"                color: #0f172a;\n"
+"               ")
+        self.lbl_total_inventory_value.setObjectName("lbl_total_inventory_value")
+        self.horizontalLayout_inventory_footer.addWidget(self.lbl_total_inventory_value)
+        spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
+        self.horizontalLayout_inventory_footer.addItem(spacerItem2)
+        self.vboxlayout11.addLayout(self.horizontalLayout_inventory_footer)
         self.tbl_inventory_report = QtWidgets.QTableWidget(parent=self.frame_inventory)
         self.tbl_inventory_report.setMinimumSize(QtCore.QSize(0, 300))
         self.tbl_inventory_report.setObjectName("tbl_inventory_report")
@@ -526,6 +540,7 @@ class Ui_ReportManagementWidget(object):
         item.setText(_translate("ReportManagementWidget", "Thanh toán"))
         self.label4.setText(_translate("ReportManagementWidget", "📦 Báo cáo giá trị tồn kho hiện tại"))
         self.label4.setProperty("class", _translate("ReportManagementWidget", "section-title"))
+        self.lbl_total_inventory_value.setText(_translate("ReportManagementWidget", "Tổng giá trị kho: 0 VND"))
         item = self.tbl_inventory_report.horizontalHeaderItem(0)
         item.setText(_translate("ReportManagementWidget", "Sản phẩm"))
         item = self.tbl_inventory_report.horizontalHeaderItem(1)

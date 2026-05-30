@@ -809,6 +809,51 @@
             </property>
            </widget>
           </item>
+
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_inventory_footer">
+            <property name="leftMargin">
+             <number>15</number>
+            </property>
+            <property name="topMargin">
+             <number>10</number>
+            </property>
+            <property name="rightMargin">
+             <number>15</number>
+            </property>
+            <property name="bottomMargin">
+             <number>15</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="lbl_total_inventory_value">
+              <property name="text">
+               <string>Tổng giá trị kho: 0 VND</string>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">
+                font-size: 15px;
+                font-weight: 700;
+                color: #0f172a;
+               </string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_inventory_footer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+
           <item>
            <widget class="QTableWidget" name="tbl_inventory_report">
             <property name="minimumSize">

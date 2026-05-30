@@ -132,6 +132,7 @@ class ReportManagementController(QWidget):
 
     def update_inventory_table(self, inventory):
         self.ui.tbl_inventory_report.setRowCount(0)
+        total_inventory_valuation = 0.0
         for row, item in enumerate(inventory):
             self.ui.tbl_inventory_report.insertRow(row)
             self.ui.tbl_inventory_report.setItem(row, 0, QTableWidgetItem(item.product_name))
@@ -151,6 +152,10 @@ class ReportManagementController(QWidget):
             total_item = QTableWidgetItem(f"{item.total_inventory_value:,.0f}")
             total_item.setTextAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
             self.ui.tbl_inventory_report.setItem(row, 4, total_item)
+
+            total_inventory_valuation += float(item.total_inventory_value)
+
+        self.ui.lbl_total_inventory_value.setText(f"Tổng giá trị kho: {total_inventory_valuation:,.0f} VND")
 
     def render_charts(self, revenue_trend, top_products):
         """Nhận Canvas đồ họa từ Builder và nhúng vào vị trí hiển thị trên UI."""

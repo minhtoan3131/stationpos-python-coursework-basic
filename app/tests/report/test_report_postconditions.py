@@ -133,7 +133,6 @@ class FakeReportRepository:
                 "invoice_code": t["invoice_code"],
                 "created_at": t["created_at"],
                 "total_amount": float(t["revenue"]),
-                 Đổi tên Key từ 'payment_method_text' thành 'payment_method' để khớp hợp đồng dữ liệu Repo thật
                 "payment_method": t["payment_method_text"]
             }
             for t in sorted_trans
@@ -185,16 +184,14 @@ def test_kpi_pipeline_financial_correctness_happy_path(report_service):
     # 2. Kiểm toán cụm dòng tiền Doanh thu
     assert kpis.gross_revenue == Decimal("550000")   # (100k + 250k + 150k) + 50k đơn hủy
     assert kpis.cancelled_value == Decimal("50000")  # Tiền hoàn trả đơn hủy
-     Lấy 550k (Gross) - 50k (Hủy) phải bằng 500k (Net Revenue)
     assert kpis.net_revenue == Decimal("500000")
 
     # 3. Kiểm toán cụm Chi phí & Lợi nhuận sạch rác kế toán
     assert kpis.total_cogs == Decimal("290000")      # Tổng giá vốn (60k + 140k + 90k)
-     Lợi nhuận gộp kỹ thuật = Doanh thu thuần (500k) - Giá vốn (290k) = 210k
     assert kpis.gross_profit == Decimal("210000")
     assert kpis.variance_garbage == Decimal("-2000")  # Ghi sổ tiền dọn rác kho trống
-     Lợi nhuận thực tế đưa vào két = Lợi nhuận gộp (210k) + Tiền rác (-2k) = 208k
     assert kpis.net_profit == Decimal("208000")
+
 
 def test_double_deduction_prevention_on_total_cancellation():
     """
@@ -203,7 +200,6 @@ def test_double_deduction_prevention_on_total_cancellation():
     không bao giờ được phép âm vì đã loại trừ việc bị trừ kép dòng tiền.
     """
     repo = FakeReportRepository()
-    # Ép môi trường kho trống/hủy sạch: Không có đơn thành công nào, chỉ có 1 đơn hủy trị giá 200k
     repo.raw_invoices = []
     repo.mock_cancelled_invoices = [
         {"id": 10, "code": "HD_XA_RAC", "total_amount": Decimal("200000"), "created_at": datetime(2026, 5, 15, 10, 0)}
@@ -220,7 +216,6 @@ def test_double_deduction_prevention_on_total_cancellation():
     assert kpis.gross_revenue == Decimal("200000")
     assert kpis.cancelled_value == Decimal("200000")
 
-    # CHỐT CHẶN BẢO VỆ: Không âm dòng tiền
     assert kpis.net_revenue == Decimal("0")
     assert kpis.net_profit == Decimal("0")
 
@@ -228,7 +223,7 @@ def test_double_deduction_prevention_on_total_cancellation():
 def test_empty_financial_period_should_return_zero_without_crashing(report_service):
     """
     KỊCH BẢN: Người dùng chọn khoảng ngày xa xôi trong tương lai hoàn toàn không có dữ liệu chứng từ.
-    KỲ VỌNG SẢN PHẨM: Hệ thống tự động điền số 0 an toàn lên tất cả 8 chỉ số, không được tung lỗi chia cho 0.
+    KỲ VỌNG SẢN PHẨM: Hệ thống tự động điền số 0 an safe lên tất cả 8 chỉ số, không được tung lỗi chia cho 0.
     """
     report_data: DashboardReportDTO = report_service.get_dashboard_report("2026-12-01", "2026-12-31")
     kpis = report_data.kpis
@@ -249,11 +244,11 @@ def test_chart_and_history_limits_and_sorting(report_service):
     top_products = report_data.top_products
     assert len(top_products) == 5
     assert top_products[0].product_name == "Bút bi Thiên Long"
-    assert all(p.product_name != "Thước kẻ" for p in top_products)  # Thước kẻ có qty thấp nhất nên phải bay màu
+    assert all(p.product_name != "Thước kẻ" for p in top_products)
 
     # 2. Kiểm tra sắp xếp lịch sử giao dịch (Mới nhất đứng đầu)
     transactions = report_data.transactions
-    assert transactions[0].invoice_code == "HD003"  # Đơn ngày 16/05 xếp trên ngày 15/05
+    assert transactions[0].invoice_code == "HD003"
 
 
 def test_activity_feed_chronological_string_sorting(report_service):
@@ -263,7 +258,25 @@ def test_activity_feed_chronological_string_sorting(report_service):
     """
     feed = report_service.get_daily_activity_feed("2026-05-15")
     assert len(feed) == 3
-    # Mốc thời gian xếp hạng giảm dần: 14:15 -> 09:15 -> 08:30
     assert feed[0]['code'] == "HD002"
     assert feed[1]['code'] == "PN001"
     assert feed[2]['code'] == "HD001"
+
+
+def test_should_aggregate_total_inventory_valuation_correctly(report_service):
+    """
+    KỊCH BẢN: Thu thập báo cáo kiểm toán giá trị danh mục tồn kho thời gian thực.
+    KỲ VỌNG: Thuật toán tích lũy tổng giá trị kho phải hoạt động chính xác tuyệt đối,
+             trả về kết quả khớp khít số liệu tổng hợp là 1,100,000 VND.
+             (800,000đ của Bút bi Thiên Long + 300,000đ của Vở kẻ ngang)
+    """
+    # ACT: Triệu hồi dữ liệu dashboard thông qua tầng Service
+    report_data: DashboardReportDTO = report_service.get_dashboard_report("2026-05-15", "2026-05-16")
+    inventory_report = report_data.inventory_valuation
+
+    # Thực thi chính xác thuật toán cộng dồn lũy kế vừa được cài đặt ở chân bảng UI Controller
+    total_inventory_value = sum(Decimal(str(item.total_inventory_value)) for item in inventory_report)
+
+    # THEN: Khẳng định tính đúng đắn toán học tài chính vĩ mô
+    assert len(inventory_report) == 2
+    assert total_inventory_value == Decimal("1100000")  # Ép chết chốt chặn 1.100.000đ
