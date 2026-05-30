@@ -125,6 +125,10 @@ class Ui_InventoryManagementWidget(object):
 "        color: #3b82f6;\n"
 "        border-bottom: 3px solid #3b82f6;\n"
 "    }\n"
+"\n"
+"    QTableWidget {\n"
+"        font-size: 14px;        /* Tăng kích thước chữ nội dung lên 14px (Mặc định thường là 12px) */\n"
+"    }\n"
 "   ")
         self.verticalLayout_main = QtWidgets.QVBoxLayout(InventoryManagementWidget)
         self.verticalLayout_main.setContentsMargins(15, 15, 15, 15)
@@ -454,8 +458,8 @@ class Ui_InventoryManagementWidget(object):
         item.setText(_translate("InventoryManagementWidget", "Thành tiền"))
         self.lbl_total_text.setText(_translate("InventoryManagementWidget", "TỔNG TIỀN PHIẾU NHẬP:"))
         self.lbl_total_value.setText(_translate("InventoryManagementWidget", "0 VND"))
-        self.btn_clear_all.setText(_translate("InventoryManagementWidget", "Hủy phiếu"))
-        self.btn_save_all.setText(_translate("InventoryManagementWidget", "XÁC NHẬN NHẬP KHO (F9)"))
+        self.btn_clear_all.setText(_translate("InventoryManagementWidget", "Hủy"))
+        self.btn_save_all.setText(_translate("InventoryManagementWidget", "XÁC NHẬN NHẬP KHO"))
         self.tabWidget_inventory.setTabText(self.tabWidget_inventory.indexOf(self.tab_import), _translate("InventoryManagementWidget", "📦 Nhập kho && Tồn kho"))
         self.txt_search_po.setPlaceholderText(_translate("InventoryManagementWidget", "Tìm mã phiếu, nhà cung cấp..."))
         self.lbl_date_from.setText(_translate("InventoryManagementWidget", "Từ ngày:"))

@@ -66,7 +66,7 @@
     }
 
     QLabel.kpi-desc {
-        font-size: 11px;
+        font-size: 12px;
         color: #64748b;
         font-weight: 500;
     }
@@ -166,6 +166,11 @@
         border-bottom: 2px solid #e2e8f0;
         color: #475569;
     }
+
+    QTableWidget {
+        font-size: 14px;        /* Tăng kích thước chữ nội dung lên 14px (Mặc định thường là 12px) */
+    }
+
    </string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_root">

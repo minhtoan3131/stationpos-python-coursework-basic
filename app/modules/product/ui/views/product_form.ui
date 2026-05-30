@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>780</width>
-    <height>800</height>
+    <height>900</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -82,8 +82,8 @@ QPushButton#btn_add_category:hover, QPushButton#btn_add_supplier:hover, QPushBut
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>765</width>
-        <height>746</height>
+        <width>780</width>
+        <height>751</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_scroll">

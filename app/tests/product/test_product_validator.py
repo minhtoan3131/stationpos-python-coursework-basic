@@ -256,7 +256,8 @@ def test_validate_update_product_inactive(validator, valid_update_dto, mock_prod
 
 def test_validate_delete_success(validator, valid_delete_dto, mock_product_repo, mock_inventory_repo):
     mock_product_repo.get_product_by_id.return_value = MockProduct(id=1, is_active=True)
-    mock_inventory_repo.get_inventory_quantity.return_value = 0
+
+    mock_inventory_repo.get_inventory_status.return_value = {"quantity": 0, "total_value": 0}
 
     validator.validate_delete(valid_delete_dto)
 
@@ -275,7 +276,8 @@ def test_validate_delete_already_inactive(validator, valid_delete_dto, mock_prod
 
 def test_validate_delete_inventory_not_empty(validator, valid_delete_dto, mock_product_repo, mock_inventory_repo):
     mock_product_repo.get_product_by_id.return_value = MockProduct(id=1, is_active=True)
-    mock_inventory_repo.get_inventory_quantity.return_value = 50
+
+    mock_inventory_repo.get_inventory_status.return_value = {"quantity": 50, "total_value": 200000}
 
     with pytest.raises(ValidationException, match="vẫn còn 50 đơn vị trong kho"):
         validator.validate_delete(valid_delete_dto)

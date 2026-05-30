@@ -18,8 +18,18 @@ class Ui_TaxManagementWidget(object):
 "    QWidget {\n"
 "        background-color: #f8fafc;\n"
 "        font-family: \'Segoe UI\', \'Roboto\', sans-serif;\n"
-"        font-size: 13px;\n"
+"        font-size: 14px;\n"
 "        color: #334155;\n"
+"    }\n"
+"\n"
+"    QWidget#lbl_conf_title {\n"
+"        font-size: 16px;\n"
+"        font-weight: 800;\n"
+"\n"
+"    }\n"
+"\n"
+"    QLabel {\n"
+"        font-size: 15px;\n"
 "    }\n"
 "\n"
 "    QFrame.section-frame, QFrame#frame_tax_history_detail {\n"
@@ -38,13 +48,16 @@ class Ui_TaxManagementWidget(object):
 "        font-weight: 600;\n"
 "        color: #64748b;\n"
 "        text-transform: uppercase;\n"
+"        background-color: #ffffff;\n"
 "    }\n"
+"\n"
 "    QLabel.kpi-value {\n"
 "        font-size: 24px;\n"
 "        font-weight: 800;\n"
-"        color: #0f172a;\n"
+"        background-color: #ffffff;\n"
 "    }\n"
-"\n"
+"    QLabel#val_total_revenue { color: #0284c7; }   /* Xanh dương nhạt*/\n"
+"    QLabel#val_total_tax { color: #f59e0b; }             /* Cam*/\n"
 "    QLabel#lbl_title {\n"
 "        font-size: 26px;\n"
 "        font-weight: 800;\n"
@@ -52,6 +65,12 @@ class Ui_TaxManagementWidget(object):
 "        padding-bottom: 5px;\n"
 "    }\n"
 "\n"
+"    QLabel#lbl_detail_total_value {\n"
+"        font-size: 20px;\n"
+"        font-weight: 800;\n"
+"        color: #0284c7;\n"
+"        padding-bottom: 12px;\n"
+"    }\n"
 "    QLabel.section-title {\n"
 "        font-size: 15px;\n"
 "        font-weight: 700;\n"
@@ -234,6 +253,8 @@ class Ui_TaxManagementWidget(object):
         self.frame_config = QtWidgets.QFrame(parent=self.tab_estimation)
         self.frame_config.setObjectName("frame_config")
         self.vl_config = QtWidgets.QVBoxLayout(self.frame_config)
+        self.vl_config.setContentsMargins(-1, 0, -1, -1)
+        self.vl_config.setSpacing(12)
         self.vl_config.setObjectName("vl_config")
         self.lbl_conf_title = QtWidgets.QLabel(parent=self.frame_config)
         self.lbl_conf_title.setObjectName("lbl_conf_title")
@@ -280,7 +301,7 @@ class Ui_TaxManagementWidget(object):
         self.lbl_pit_formula.setObjectName("lbl_pit_formula")
         self.vl_config.addWidget(self.lbl_pit_formula)
         self.lbl_disclaimer = QtWidgets.QLabel(parent=self.frame_config)
-        self.lbl_disclaimer.setStyleSheet("color: #b45309; font-size: 12px; font-style: italic; padding-top: 10px; border-top: 1px dashed #cbd5e1;")
+        self.lbl_disclaimer.setStyleSheet("color: #b45309; font-size: 14px; font-style: italic; padding-top: 10px; border-top: 1px dashed #cbd5e1;")
         self.lbl_disclaimer.setWordWrap(True)
         self.lbl_disclaimer.setObjectName("lbl_disclaimer")
         self.vl_config.addWidget(self.lbl_disclaimer)
@@ -398,7 +419,7 @@ class Ui_TaxManagementWidget(object):
         self.verticalLayout_main.addWidget(self.tabWidget_tax)
 
         self.retranslateUi(TaxManagementWidget)
-        self.tabWidget_tax.setCurrentIndex(1)
+        self.tabWidget_tax.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(TaxManagementWidget)
 
     def retranslateUi(self, TaxManagementWidget):
@@ -407,13 +428,18 @@ class Ui_TaxManagementWidget(object):
         self.lbl_title.setText(_translate("TaxManagementWidget", "Cấu hình & Quản lý Thuế Hộ Kinh Doanh"))
         self.card1.setProperty("class", _translate("TaxManagementWidget", "kpi-card"))
         self.lbl_rev.setText(_translate("TaxManagementWidget", "Doanh thu năm"))
+        self.lbl_rev.setProperty("class", _translate("TaxManagementWidget", "kpi-label"))
         self.val_total_revenue.setText(_translate("TaxManagementWidget", "0 VND"))
+        self.val_total_revenue.setProperty("class", _translate("TaxManagementWidget", "kpi-value"))
         self.card2.setProperty("class", _translate("TaxManagementWidget", "kpi-card"))
         self.lbl_status.setText(_translate("TaxManagementWidget", "Trạng thái phân khúc"))
+        self.lbl_status.setProperty("class", _translate("TaxManagementWidget", "kpi-label"))
         self.val_tax_status.setText(_translate("TaxManagementWidget", "-"))
+        self.val_tax_status.setProperty("class", _translate("TaxManagementWidget", "kpi-value"))
         self.card3.setProperty("class", _translate("TaxManagementWidget", "kpi-card"))
         self.lbl_tax.setText(_translate("TaxManagementWidget", "Thuế dự kiến nộp"))
         self.val_total_tax.setText(_translate("TaxManagementWidget", "0 VND"))
+        self.val_total_tax.setProperty("class", _translate("TaxManagementWidget", "kpi-value"))
         self.lbl_progress_title.setText(_translate("TaxManagementWidget", "Phân tích cảnh báo ngưỡng giới hạn quy mô pháp lý"))
         self.lbl_table_title.setText(_translate("TaxManagementWidget", "Bảng phân bổ chi tiết 12 tháng dự toán động"))
         item = self.tbl_monthly_tax.horizontalHeaderItem(0)
@@ -426,7 +452,7 @@ class Ui_TaxManagementWidget(object):
         item.setText(_translate("TaxManagementWidget", "Thuế TNCN"))
         item = self.tbl_monthly_tax.horizontalHeaderItem(4)
         item.setText(_translate("TaxManagementWidget", "Tổng nộp"))
-        self.lbl_conf_title.setText(_translate("TaxManagementWidget", "Mô phỏng thông số cấu hình"))
+        self.lbl_conf_title.setText(_translate("TaxManagementWidget", "Mô phỏng thông số cấu hình:"))
         self.lbl_th.setText(_translate("TaxManagementWidget", "Mức miễn thuế cơ sở (VND/năm):"))
         self.lbl_meth.setText(_translate("TaxManagementWidget", "Phương pháp tính thuế TNCN:"))
         self.cbo_pit_method.setItemText(0, _translate("TaxManagementWidget", "Khoán % doanh thu"))

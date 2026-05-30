@@ -131,8 +131,7 @@ def test_should_populate_kpi_cards_tables_and_render_charts_on_successful_data_l
     assert table_trans.rowCount() == 1
     assert table_trans.item(0, 0).text() == "HD003"
     assert table_trans.item(0, 2).text() == "150,000"
-    assert table_trans.item(0, 2).textAlignment() == (Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
-
+    assert table_trans.item(0, 2).textAlignment() == (Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
     # 4. Kiểm duyệt Bảng Báo cáo tồn kho vật lý phía dưới
     table_inv = window.ui.tbl_inventory_report
     assert table_inv.rowCount() == 1

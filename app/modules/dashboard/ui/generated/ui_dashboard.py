@@ -98,6 +98,10 @@ class Ui_DashboardWidget(object):
 "    QListWidget#list_live_feed::item:hover {\n"
 "        background-color: #f1f5f9;\n"
 "    }\n"
+"\n"
+"    QLabel {\n"
+"        font-size: 14px;\n"
+"    }\n"
 "   ")
         self.main_layout = QtWidgets.QVBoxLayout(DashboardWidget)
         self.main_layout.setContentsMargins(30, 25, 30, 30)

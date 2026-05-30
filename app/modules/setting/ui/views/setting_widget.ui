@@ -60,7 +60,6 @@ QLabel {
     color: #334155;
 }
 
-/* Các tiêu đề được đồng bộ hóa từ home_welcome.ui */
 QLabel#label_title {
     font-size: 26px;
     font-weight: 800;
@@ -78,7 +77,7 @@ QLabel#label_store_title, QLabel#label_sec_title, QLabel#label_backup_title {
 }
 
 QLabel#label_store_sub, QLabel#label_sec_sub, QLabel#label_backup_sub {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
     color: #64748b;
 }
@@ -185,7 +184,7 @@ QCheckBox::indicator {
         <x>0</x>
         <y>0</y>
         <width>1390</width>
-        <height>1103</height>
+        <height>1081</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_main">
@@ -272,7 +271,7 @@ color: #3b82f6; border-radius: 14px; font-size: 26px;</string>
         <widget class="QFrame" name="frame_store">
          <layout class="QVBoxLayout" name="verticalLayout_store">
           <property name="spacing">
-           <number>20</number>
+           <number>16</number>
           </property>
           <property name="leftMargin">
            <number>24</number>
@@ -457,7 +456,7 @@ color: #3b82f6; border-radius: 8px; font-size: 20px;</string>
           <widget class="QFrame" name="frame_security">
            <layout class="QVBoxLayout" name="verticalLayout_sec">
             <property name="spacing">
-             <number>20</number>
+             <number>16</number>
             </property>
             <property name="leftMargin">
              <number>24</number>
@@ -614,7 +613,7 @@ color: #ef4444; border-radius: 8px; font-size: 20px;</string>
           <widget class="QFrame" name="frame_backup">
            <layout class="QVBoxLayout" name="verticalLayout_backup">
             <property name="spacing">
-             <number>20</number>
+             <number>16</number>
             </property>
             <property name="leftMargin">
              <number>24</number>
@@ -728,7 +727,7 @@ color: #10b981; border-radius: 8px; font-size: 20px;</string>
                <widget class="QLabel" name="lbl_time_helper">
                 <property name="styleSheet">
                  <string>color: #64748b;
-font-size: 13px; margin-top: 25px;</string>
+font-size: 14px; margin-top: 25px;</string>
                 </property>
                 <property name="text">
                  <string>Giờ hệ

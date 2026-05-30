@@ -172,7 +172,7 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setPointSize(14)
         font.setBold(True)
-        font.setWeight(75)
+        font.setWeight(600)
         self.btn_lock_app.setFont(font)
         self.btn_lock_app.setStyleSheet("\n"
 "           QPushButton#btn_lock_app {\n"

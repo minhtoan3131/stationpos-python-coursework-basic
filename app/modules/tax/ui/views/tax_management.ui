@@ -19,8 +19,18 @@
     QWidget {
         background-color: #f8fafc;
         font-family: 'Segoe UI', 'Roboto', sans-serif;
-        font-size: 13px;
+        font-size: 14px;
         color: #334155;
+    }
+
+    QWidget#lbl_conf_title {
+        font-size: 16px;
+        font-weight: 800;
+
+    }
+
+    QLabel {
+        font-size: 15px;
     }
 
     QFrame.section-frame, QFrame#frame_tax_history_detail {
@@ -39,13 +49,16 @@
         font-weight: 600;
         color: #64748b;
         text-transform: uppercase;
+        background-color: #ffffff;
     }
+
     QLabel.kpi-value {
         font-size: 24px;
         font-weight: 800;
-        color: #0f172a;
+        background-color: #ffffff;
     }
-
+    QLabel#val_total_revenue { color: #0284c7; }   /* Xanh dương nhạt*/
+    QLabel#val_total_tax { color: #f59e0b; }             /* Cam*/
     QLabel#lbl_title {
         font-size: 26px;
         font-weight: 800;
@@ -53,6 +66,12 @@
         padding-bottom: 5px;
     }
 
+    QLabel#lbl_detail_total_value {
+        font-size: 20px;
+        font-weight: 800;
+        color: #0284c7;
+        padding-bottom: 12px;
+    }
     QLabel.section-title {
         font-size: 15px;
         font-weight: 700;
@@ -169,7 +188,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget_tax">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_estimation">
       <attribute name="title">
@@ -207,12 +226,18 @@
               <property name="text">
                <string>Doanh thu năm</string>
               </property>
+              <property name="class" stdset="0">
+                 <string>kpi-label</string>
+              </property>
              </widget>
             </item>
             <item>
              <widget class="QLabel" name="val_total_revenue">
               <property name="text">
                <string>0 VND</string>
+              </property>
+              <property name="class" stdset="0">
+                 <string>kpi-value</string>
               </property>
              </widget>
             </item>
@@ -230,12 +255,18 @@
               <property name="text">
                <string>Trạng thái phân khúc</string>
               </property>
+              <property name="class" stdset="0">
+                 <string>kpi-label</string>
+              </property>
              </widget>
             </item>
             <item>
              <widget class="QLabel" name="val_tax_status">
               <property name="text">
                <string>-</string>
+              </property>
+              <property name="class" stdset="0">
+                 <string>kpi-value</string>
               </property>
              </widget>
             </item>
@@ -259,6 +290,9 @@
              <widget class="QLabel" name="val_total_tax">
               <property name="text">
                <string>0 VND</string>
+              </property>
+              <property name="class" stdset="0">
+                 <string>kpi-value</string>
               </property>
              </widget>
             </item>
@@ -337,10 +371,16 @@
          <item>
           <widget class="QFrame" name="frame_config">
            <layout class="QVBoxLayout" name="vl_config">
+            <property name="spacing">
+             <number>12</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
             <item>
              <widget class="QLabel" name="lbl_conf_title">
               <property name="text">
-               <string>Mô phỏng thông số cấu hình</string>
+               <string>Mô phỏng thông số cấu hình:</string>
               </property>
              </widget>
             </item>
@@ -442,7 +482,7 @@
             <item>
              <widget class="QLabel" name="lbl_disclaimer">
               <property name="styleSheet">
-               <string notr="true">color: #b45309; font-size: 12px; font-style: italic; padding-top: 10px; border-top: 1px dashed #cbd5e1;</string>
+               <string notr="true">color: #b45309; font-size: 14px; font-style: italic; padding-top: 10px; border-top: 1px dashed #cbd5e1;</string>
               </property>
               <property name="text">
                <string>⚠️ Lưu ý: Các thông số miễn thuế và thuế suất định biên phải được thiết lập phù hợp với danh mục ngành nghề kinh doanh và văn bản quy định pháp lý hiện hành của Tổng cục Thuế.</string>

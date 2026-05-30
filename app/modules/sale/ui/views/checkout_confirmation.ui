@@ -33,6 +33,7 @@
         font-weight: 900;
         color: #0f172a;
         letter-spacing: 1px;
+        background-color: #ffffff;
     }
 
     QLabel#lbl_invoice_id {
@@ -47,6 +48,7 @@
     QLabel#lbl_store_info, QLabel#lbl_date {
         color: #475569;
         font-size: 14px;
+        background-color: #ffffff;
     }
 
     /* Bảng chi tiết Bill */
@@ -420,7 +422,7 @@
         </size>
        </property>
        <property name="text">
-        <string>QUAY LẠI (Esc)</string>
+        <string>QUAY LẠI</string>
        </property>
       </widget>
      </item>
@@ -446,7 +448,7 @@
         </size>
        </property>
        <property name="text">
-        <string>XÁC NHẬN &amp; IN HÓA ĐƠN (F9)</string>
+        <string>XÁC NHẬN &amp;&amp; IN HÓA ĐƠN</string>
        </property>
       </widget>
      </item>

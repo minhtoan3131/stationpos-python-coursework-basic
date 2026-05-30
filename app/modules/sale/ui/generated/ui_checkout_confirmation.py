@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'app/ui/sale/views/checkout_confirmation.ui'
+# Form implementation generated from reading ui file 'app/modules/sale/ui/views/checkout_confirmation.ui'
 #
 # Created by: PyQt6 UI code generator 6.11.0
 #
@@ -32,6 +32,7 @@ class Ui_CheckoutDialog(object):
 "        font-weight: 900;\n"
 "        color: #0f172a;\n"
 "        letter-spacing: 1px;\n"
+"        background-color: #ffffff;\n"
 "    }\n"
 "\n"
 "    QLabel#lbl_invoice_id {\n"
@@ -46,6 +47,7 @@ class Ui_CheckoutDialog(object):
 "    QLabel#lbl_store_info, QLabel#lbl_date {\n"
 "        color: #475569;\n"
 "        font-size: 14px;\n"
+"        background-color: #ffffff;\n"
 "    }\n"
 "\n"
 "    /* Bảng chi tiết Bill */\n"
@@ -281,5 +283,5 @@ class Ui_CheckoutDialog(object):
         self.label_3.setText(_translate("CheckoutDialog", "HÌNH THỨC TT:"))
         self.cbo_payment_method.setItemText(0, _translate("CheckoutDialog", "Tiền mặt"))
         self.cbo_payment_method.setItemText(1, _translate("CheckoutDialog", "Chuyển khoản / Quẹt thẻ"))
-        self.btn_back.setText(_translate("CheckoutDialog", "QUAY LẠI (Esc)"))
-        self.btn_confirm.setText(_translate("CheckoutDialog", "XÁC NHẬN & IN HÓA ĐƠN (F9)"))
+        self.btn_back.setText(_translate("CheckoutDialog", "QUAY LẠI"))
+        self.btn_confirm.setText(_translate("CheckoutDialog", "XÁC NHẬN && IN HÓA ĐƠN"))

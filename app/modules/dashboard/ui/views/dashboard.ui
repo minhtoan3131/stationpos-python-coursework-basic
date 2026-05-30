@@ -99,6 +99,10 @@
     QListWidget#list_live_feed::item:hover {
         background-color: #f1f5f9;
     }
+
+    QLabel {
+        font-size: 14px;
+    }
    </string>
   </property>
   <layout class="QVBoxLayout" name="main_layout">

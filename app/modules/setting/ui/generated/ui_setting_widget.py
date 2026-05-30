@@ -21,7 +21,7 @@ class Ui_SettingWidget(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 1390, 1103))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 1390, 1081))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.verticalLayout_main = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout_main.setContentsMargins(30, 25, 30, 30)
@@ -52,7 +52,7 @@ class Ui_SettingWidget(object):
         self.frame_store.setObjectName("frame_store")
         self.verticalLayout_store = QtWidgets.QVBoxLayout(self.frame_store)
         self.verticalLayout_store.setContentsMargins(24, 24, 24, 24)
-        self.verticalLayout_store.setSpacing(20)
+        self.verticalLayout_store.setSpacing(16)
         self.verticalLayout_store.setObjectName("verticalLayout_store")
         self.horizontalLayout_store_header = QtWidgets.QHBoxLayout()
         self.horizontalLayout_store_header.setObjectName("horizontalLayout_store_header")
@@ -125,7 +125,7 @@ class Ui_SettingWidget(object):
         self.frame_security.setObjectName("frame_security")
         self.verticalLayout_sec = QtWidgets.QVBoxLayout(self.frame_security)
         self.verticalLayout_sec.setContentsMargins(24, 24, 24, 24)
-        self.verticalLayout_sec.setSpacing(20)
+        self.verticalLayout_sec.setSpacing(16)
         self.verticalLayout_sec.setObjectName("verticalLayout_sec")
         self.horizontalLayout_sec_header = QtWidgets.QHBoxLayout()
         self.horizontalLayout_sec_header.setObjectName("horizontalLayout_sec_header")
@@ -181,7 +181,7 @@ class Ui_SettingWidget(object):
         self.frame_backup.setObjectName("frame_backup")
         self.verticalLayout_backup = QtWidgets.QVBoxLayout(self.frame_backup)
         self.verticalLayout_backup.setContentsMargins(24, 24, 24, 24)
-        self.verticalLayout_backup.setSpacing(20)
+        self.verticalLayout_backup.setSpacing(16)
         self.verticalLayout_backup.setObjectName("verticalLayout_backup")
         self.horizontalLayout_backup_header = QtWidgets.QHBoxLayout()
         self.horizontalLayout_backup_header.setObjectName("horizontalLayout_backup_header")
@@ -314,7 +314,6 @@ class Ui_SettingWidget(object):
 "    color: #334155;\n"
 "}\n"
 "\n"
-"/* Các tiêu đề được đồng bộ hóa từ dashboard.ui */\n"
 "QLabel#label_title {\n"
 "    font-size: 26px;\n"
 "    font-weight: 800;\n"
@@ -332,7 +331,7 @@ class Ui_SettingWidget(object):
 "}\n"
 "\n"
 "QLabel#label_store_sub, QLabel#label_sec_sub, QLabel#label_backup_sub {\n"
-"    font-size: 13px;\n"
+"    font-size: 14px;\n"
 "    font-weight: 600;\n"
 "    color: #64748b;\n"
 "}\n"
@@ -454,7 +453,7 @@ class Ui_SettingWidget(object):
         self.lbl_time.setText(_translate("SettingWidget", "Giờ chạy tự động"))
         self.time_backup.setDisplayFormat(_translate("SettingWidget", "HH:mm                   📅 "))
         self.lbl_time_helper.setStyleSheet(_translate("SettingWidget", "color: #64748b;\n"
-"font-size: 13px; margin-top: 25px;"))
+"font-size: 14px; margin-top: 25px;"))
         self.lbl_time_helper.setText(_translate("SettingWidget", "Giờ hệ\n"
 "thống 24h"))
         self.lbl_folder.setText(_translate("SettingWidget", "Thư mục lưu trữ"))

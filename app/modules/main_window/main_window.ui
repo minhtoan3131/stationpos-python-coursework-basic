@@ -235,7 +235,7 @@
          <property name="font">
           <font>
            <pointsize>14</pointsize>
-           <weight>75</weight>
+           <weight>600</weight>
            <bold>true</bold>
           </font>
          </property>

@@ -65,7 +65,7 @@ class Ui_ReportManagementWidget(object):
 "    }\n"
 "\n"
 "    QLabel.kpi-desc {\n"
-"        font-size: 11px;\n"
+"        font-size: 12px;\n"
 "        color: #64748b;\n"
 "        font-weight: 500;\n"
 "    }\n"
@@ -165,6 +165,11 @@ class Ui_ReportManagementWidget(object):
 "        border-bottom: 2px solid #e2e8f0;\n"
 "        color: #475569;\n"
 "    }\n"
+"\n"
+"    QTableWidget {\n"
+"        font-size: 14px;        /* Tăng kích thước chữ nội dung lên 14px (Mặc định thường là 12px) */\n"
+"    }\n"
+"\n"
 "   ")
         self.verticalLayout_root = QtWidgets.QVBoxLayout(ReportManagementWidget)
         self.verticalLayout_root.setContentsMargins(0, 0, 0, 0)

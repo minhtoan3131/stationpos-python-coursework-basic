@@ -43,9 +43,10 @@ class TaxManagementController(QWidget):
             tbl.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
 
         self.ui.spn_threshold.setGroupSeparatorShown(True)
-
-        # Mở khóa tự do 100% cho mọi ô cấu hình thông số theo ý định của bạn
         self.ui.frame_config.setEnabled(True)
+        self.ui.splitter_invoice.setStretchFactor(0, 1)
+        self.ui.splitter_invoice.setStretchFactor(1, 1)
+        self.ui.splitter_invoice.setSizes([700, 700])
 
     def bind_events(self):
         self.ui.tabWidget_tax.currentChanged.connect(self.handle_tab_changed)
@@ -197,25 +198,45 @@ class TaxManagementController(QWidget):
         try:
             ledgers = self.tax_service.get_all_ledgers()
             self.ui.tbl_tax_history_master.setRowCount(len(ledgers))
-            for idx, ledger in enumerate(ledgers):
-                self.ui.tbl_tax_history_master.setItem(idx, 0, QTableWidgetItem(str(ledger.apply_year)))
-                self.ui.tbl_tax_history_master.setItem(idx, 1, TaxUIHelper.create_numeric_item(ledger.total_revenue))
-                self.ui.tbl_tax_history_master.setItem(idx, 2, TaxUIHelper.create_numeric_item(ledger.total_cost))
-                self.ui.tbl_tax_history_master.setItem(idx, 3, TaxUIHelper.create_numeric_item(
-                    ledger.final_vat_amount + ledger.final_pit_amount))
 
+            for idx, ledger in enumerate(ledgers):
+                # Cột 0: Năm tài chính
+                year_item = QTableWidgetItem(str(ledger.apply_year))
+                year_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+                self.ui.tbl_tax_history_master.setItem(idx, 0, year_item)
+
+                # Cột 1: Tổng doanh thu
+                rev_item = TaxUIHelper.create_numeric_item(ledger.total_revenue)
+                rev_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+                self.ui.tbl_tax_history_master.setItem(idx, 1, rev_item)
+
+                # Cột 2: Tổng chi phí
+                cost_item = TaxUIHelper.create_numeric_item(ledger.total_cost)
+                cost_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+                self.ui.tbl_tax_history_master.setItem(idx, 2, cost_item)
+
+                # Cột 3: Tổng thuế đã nộp
+                tax_item = TaxUIHelper.create_numeric_item(ledger.final_vat_amount + ledger.final_pit_amount)
+                tax_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+                self.ui.tbl_tax_history_master.setItem(idx, 3, tax_item)
+
+                # Cột 4: Trạng thái đóng khóa sổ
                 status_item = QTableWidgetItem("Bản nháp" if ledger.status == "DRAFT" else "🔒 Đã khóa sổ")
                 status_item.setForeground(
                     Qt.GlobalColor.blue if ledger.status == "CLOSED" else Qt.GlobalColor.darkYellow)
+                status_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)  # ✅ Sửa từ AlignRight thành AlignCenter
                 self.ui.tbl_tax_history_master.setItem(idx, 4, status_item)
 
-                # Áp dụng cơ chế Master Cache: Đóng gói toàn bộ thông số cấu hình của Header chứng từ vào các Cell data slot
+                # =========================================================================
+                # Cơ chế Master Cache: Lưu trữ Meta dữ liệu chạy ngầm dưới ô
+                # =========================================================================
                 self.ui.tbl_tax_history_master.item(idx, 0).setData(Qt.ItemDataRole.UserRole, ledger.id)
                 self.ui.tbl_tax_history_master.item(idx, 1).setData(Qt.ItemDataRole.UserRole, ledger.threshold_amount)
                 self.ui.tbl_tax_history_master.item(idx, 2).setData(Qt.ItemDataRole.UserRole, ledger.pit_method)
                 self.ui.tbl_tax_history_master.item(idx, 3).setData(Qt.ItemDataRole.UserRole, ledger.vat_percent)
                 self.ui.tbl_tax_history_master.item(idx, 4).setData(Qt.ItemDataRole.UserRole, ledger.pit_percent)
                 self.ui.tbl_tax_history_master.item(idx, 0).setData(Qt.ItemDataRole.UserRole + 1, ledger.finalized_at)
+
         except Exception as e:
             traceback.print_exc()
 

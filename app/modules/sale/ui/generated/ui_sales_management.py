@@ -113,6 +113,10 @@ class Ui_SalesManagementWidget(object):
 "    }\n"
 "    QTabBar::tab:selected { background: #ffffff; color: #10b981; border-bottom: 3px solid #10b981; }\n"
 "\n"
+"    QTableWidget {\n"
+"        font-size: 14px;        /* Tăng kích thước chữ nội dung lên 14px (Mặc định thường là 12px) */\n"
+"    }\n"
+"\n"
 "    /* Tab Lịch sử có thể đổi màu indicator sang xanh dương nếu muốn bằng code, ở đây mặc định theo POS */\n"
 "   ")
         self.verticalLayout_main = QtWidgets.QVBoxLayout(SalesManagementWidget)
@@ -417,8 +421,8 @@ class Ui_SalesManagementWidget(object):
         item.setText(_translate("SalesManagementWidget", "Thành tiền"))
         self.lbl_total_text.setText(_translate("SalesManagementWidget", "KHÁCH CẦN TRẢ:"))
         self.lbl_total_bill.setText(_translate("SalesManagementWidget", "0 VND"))
-        self.btn_cancel_bill.setText(_translate("SalesManagementWidget", "Hủy hóa đơn"))
-        self.btn_checkout.setText(_translate("SalesManagementWidget", "THANH TOÁN (F9)"))
+        self.btn_cancel_bill.setText(_translate("SalesManagementWidget", "Hủy"))
+        self.btn_checkout.setText(_translate("SalesManagementWidget", "THANH TOÁN"))
         self.tabWidget_sales.setTabText(self.tabWidget_sales.indexOf(self.tab_pos), _translate("SalesManagementWidget", "🛒 Bán lẻ POS"))
         self.txt_search_invoice.setPlaceholderText(_translate("SalesManagementWidget", "Tìm mã hóa đơn..."))
         self.lbl_date_from.setText(_translate("SalesManagementWidget", "Từ ngày:"))

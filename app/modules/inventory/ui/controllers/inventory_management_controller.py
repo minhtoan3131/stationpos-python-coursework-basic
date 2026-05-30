@@ -59,6 +59,7 @@ class InventoryManagementController(QWidget):
         header_items.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)  # SKU vừa đủ
         self.ui.tbl_items.setColumnWidth(2, 100)  # Cột ĐVT
 
+        self.ui.tbl_items.setHorizontalHeaderItem(6, QTableWidgetItem(""))
         # 3. Mặc định ngày nhập
         self.ui.txt_import_date.setText(datetime.datetime.now().strftime("%d/%m/%Y %H:%M"))
 

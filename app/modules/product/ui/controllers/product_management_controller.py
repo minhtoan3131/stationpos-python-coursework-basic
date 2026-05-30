@@ -22,6 +22,21 @@ from app.modules.product.services.unit_service import UnitService
 from app.modules.product.ultils.product_margin_calculator import ProductMarginCalculator
 
 
+# =========================================================================
+# LỚP TIỆN ÍCH CHUYÊN BIỆT: ÉP BUỘC SẮP XẾP THEO GIÁ TRỊ SỐ THỰC GỐC
+# =========================================================================
+class NumericTableWidgetItem(QTableWidgetItem):
+    def __init__(self, value: float, display_text: str):
+        super().__init__(display_text)
+        self.value = value
+
+    def __lt__(self, other):
+        # Đánh chặn phép so sánh của Qt để so sánh 2 số thực thay vì 2 chuỗi text
+        if isinstance(other, NumericTableWidgetItem):
+            return self.value < other.value
+        return super().__lt__(other)
+
+
 class ProductManagementController(QWidget):
 
     def __init__(self,
@@ -39,11 +54,9 @@ class ProductManagementController(QWidget):
         self.unit_service = unit_service
         self.ui.tbl_products.setColumnHidden(0, True)
 
-       # Setup các cột cho hài hòa
-       #  ------------
+        # Setup các cột cho hài hòa
         header = self.ui.tbl_products.horizontalHeader()
         header.setStretchLastSection(False)
-        # Đặt kích thước tối thiểu cho TẤT CẢ các cột là 90 pixel.
         header.setMinimumSectionSize(90)
         header.setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
 
@@ -59,8 +72,7 @@ class ProductManagementController(QWidget):
         self.ui.tbl_products.setColumnWidth(7, 110)  # Giá bán lẻ
         self.ui.tbl_products.setColumnWidth(8, 110)  # Giá bán sỉ
         self.ui.tbl_products.setColumnWidth(9, 100)  # Biên LN lẻ
-        self.ui.tbl_products.setColumnWidth(10, 150)  # Barcode
-        # ---------
+        self.ui.tbl_products.setColumnWidth(10, 150) # Barcode
 
         self.load_products()
         self.bind_events()
@@ -86,52 +98,58 @@ class ProductManagementController(QWidget):
             QMessageBox.critical(self, "Lỗi hệ thống", f"Không thể tải danh sách sản phẩm:\n{str(e)}")
 
     def populate_product_table(self, products):
+        # BẮT BUỘC: Khóa tính năng sorting trước khi cấu hình dòng để chống giật lag và lỗi lệch chỉ số dòng mid-loop
+        self.ui.tbl_products.setSortingEnabled(False)
+
         self.ui.tbl_products.setRowCount(0)
         self.ui.tbl_products.setRowCount(len(products))
 
         for row_index, product in enumerate(products):
-            # Cột 0: ID (Ẩn ngầm)
-            self.ui.tbl_products.setItem(row_index, 0, QTableWidgetItem(str(product.id)))
+            # Cột 0: ID (Ẩn ngầm - Dùng số nguyên để sắp xếp thứ tự ID chuẩn xác)
+            id_val = int(product.id) if product.id else 0
+            self.ui.tbl_products.setItem(row_index, 0, NumericTableWidgetItem(id_val, str(product.id)))
 
-            # Cột 1, 2, 3, 4: Điền thông tin SKU, Tên, Danh mục, Nhà cung cấp
+            # Cột 1, 2, 3, 4: Điền thông tin SKU, Tên, Danh mục, Nhà cung cấp (Văn bản thuần)
             self.ui.tbl_products.setItem(row_index, 1, QTableWidgetItem(product.sku))
             self.ui.tbl_products.setItem(row_index, 2, QTableWidgetItem(product.name))
             self.ui.tbl_products.setItem(row_index, 3, QTableWidgetItem(product.category_name))
             self.ui.tbl_products.setItem(row_index, 4, QTableWidgetItem(product.supplier_name or "---"))
 
-            # Cột 5: Tồn kho hiện tại (Hiển thị kèm đơn vị tính cơ bản)
+            # Cột 5: Tồn kho hiện tại (Dùng NumericTableWidgetItem để trích xuất số lượng gốc phục vụ sort)
+            stock_qty_val = float(product.stock_qty) if product.stock_qty else 0.0
             stock_display = f"{product.stock_qty:,} {product.unit_name}"
-            stock_item = QTableWidgetItem(stock_display)
+            stock_item = NumericTableWidgetItem(stock_qty_val, stock_display)
             stock_item.setTextAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
             self.ui.tbl_products.setItem(row_index, 5, stock_item)
 
-            # Cột 6: Giá vốn trung bình MAC
-            cost_item = QTableWidgetItem(f"{product.cost_price:,.0f}")
+            # Cột 6: Giá vốn trung bình MAC (Dùng NumericTableWidgetItem mới)
+            cost_val = float(product.cost_price) if product.cost_price else 0.0
+            cost_item = NumericTableWidgetItem(cost_val, f"{cost_val:,.0f}")
             cost_item.setTextAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
-            cost_item.setForeground(QColor("#4b5563"))  # Đặt màu xám thanh lịch
+            cost_item.setForeground(QColor("#4b5563"))  # Đặt màu xám thanh lịch cho trường dữ liệu nội bộ
             self.ui.tbl_products.setItem(row_index, 6, cost_item)
 
-            # Cột 7: Giá bán lẻ
-            retail_item = QTableWidgetItem(
-                f"{float(product.retail_price):,.0f}")  # Ép sang float để format chuỗi an toàn
+            # Cột 7: Giá bán lẻ (Dùng NumericTableWidgetItem mới)
+            retail_val = float(product.retail_price) if product.retail_price else 0.0
+            retail_item = NumericTableWidgetItem(retail_val, f"{retail_val:,.0f}")
             retail_item.setTextAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
 
-            # Cột 8: Giá bán sỉ
-            wholesale_val = float(product.wholesale_price) if product.wholesale_price else 0
-            wholesale_item = QTableWidgetItem(f"{wholesale_val:,.0f}" if wholesale_val > 0 else "---")
+            # ột 8: Giá bán sỉ (Dùng NumericTableWidgetItem mới)
+            wholesale_val = float(product.wholesale_price) if product.wholesale_price else 0.0
+            wholesale_item = NumericTableWidgetItem(wholesale_val, f"{wholesale_val:,.0f}" if wholesale_val > 0 else "---")
             wholesale_item.setTextAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
             self.ui.tbl_products.setItem(row_index, 8, wholesale_item)
 
-            # Cột 9
+            # Cột 9: Biên lợi nhuận lẻ (%) (Gọi bộ tính toán và bao bọc bởi NumericTableWidgetItem)
             margin_percent, margin_text, hex_color = ProductMarginCalculator.calculate_margin_and_status(
                 retail_price=product.retail_price,
                 cost_price=product.cost_price
             )
 
-            margin_item = QTableWidgetItem(margin_text)
+            margin_item = NumericTableWidgetItem(float(margin_percent), margin_text)
             margin_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
 
-            # Áp cấu hình màu sắc động và in đậm chữ dựa theo mã màu Hex từ Calculator trả về
+            # Giữ nguyên hệ thống bôi màu cảnh báo và in đậm chữ theo mã Hex trả về
             color = QColor(hex_color)
             margin_item.setForeground(color)
 
@@ -147,10 +165,13 @@ class ProductManagementController(QWidget):
             self.ui.tbl_products.setItem(row_index, 7, retail_item)
             self.ui.tbl_products.setItem(row_index, 9, margin_item)
 
-            # Cột 10: Barcode
+            # Cột 10: Barcode (Văn bản thuần)
             self.ui.tbl_products.setItem(row_index, 10, QTableWidgetItem(product.barcode or ""))
 
         self.ui.lbl_total_products.setText(f"Tổng cộng: {len(products):,} sản phẩm")
+
+        # Mở khóa kích hoạt lại tính năng sorting sau khi toàn bộ dữ liệu đã được nạp
+        self.ui.tbl_products.setSortingEnabled(True)
 
     def search_products(self):
         try:
@@ -187,6 +208,7 @@ class ProductManagementController(QWidget):
         except ValidationException as ve:
             QMessageBox.warning(self, "Không thể xóa", str(ve))
         except Exception as e:
+            traceback.print_exc()
             QMessageBox.critical(self, "Lỗi hệ thống", f"Lỗi không xác định khi xóa:\n{str(e)}")
 
     def open_create_dialog(self):

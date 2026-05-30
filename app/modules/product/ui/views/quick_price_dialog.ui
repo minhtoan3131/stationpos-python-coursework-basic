@@ -18,7 +18,7 @@
 /* ENTERPRISE MODERN QUICK DIALOG STYLE */
 QDialog {
     background-color: #ffffff;
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Segoe UI', 'Roboto', sans-serif;
 }
 QLabel#lbl_title {
     font-size: 16px;

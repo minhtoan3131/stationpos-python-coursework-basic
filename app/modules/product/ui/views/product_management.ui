@@ -18,7 +18,7 @@
 /* ENTERPRISE MODERN STYLE */
 QWidget#ProductManagementWidget {
     background-color: #fcfcfc;
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Segoe UI', 'Roboto', sans-serif;
 }
 
 QFrame#frame_container {
@@ -26,7 +26,12 @@ QFrame#frame_container {
     border: 1px solid #e0e0e0;
     border-radius: 12px;
 }
-
+QMessageBox QPushButton {
+    color: #334155; /* Màu chữ nút bấm */
+    background-color: #e2e8f0;
+    border: 1px solid #cbd5e1;
+    padding: 5px 15px;
+}
 QLabel#lbl_title {
     font-size: 26px;
     font-weight: 800;
@@ -86,6 +91,21 @@ QHeaderView::section {
     border-bottom: 2px solid #f1f1f1;
     color: #4a5568;
 }
+
+
+QTableWidget {
+        font-size: 14px;        /* Tăng kích thước chữ nội dung lên 14px (Mặc định thường là 12px) */
+        font-weight: 500;       /* Đẩy độ đậm chữ lên mức vừa phải để dễ đọc số liệu kế toán */
+}
+
+/* 2. Phóng to chữ của các thanh Tiêu đề cột (Headers) */
+QHeaderView::section {
+    font-size: 14px;        /* Đặt kích thước chữ tiêu đề cột lớn hơn nội dung 1px */
+    font-weight: 800;       /* Ép font Siêu Đậm (Bold) bộc lộ rõ cấu trúc cột phân lớp */
+    padding: 12px 6px;      /* Nới rộng khoảng cách đệm để tiêu đề không bị bó hẹp khi chữ to lên */
+}
+
+
    </string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_root">

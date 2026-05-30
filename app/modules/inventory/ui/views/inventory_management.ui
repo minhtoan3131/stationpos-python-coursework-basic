@@ -126,6 +126,10 @@
         color: #3b82f6;
         border-bottom: 3px solid #3b82f6;
     }
+
+    QTableWidget {
+        font-size: 14px;        /* Tăng kích thước chữ nội dung lên 14px (Mặc định thường là 12px) */
+    }
    </string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_main">
@@ -429,7 +433,7 @@
                </size>
               </property>
               <property name="text">
-               <string>Hủy phiếu</string>
+               <string>Hủy</string>
               </property>
              </widget>
             </item>
@@ -455,7 +459,7 @@
                </size>
               </property>
               <property name="text">
-               <string>XÁC NHẬN NHẬP KHO (F9)</string>
+               <string>XÁC NHẬN NHẬP KHO</string>
               </property>
              </widget>
             </item>

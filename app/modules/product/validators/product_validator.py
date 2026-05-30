@@ -65,7 +65,8 @@ class ProductValidator:
         if self.inventory_repository is None:
             raise Exception("Chưa cấu hình InventoryRepository cho Validator.")
 
-        inventory_qty = self.inventory_repository.get_inventory_quantity(dto.product_id)
+        inventory_status = self.inventory_repository.get_inventory_status(dto.product_id)
+        inventory_qty = inventory_status.get('quantity', 0)  # Lấy giá trị từ dict trả về
         if inventory_qty > 0:
             raise ValidationException(
                 f"Không thể xóa! Sản phẩm này vẫn còn {inventory_qty} đơn vị trong kho. "

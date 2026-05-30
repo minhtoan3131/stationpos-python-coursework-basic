@@ -12,7 +12,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 class Ui_ProductFormDialog(object):
     def setupUi(self, ProductFormDialog):
         ProductFormDialog.setObjectName("ProductFormDialog")
-        ProductFormDialog.resize(780, 800)
+        ProductFormDialog.resize(780, 900)
         ProductFormDialog.setStyleSheet("\n"
 "/* ENTERPRISE FORM STYLING */\n"
 "QDialog { background-color: #f4f6f8; font-family: \'Segoe UI\', sans-serif; }\n"
@@ -55,7 +55,7 @@ class Ui_ProductFormDialog(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 765, 746))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 780, 751))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.verticalLayout_scroll = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout_scroll.setContentsMargins(25, 10, 25, 25)
