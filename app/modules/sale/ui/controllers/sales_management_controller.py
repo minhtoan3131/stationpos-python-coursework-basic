@@ -101,7 +101,6 @@ class SalesManagementController(QWidget):
             QMessageBox.critical(self, "Lỗi", f"Không thể tải danh sách sản phẩm: {str(e)}")
 
     def display_product_table(self, data_list):
-        from app.modules.sale.utils.sale_calculator import SaleCalculator  # Import tiện ích tính toán
 
         self.ui.tbl_products_sales.setRowCount(0)
         self.raw_sales_data.clear()

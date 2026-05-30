@@ -27,6 +27,9 @@ class FakeInventoryRepo:
     def get_inventory_status(self, product_id):
         return self.inventory.get(product_id)
 
+    def get_conversion_info(self, product_id, unit_id):
+        return {'ratio': Decimal('1')}
+
 
 class FakePOHistoryRepo:
     def __init__(self):

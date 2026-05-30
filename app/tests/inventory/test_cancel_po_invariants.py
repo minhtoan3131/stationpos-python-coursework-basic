@@ -34,6 +34,9 @@ class FakeInventoryRepo:
 
     def add_stock_transaction(self, trans_data): self.stock_transactions.append(trans_data)
 
+    def get_conversion_info(self, product_id, unit_id):
+        return {'ratio': Decimal('1')}
+
 
 class FakePOHistoryRepo:
     def __init__(self):

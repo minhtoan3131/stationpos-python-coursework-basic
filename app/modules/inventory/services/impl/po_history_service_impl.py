@@ -73,20 +73,18 @@ class PurchaseOrderHistoryServiceImpl(PurchaseOrderHistoryService):
             po_items = db.po_history_repo.get_purchase_order_items(po_id)
             po_timestamp = po_master['created_at']  # Timestamp của phiếu nhập phục vụ Chốt chặn 2
 
-            # Bước 1: Vòng lặp Validation chốt chặn kép trước khi biến động bất kỳ dòng dữ liệu nào
+            # ==================================================================
+            # BƯỚC 1: VÒNG LẶP VALIDATION CHỐT CHẶN KÉP (CHỐNG RÚT RUỘT KHO)
+            # ==================================================================
             for item in po_items:
                 product_id = item['product_id']
                 imported_qty = item['quantity']
                 imported_unit_id = item['unit_id']
 
-                # Tính toán số lượng quy đổi cơ bản
-                product_data = db.product_repo.get_product_detail_for_import(product_id)
-                base_qty_to_deduct = imported_qty
-                conv_unit_id = product_data.get('conversion_unit_id')
-                conv_ratio = product_data.get('conversion_ratio')
-
-                if conv_unit_id and imported_unit_id == conv_unit_id and conv_ratio:
-                    base_qty_to_deduct = imported_qty * int(float(conv_ratio))
+                # Tra cứu tỷ lệ quy đổi
+                conv_info = db.inventory_repo.get_conversion_info(product_id, imported_unit_id)
+                ratio = Decimal(str(conv_info['ratio'])) if conv_info else Decimal('1')
+                base_qty_to_deduct = int(Decimal(str(imported_qty)) * ratio)
 
                 # --- CHỐT CHẶN 2: Bảo vệ Lịch sử MAC (QUAN TRỌNG) ---
                 if db.po_history_repo.has_subsequent_delivery_transactions(product_id, po_timestamp):
@@ -95,7 +93,7 @@ class PurchaseOrderHistoryServiceImpl(PurchaseOrderHistoryService):
                         f"sau thời điểm nhập phiếu này. Vui lòng sử dụng nghiệp vụ Trả hàng NCC."
                     )
 
-                # --- CHỐT CHẶN 1: Logic Tồn kho (Khóa dòng FOR UPDATE qua get_inventory_status) ---
+                # --- CHỐT CHẶN 1: Logic Tồn kho (Khóa dòng FOR UPDATE) ---
                 inv_status = db.inventory_repo.get_inventory_status(product_id)
                 current_qty = inv_status['quantity']
 
@@ -105,7 +103,9 @@ class PurchaseOrderHistoryServiceImpl(PurchaseOrderHistoryService):
                         f"Sản phẩm [{item['sku']}] không đủ lượng tồn. (Tồn hiện tại: {current_qty}, Cần trừ: {base_qty_to_deduct})"
                     )
 
-            # Thực thi biến động dữ liệu khi các chốt chặn đã an toàn vượt qua
+            # ==================================================================
+            # BƯỚC 3 & 4: THỰC THI BIẾN ĐỘNG DỮ LIỆU KHO KHI CÁC CHỐT CHẶN ĐÃ AN TOÀN
+            # ==================================================================
             total_qty = 0
             for item in po_items:
                 product_id = item['product_id']
@@ -115,26 +115,25 @@ class PurchaseOrderHistoryServiceImpl(PurchaseOrderHistoryService):
 
                 total_qty += imported_qty
 
-                product_data = db.product_repo.get_product_detail_for_import(product_id)
-                base_qty_to_deduct = imported_qty
-                if product_data.get('conversion_unit_id') and imported_unit_id == product_data.get(
-                        'conversion_unit_id') and product_data.get('conversion_ratio'):
-                    base_qty_to_deduct = imported_qty * int(float(product_data.get('conversion_ratio')))
+                # Tra cứu tỷ lệ quy đổi
+                conv_info = db.inventory_repo.get_conversion_info(product_id, imported_unit_id)
+                ratio = Decimal(str(conv_info['ratio'])) if conv_info else Decimal('1')
+                base_qty_to_deduct = int(Decimal(str(imported_qty)) * ratio)
 
                 inv_status = db.inventory_repo.get_inventory_status(product_id)
                 current_qty = inv_status['quantity']
                 current_total_value = Decimal(str(inv_status['total_value']))
 
-                # Tiến hành rút lùi toán học
+                # Tiến hành rút lùi toán học tài chính kho
                 new_qty = current_qty - base_qty_to_deduct
                 new_total_value_tmp = current_total_value - imported_total_price
                 new_total_value = new_total_value_tmp
 
-                # --- CHỐT CHẶN MINH BẠCH: Dọn rác thập phân lúc nhập (Trường hợp kho về 0 nhưng còn đọng tiền rác) ---
+                # --- CHỐT CHẶN MINH BẠCH: Dọn rác thập phân lúc nhập ---
                 if new_qty == 0 and new_total_value_tmp != 0:
                     variance = new_total_value_tmp
 
-                    # Bắn log hạch toán ADJUST_VARIANCE để giải trình chênh lệch kế toán ngoại vi
+                    # Bắn log hạch toán ADJUST_VARIANCE mang dấu âm đối ứng chuẩn xác để triệt tiêu tài sản ma
                     db.inventory_repo.add_stock_transaction({
                         'product_id': product_id,
                         'qty': 0,
@@ -149,7 +148,6 @@ class PurchaseOrderHistoryServiceImpl(PurchaseOrderHistoryService):
                 # Tính toán lại chỉ số MAC lùi sau khi rút hàng
                 if new_qty > 0:
                     new_mac = new_total_value / Decimal(str(new_qty))
-                    # Đảm bảo làm tròn nửa lên 4 chữ số thập phân lưu trữ DB
                     new_mac = new_mac.quantize(Decimal('0.0001'))
                     new_total_value = new_total_value.quantize(Decimal('0.0001'))
                 else:
