@@ -134,5 +134,5 @@ def test_cancel_po_forces_absolute_zero_and_logs_variance_clearance(po_service, 
     variance_log = db_inv.stock_transactions[0]
     assert variance_log['type'] == 'ADJUST_VARIANCE'
     assert variance_log['qty'] == 0  # Không biến động lượng vật lý
-    assert variance_log['variance_amount'] == Decimal('0.0001')  # Truy tìm ra đúng lượng rác dư thừa
+    assert variance_log['variance_amount'] == Decimal('-0.0001')  # Truy tìm ra đúng lượng rác dư thừa
     assert "Điều chỉnh dọn rác giá trị tồn đọng khi kho trống" in variance_log['note']

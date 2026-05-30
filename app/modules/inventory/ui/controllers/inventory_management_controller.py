@@ -273,18 +273,17 @@ class InventoryManagementController(QWidget):
         self.calculate_cart_total()
 
     def handle_save_purchase(self):
-        """Xác nhận nhập kho - Gom dữ liệu In-Memory trước khi gọi Service"""
+        """Xác nhận nhập kho - Truyền trực tiếp dữ liệu thô xuống Service để bảo toàn Decimal"""
         supplier_id = self.ui.cbo_supplier.currentData()
         if supplier_id == 0:
             QMessageBox.warning(self, "Cảnh báo", "Vui lòng chọn Nhà cung cấp!")
             return
 
-        # Nếu ngay cả trên bảng hiển thị còn không có dòng nào -> Báo trống luôn tại đây
         if self.ui.tbl_items.rowCount() == 0:
             QMessageBox.warning(self, "Cảnh báo", "Giỏ hàng nhập hiện đang trống!")
             return
 
-        aggregated_items = {}
+        items_dto = []
         raw_details_for_confirm = []
 
         # Quét qua từng dòng vật lý trên UI
@@ -305,8 +304,6 @@ class InventoryManagementController(QWidget):
             # Đọc chuỗi text trong ô giá gõ tay
             price_text = price_item.text().strip().replace(",", "") if price_item else ""
 
-            # --- CHỐT CHẶN 2: BẮT LỖI GIÁ TRỐNG (ƯU TIÊN CAO) ---
-            # Chạy qua đây, dòng test UI có price_text == "" sẽ kích hoạt khối này ngay lập tức!
             if not price_text:
                 QMessageBox.warning(
                     self,
@@ -327,53 +324,18 @@ class InventoryManagementController(QWidget):
                 )
                 return
 
-            # Logic gom nhóm tính toán tiền dòng (Giữ nguyên)
-            line_total_amount = qty_val * price_val
-
-            full_product_list = self.inventory_service.search_products_for_import(sku_text)
-            if not full_product_list:
-                continue
-            p = full_product_list[0]
-
-            base_qty_line = qty_val
-            if p.conversion_unit_id and cbo_unit.currentData() == p.conversion_unit_id and p.conversion_ratio:
-                base_qty_line = qty_val * int(float(p.conversion_ratio))
-
-            if product_id not in aggregated_items:
-                aggregated_items[product_id] = {
-                    'product_id': product_id,
-                    'sku': sku_text,
-                    'name': prod_name,
-                    'base_unit_id': p.base_unit_id,
-                    'total_base_qty': 0,
-                    'total_amount': 0.0
-                }
-
-            aggregated_items[product_id]['total_base_qty'] += base_qty_line
-            aggregated_items[product_id]['total_amount'] += line_total_amount
+            # Bê nguyên đại lượng thô từ UI (Hộp gõ sao giữ vậy) đút thẳng vào DTO gửi đi.
+            items_dto.append(PurchaseOrderItemDTO(
+                product_id=product_id,
+                unit_id=cbo_unit.currentData(),  # Giữ nguyên ID đơn vị Sỉ (Hộp) người dùng chọn
+                quantity=qty_val,               # Số lượng nguyên bản (Ví dụ: 3 Hộp)
+                unit_price=price_val            # Đơn giá nguyên bản (Ví dụ: 100,000 VND)
+            ))
 
             raw_details_for_confirm.append({
                 'sku': sku_text, 'name': prod_name, 'unit_name': cbo_unit.currentText(),
                 'qty': qty_val, 'price': price_val
             })
-
-        # --- CHỐT CHẶN 3: AN TOÀN CUỐI CÙNG ---
-        if not aggregated_items:
-            QMessageBox.warning(self, "Cảnh báo", "Giỏ hàng nhập hiện đang trống!")
-            return
-
-        # Chuyển đổi dict đã gom nhóm thành mảng DTO gửi xuống Service
-        items_dto = []
-        for pid, info in aggregated_items.items():
-            # Vì đã nhân quy đổi trên App nên đơn giá mới = Tổng tiền / Tổng lượng cơ bản
-            calculated_unit_price = info['total_amount'] / info['total_base_qty']
-
-            items_dto.append(PurchaseOrderItemDTO(
-                product_id=pid,
-                unit_id=info['base_unit_id'],  # Đã đưa về đơn vị cơ bản
-                quantity=info['total_base_qty'],  # Tổng lượng cơ bản (Ví dụ: 57)
-                unit_price=calculated_unit_price  # Tổng giá trị chia đều (Ví dụ: 520k / 57)
-            ))
 
         try:
             dto = PurchaseOrderCreateDTO(
@@ -382,12 +344,12 @@ class InventoryManagementController(QWidget):
                 items=items_dto
             )
 
-            # Hiện hộp thoại xác nhận tổng thể (Hiển thị chi tiết sỉ/lẻ gốc trực quan cho user)
+            # Hiện hộp thoại xác nhận tổng thể
             supplier_name = self.ui.cbo_supplier.currentText()
             confirm_dialog = PurchaseOrderConfirmController(dto, supplier_name, raw_details_for_confirm)
             if confirm_dialog.exec() != QDialog.DialogCode.Accepted: return
 
-            # Gọi Service xử lý - Lúc này mỗi SKU chỉ xuất hiện đúng 1 lần duy nhất!
+            # Gọi Service xử lý - Nhường toàn bộ quyền tính toán an toàn cho toán học Decimal
             po_id = self.inventory_service.create_purchase_order(dto)
             QMessageBox.information(self, "Thành công", f"Đã nhập kho thành công! (Mã phiếu: {po_id})")
 

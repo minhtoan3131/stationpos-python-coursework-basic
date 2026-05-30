@@ -139,7 +139,7 @@ class PurchaseOrderHistoryServiceImpl(PurchaseOrderHistoryService):
                         'product_id': product_id,
                         'qty': 0,
                         'type': 'ADJUST_VARIANCE',
-                        'variance_amount': variance,
+                        'variance_amount': -variance,
                         'note': f"Hủy phiếu: Điều chỉnh dọn rác giá trị tồn đọng khi kho trống",
                         'ref_id': po_id
                     })
