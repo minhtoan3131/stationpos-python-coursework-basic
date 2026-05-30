@@ -3,7 +3,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Optional
 from PyQt6.QtWidgets import QWidget, QHeaderView, QAbstractItemView, QMessageBox, QTableWidgetItem, QInputDialog, \
-    QLineEdit
+    QLineEdit, QFileDialog
 from PyQt6.QtCore import Qt
 
 from app.modules.tax.ui.generated.ui_tax_management import Ui_TaxManagementWidget
@@ -59,11 +59,16 @@ class TaxManagementController(QWidget):
         self.ui.tbl_tax_history_master.itemSelectionChanged.connect(self.handle_master_row_selected)
         self.ui.btn_close_ledger.clicked.connect(self.handle_finalize_and_lock_ledger)
 
+        self.ui.btn_print_ledger.clicked.connect(self.handle_print_ledger)
+        self.ui.btn_export_ledger_excel.clicked.connect(self.handle_export_excel)
+
     def handle_tab_changed(self, index: int):
         if index == 0:
             self.load_data_for_year(self.current_operating_year)
         elif index == 1:
             self.load_history_master_table()
+            self.selected_ledger_id = None
+            self.selected_ledger_year = None
             # Dọn dẹp sạch sẽ vết dữ liệu hiển thị cũ bên Khung Detail phải
             self.ui.tbl_ledger_details.setRowCount(0)
             self.ui.lbl_md_ledger_year.setText("<b>Năm quyết toán:</b> --")
@@ -74,6 +79,10 @@ class TaxManagementController(QWidget):
             self.ui.lbl_md_vat_rate.setText("<b>Thuế suất GTGT:</b> --")
             self.ui.lbl_md_pit_rate.setText("<b>Thuế suất TNCN:</b> --")
             self.ui.btn_close_ledger.setEnabled(False)
+
+            self.ui.btn_close_ledger.setEnabled(False)
+            self.ui.btn_print_ledger.setEnabled(False)
+            self.ui.btn_export_ledger_excel.setEnabled(False)
 
     def handle_live_recalculation(self):
         """Tính toán live và đồng bộ chuỗi text công thức động lên nhãn chữ (ĐÃ XÓA SỐ CỨNG PHÂN KHÚC)"""
@@ -243,7 +252,12 @@ class TaxManagementController(QWidget):
     def handle_master_row_selected(self):
         """Luồng tương tác Master-Detail phản ứng nhanh từ Cache, điền thông số cấu hình đóng băng lên Header Tab 2"""
         selected_rows = self.ui.tbl_tax_history_master.selectedItems()
-        if not selected_rows: return
+        if not selected_rows:
+            self.selected_ledger_id = None
+            self.selected_ledger_year = None
+            self.ui.btn_print_ledger.setEnabled(False)
+            self.ui.btn_export_ledger_excel.setEnabled(False)
+            return
         try:
             row_idx = selected_rows[0].row()
             self.selected_ledger_id = self.ui.tbl_tax_history_master.item(row_idx, 0).data(Qt.ItemDataRole.UserRole)
@@ -288,19 +302,33 @@ class TaxManagementController(QWidget):
             else:
                 self.ui.lbl_md_ledger_date.setText("<b>Ngày khóa sổ:</b> Chưa khóa (Bản nháp)")
 
+            self.ui.btn_close_ledger.setEnabled(True)
+            self.ui.btn_print_ledger.setEnabled(True)
+            self.ui.btn_export_ledger_excel.setEnabled(True)
+
             if status_text == "🔒 Đã khóa sổ":
                 self.ui.lbl_md_ledger_status.setText(
                     "<b>Trạng thái bảo mật:</b> <span style='color:green;'>🔒 ĐÃ KHÓA SỔ</span>")
-                self.ui.btn_close_ledger.setEnabled(False)
             else:
                 self.ui.lbl_md_ledger_status.setText(
                     "<b>Trạng thái bảo mật:</b> <span style='color:orange;'>⚠️ Bản nháp (Mở duyệt)</span>")
-                self.ui.btn_close_ledger.setEnabled(True)
         except Exception as e:
             traceback.print_exc()
 
     def handle_finalize_and_lock_ledger(self):
         if not self.selected_ledger_year: return
+        selected_rows = self.ui.tbl_tax_history_master.selectedItems()
+        if selected_rows:
+            row_idx = selected_rows[0].row()
+            status_text = self.ui.tbl_tax_history_master.item(row_idx, 4).text()
+            if status_text == "🔒 Đã khóa sổ":
+                QMessageBox.information(
+                    self, "Thông báo hệ thống",
+                    f"⚠️ <b>KỲ TÍNH THUẾ ĐÃ ĐÓNG BĂNG:</b><br><br>"
+                    f"Sổ cái tài chính năm <b>{self.selected_ledger_year}</b> đã được chốt và khóa.<br>"
+                    f"Hệ thống không cho phép thực hiện chốt sổ lại lần hai trên chứng từ này!"
+                )
+                return
         reply = QMessageBox.warning(
             self, "XÁC NHẬN CHỐT SỔ TÀI CHÍNH",
             f"BẠN ĐANG THỰC HIỆN KHÓA SỔ THUẾ NĂM {self.selected_ledger_year}.\n\nThao tác này sẽ ĐÓNG BĂNG VĨNH VIỄN toàn bộ số liệu. Không thể điều chỉnh sau khi chốt.\n\nBạn có chắc chắn muốn thực hiện không?",
@@ -315,7 +343,7 @@ class TaxManagementController(QWidget):
                 QMessageBox.information(self, "Thành công",
                                         f"🔒 Kỳ thuế năm {self.selected_ledger_year} đã đóng băng vĩnh viễn.")
                 self.load_history_master_table()
-                self.ui.btn_close_ledger.setEnabled(False)
+                self.ui.btn_close_ledger.setEnabled(True)
                 self.ui.lbl_md_ledger_status.setText(
                     "<b>Trạng thái bảo mật:</b> <span style='color:green;'>🔒 ĐÃ KHÓA SỔ</span>")
             else:
@@ -331,3 +359,96 @@ class TaxManagementController(QWidget):
             self.ui.tbl_monthly_tax.setItem(idx, 2, TaxUIHelper.create_numeric_item(month_detail.vat_amount))
             self.ui.tbl_monthly_tax.setItem(idx, 3, TaxUIHelper.create_numeric_item(month_detail.pit_amount))
             self.ui.tbl_monthly_tax.setItem(idx, 4, TaxUIHelper.create_numeric_item(month_detail.total_tax))
+
+    def handle_print_ledger(self):
+        """Mô phỏng lệnh kết xuất in ấn chứng từ thuế"""
+        selected_rows = self.ui.tbl_tax_history_master.selectedItems()
+        if not selected_rows or not self.selected_ledger_year:
+            QMessageBox.warning(self, "Cảnh báo",
+                                "Vui lòng chọn một kỳ quyết toán sổ cái trên bảng lịch sử trước khi thực hiện in chứng từ!")
+            return
+
+        QMessageBox.information(
+            self, "Driver Máy In Hệ Thống",
+            f"🖨️ <b>[MÔ PHỎNG IN CHỨNG TỪ THUẾ]</b><br><br>"
+            f"Đã gửi thành công lệnh kết xuất dữ liệu Sổ cái Thuế năm <b>{self.selected_ledger_year}</b> "
+            f"tới Driver máy in mặc định của hệ thống.<br><br>"
+            f"Trạng thái: <b>Hoàn tất truyền dữ liệu (Spooling Completed).</b>"
+        )
+
+    def handle_export_excel(self):
+        """Xử lý nghiệp vụ chọn nơi lưu và ra lệnh kết xuất báo cáo Excel Sổ cái thuế"""
+        selected_rows = self.ui.tbl_tax_history_master.selectedItems()
+        if not selected_rows or not self.selected_ledger_year or not self.selected_ledger_id:
+            QMessageBox.warning(self, "Cảnh báo",
+                                "Vui lòng chọn một kỳ quyết toán sổ cái trên bảng lịch sử trước khi xuất báo cáo Excel!")
+            return
+
+        current_time = datetime.now().strftime("%Y%m%d_%H%M")
+        default_filename = f"SoCaiThue_Nam_{self.selected_ledger_year}_{current_time}.xlsx"
+
+        # Mở hộp thoại lưu file của Hệ điều hành
+        file_path, _ = QFileDialog.getSaveFileName(
+            self,
+            "Xuất Excel Chi tiết Sổ cái Thuế",
+            default_filename,
+            "Excel Files (*.xlsx);;All Files (*)"
+        )
+
+        if file_path:
+            if not file_path.endswith('.xlsx'):
+                file_path += '.xlsx'
+
+            try:
+                # Đọc live Metadata đóng băng trực tiếp từ Cache dòng Master được chọn trên UI
+                selected_rows = self.ui.tbl_tax_history_master.selectedItems()
+                if not selected_rows: return
+                row_idx = selected_rows[0].row()
+
+                threshold_val = self.ui.tbl_tax_history_master.item(row_idx, 1).data(Qt.ItemDataRole.UserRole)
+                method_val = self.ui.tbl_tax_history_master.item(row_idx, 2).data(Qt.ItemDataRole.UserRole)
+                vat_val = self.ui.tbl_tax_history_master.item(row_idx, 3).data(Qt.ItemDataRole.UserRole)
+                pit_val = self.ui.tbl_tax_history_master.item(row_idx, 4).data(Qt.ItemDataRole.UserRole)
+                finalized_at_raw = self.ui.tbl_tax_history_master.item(row_idx, 0).data(Qt.ItemDataRole.UserRole + 1)
+                status_text = self.ui.tbl_tax_history_master.item(row_idx, 4).text()
+
+                date_str = "Chưa khóa (Bản nháp)"
+                if finalized_at_raw:
+                    date_str = finalized_at_raw.strftime("%d/%m/%Y %H:%M") if hasattr(finalized_at_raw,
+                                                                                      'strftime') else str(
+                        finalized_at_raw)
+
+                metadata = {
+                    "year": self.selected_ledger_year,
+                    "threshold": threshold_val if threshold_val else Decimal('0'),
+                    "method_display": "Khoán % doanh thu" if method_val == "FLAT_RATE" else "Sổ sách kế toán",
+                    "vat_percent": vat_val,
+                    "pit_percent": pit_val,
+                    "status": status_text,
+                    "finalized_at": date_str
+                }
+
+                # Gọi Service kéo mảng dữ liệu 12 tháng tương ứng từ DB
+                items = self.tax_service.get_ledger_details(self.selected_ledger_id)
+
+                # Tiến hành kết xuất tệp vật lý thông qua Exporter
+                from app.modules.tax.utils.tax_ledger_excel_exporter import TaxLedgerExcelExporter
+                success = TaxLedgerExcelExporter.export_ledger(
+                    file_path=file_path,
+                    metadata=metadata,
+                    items=items
+                )
+
+                if success:
+                    QMessageBox.information(
+                        self,
+                        "Thành công",
+                        f"Đã xuất chi tiết sổ cái thuế năm {self.selected_ledger_year} thành công tại đường dẫn:\n{file_path}"
+                    )
+            except Exception as e:
+                traceback.print_exc()
+                QMessageBox.critical(
+                    self,
+                    "Lỗi hệ thống",
+                    f"Kết xuất báo cáo Excel sổ cái thuế thất bại:\n{str(e)}"
+                )
