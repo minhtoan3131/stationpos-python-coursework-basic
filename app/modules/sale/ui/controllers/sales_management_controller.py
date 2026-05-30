@@ -206,7 +206,7 @@ class SalesManagementController(QWidget):
         self.ui.tbl_cart.setItem(row_idx, 2, unit_item)
 
         spin_qty = QSpinBox()
-        spin_qty.setRange(1, 9999)
+        spin_qty.setRange(1, 100000)
         spin_qty.setValue(1)
         spin_qty.setAlignment(Qt.AlignmentFlag.AlignCenter)
         spin_qty.valueChanged.connect(self.calculate_total)
@@ -298,6 +298,17 @@ class SalesManagementController(QWidget):
                 quantity=qty, price=price, total=line_total,
                 cost_price=cost_price
             ))
+
+        MAX_FINANCIAL_CEILING = Decimal("50000000000")  # 50 Tỷ VND
+
+        if total_amount > MAX_FINANCIAL_CEILING:
+            QMessageBox.critical(
+                self, "Từ chối thanh toán",
+                f"⚠️ <b>VƯỢT NGƯỠNG HẠN MỨC HỆ THỐNG:</b>\n\n"
+                f"Tổng giá trị đơn hàng hiện tại là: <b>{float(total_amount):,.0f} VND</b>.\n"
+                f"Vui lòng tách nhỏ giỏ hàng hoặc điều chỉnh lại số lượng mặt hàng!"
+            )
+            return
 
         # Khởi tạo CheckoutDTO gửi sang Dialog
         checkout_dto = CheckoutDTO(

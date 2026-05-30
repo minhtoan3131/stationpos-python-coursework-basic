@@ -137,20 +137,13 @@ class InventoryManagementController(QWidget):
     # ==========================================
 
     def add_selected_to_cart(self):
-        """Xử lý thêm vào phiếu - Chỉnh sửa: BỎ tự động điền giá MAC lịch sử"""
+        """Xử lý thêm vào phiếu"""
         selected_row = self.ui.tbl_inventory.currentRow()
         if selected_row < 0: return
 
         product_info = self.raw_inventory_data[selected_row]
 
-        # KIỂM TRA TRÙNG LẶP:
-        # for r in range(self.ui.tbl_items.rowCount()):
-        #     if self.ui.tbl_items.item(r, 0).text() == product_info.sku:
-        #         spn = self.ui.tbl_items.cellWidget(r, 3)
-        #         spn.setValue(spn.value() + 1)
-        #         return
-
-        # 2. THÊM DÒNG MỚI
+        # THÊM DÒNG MỚI
         full_product_list = self.inventory_service.search_products_for_import(product_info.sku)
         if not full_product_list: return
         p = full_product_list[0]
@@ -177,7 +170,8 @@ class InventoryManagementController(QWidget):
         # SpinBox Số lượng
         spn_qty = QSpinBox()
         spn_qty.setMinimum(1)
-        spn_qty.setMaximum(999999)
+        # Đặt hạn mức trần số lượng nhập kho trên 1 dòng là 100,000 (Chống tràn số)
+        spn_qty.setMaximum(100000)
         spn_qty.setValue(1)
         spn_qty.setAlignment(Qt.AlignmentFlag.AlignCenter)
         spn_qty.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
@@ -316,6 +310,15 @@ class InventoryManagementController(QWidget):
                 price_val = float(price_text)
                 if price_val <= 0:
                     raise ValueError
+                # Khống chế đơn giá nhập của từng món không vượt quá 1 Tỷ VND
+                MAX_PRICE_CEILING = 1000000000.0  # 1 Tỷ VND
+                if price_val > MAX_PRICE_CEILING:
+                    QMessageBox.warning(
+                        self, "Dữ liệu vượt hạn mức",
+                        f"Đơn giá nhập của mặt hàng [{sku_text}] vượt quá hạn mức tối đa cho phép (1 Tỷ VND)!\n"
+                        f"Vui lòng kiểm tra lại số lượng đã nhập"
+                    )
+                    return
             except ValueError:
                 QMessageBox.warning(
                     self,
@@ -336,6 +339,20 @@ class InventoryManagementController(QWidget):
                 'sku': sku_text, 'name': prod_name, 'unit_name': cbo_unit.currentText(),
                 'qty': qty_val, 'price': price_val
             })
+
+        # Đánh chặn tổng tiền toàn bộ phiếu nhập trước khi đẩy xuống DB
+        # Ngưỡng khống chế an toàn là 50 Tỷ VND (Dưới ngưỡng 99 Tỷ của cấu trúc DECIMAL(15,4))
+        total_po_amount = sum(item.quantity * item.unit_price for item in items_dto)
+        MAX_FINANCIAL_CEILING = 50000000000.0  # 50 Tỷ VND
+
+        if total_po_amount > MAX_FINANCIAL_CEILING:
+            QMessageBox.critical(
+                self, "Từ chối giao dịch",
+                f"⚠️ <b>VƯỢT NGƯỠNG HẠN MỨC HỆ THỐNG:</b>\n\n"
+                f"Tổng giá trị phiếu nhập kho hiện tại là: <b>{total_po_amount:,.0f} VND</b>.\n"
+                f"Vui lòng tách nhỏ phiếu này thành các chứng từ nhập kho độc lập!"
+            )
+            return
 
         try:
             dto = PurchaseOrderCreateDTO(

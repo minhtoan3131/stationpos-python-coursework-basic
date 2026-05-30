@@ -42,6 +42,13 @@ class CheckoutDialogController(QDialog):
         self.ui.tbl_invoice_items.verticalHeader().setVisible(False)
         self.ui.tbl_invoice_items.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
 
+        # ==================================================================
+        # Thiết lập trần nhập liệu cho ô Tiền khách đưa
+        # Mặc định SpinBox chỉ cho nhập số nhỏ, ta mở rộng lên tối đa 100 Tỷ VND
+        # ==================================================================
+        self.ui.spn_cash_received.setMinimum(0)
+        self.ui.spn_cash_received.setMaximum(100000000000.0)
+
     def populate_data(self):
         # Điền thông tin hóa đơn
         self.ui.lbl_invoice_id.setText(f"Số HĐ: {self.checkout_dto.code}")
@@ -128,6 +135,16 @@ class CheckoutDialogController(QDialog):
 
         if payment_method == 'CASH' and cash_received < self.checkout_dto.final_amount:
             QMessageBox.warning(self, "Cảnh báo", "Số tiền khách đưa chưa đủ để thanh toán hóa đơn này!")
+            self.ui.spn_cash_received.setFocus()
+            return
+
+        MAX_CASH_LIMIT = Decimal("100000000000")  # 100 Tỷ VND
+        if payment_method == 'CASH' and cash_received > MAX_CASH_LIMIT:
+            QMessageBox.warning(
+                self, "Số tiền không hợp lệ",
+                f"Số tiền khách đưa (<b>{float(cash_received):,.0f} VND</b>) vượt quá hạn mức thanh toán thực tế của hệ thống!\n"
+                f"Vui lòng kiểm tra lại."
+            )
             self.ui.spn_cash_received.setFocus()
             return
 
