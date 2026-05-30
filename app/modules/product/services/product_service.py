@@ -57,3 +57,6 @@ class ProductService(ABC):
         pass
     @abstractmethod
     def update_product_prices(self, product_id: int, retail_price: float, wholesale_price: float) -> bool: pass
+
+    @abstractmethod
+    def has_transactions(self, product_id: int) -> bool: pass

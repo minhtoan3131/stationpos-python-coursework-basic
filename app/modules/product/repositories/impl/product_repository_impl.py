@@ -187,3 +187,15 @@ class ProductRepositoryImpl(BaseRepository, ProductRepository):
         """
         self.cursor.execute(query, (retail_price, wholesale_price, product_id))
         return self.cursor.rowcount > 0
+
+    def has_historical_transactions(self, product_id: int) -> bool:
+        sql = """
+            SELECT EXISTS(
+                SELECT 1 FROM invoice_items WHERE product_id = %s
+                UNION ALL
+                SELECT 1 FROM purchase_order_items WHERE product_id = %s
+            ) AS has_tx
+        """
+        self.cursor.execute(sql, (product_id, product_id))
+        row = self.cursor.fetchone()
+        return bool(row['has_tx']) if row else False

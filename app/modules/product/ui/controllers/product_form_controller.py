@@ -132,6 +132,23 @@ class ProductFormController(QDialog):
                 self.ui.cbo_conversion_unit.setCurrentIndex(0)
                 self.ui.spn_conversion_ratio.setValue(0)
 
+            # --- CHỐT CHẶN AN TOÀN KHO: KHÓA ĐVT & TỶ LỆ NẾU ĐÃ KINH DOANH ---
+            if self.product_service.has_transactions(self.product_id):
+                # Khóa cứng các linh kiện cấu trúc đơn vị quy đổi
+                self.ui.cbo_base_unit.setEnabled(False)
+                self.ui.cbo_conversion_unit.setEnabled(False)
+                self.ui.spn_conversion_ratio.setEnabled(False)
+
+                # Khóa luôn nút bấm thêm nhanh (+) ĐVT bên cạnh để chống đi đường vòng
+                self.ui.btn_add_base_unit.setEnabled(False)
+                self.ui.btn_add_conversion_unit.setEnabled(False)
+
+                # Hiển thị Tooltip giải thích trực quan khi user di chuột vào trường bị khóa
+                warning_msg = "Không thể thay đổi quy cách vì sản phẩm này đã phát sinh lịch sử giao dịch mua/bán."
+                self.ui.cbo_base_unit.setToolTip(warning_msg)
+                self.ui.cbo_conversion_unit.setToolTip(warning_msg)
+                self.ui.spn_conversion_ratio.setToolTip(warning_msg)
+
         except Exception as e:
             QMessageBox.critical(self, "Lỗi tải dữ liệu", f"Không thể lấy thông tin sản phẩm:\n{str(e)}")
             self.close()

@@ -68,3 +68,8 @@ class ProductRepository(ABC):
     def update_selling_prices(self, product_id: int, retail_price: float, wholesale_price: float) -> bool:
         """Cập nhật giá bán lẻ và giá sỉ của sản phẩm dưới database."""
         pass
+
+    @abstractmethod
+    def has_historical_transactions(self, product_id: int) -> bool:
+        """Kiểm tra xem sản phẩm đã phát sinh bất kỳ lịch sử mua hoặc bán nào chưa"""
+        pass

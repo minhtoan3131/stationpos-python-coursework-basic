@@ -234,3 +234,11 @@ class ProductServiceImpl(ProductService):
             raise e
         finally:
             connection.close()
+
+    def has_transactions(self, product_id: int) -> bool:
+        connection = DatabaseConnection.get_connection()
+        try:
+            product_repo = ProductRepositoryImpl(connection)
+            return product_repo.has_historical_transactions(product_id)
+        finally:
+            connection.close()
