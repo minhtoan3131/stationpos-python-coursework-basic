@@ -79,7 +79,6 @@ class ProductMapper:
 
     @staticmethod
     def to_product_list_dto(row: dict) -> ProductListDTO:
-
         return ProductListDTO(
             id=row["id"],
             sku=row["sku"],
@@ -90,9 +89,11 @@ class ProductMapper:
             wholesale_price=row["wholesale_price"],
             barcode=row["barcode"],
             supplier_name=row["supplier_name"],
+            cost_price=float(row["cost_price"]) if row.get("cost_price") else 0.0,
+            stock_qty=int(row["stock_qty"]) if row.get("stock_qty") is not None else 0,
+
             conversion_unit_name=row.get("conversion_unit_name"),
             conversion_ratio=row.get("conversion_ratio")
-
         )
 
     # =========================

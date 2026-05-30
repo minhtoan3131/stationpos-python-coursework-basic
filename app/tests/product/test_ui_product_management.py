@@ -9,7 +9,7 @@ from app.modules.product.dtos.product_list_dto import ProductListDTO
 
 
 # ==========================================
-# FIXTURES
+# FIXTURES ( ĐỒNG BỘ CẤU TRÚC UOM MỚI)
 # ==========================================
 
 @pytest.fixture
@@ -19,12 +19,16 @@ def mock_products():
             id=1, sku="SP001", name="Bút bi Thiên Long", category_name="Bút viết",
             unit_name="Cây", retail_price=5000, wholesale_price=4500,
             barcode="893123456", supplier_name="Thiên Long",
+            cost_price=4000.0, stock_qty=100,
+
             conversion_unit_name="Hộp", conversion_ratio=12
         ),
         ProductListDTO(
             id=2, sku="SP002", name="Tập vở 200 trang", category_name="Tập vở",
             unit_name="Quyển", retail_price=10000, wholesale_price=None,
             barcode="893654321", supplier_name="Hồng Hà",
+            cost_price=8000.0, stock_qty=50,
+
             conversion_unit_name=None, conversion_ratio=None
         )
     ]
@@ -58,7 +62,7 @@ def manager_window(qtbot, mock_products):
 
 
 # ==========================================
-# Các hàm Test giữ nguyên logic, chỉ sửa phần assert
+# CÁC HÀM TEST ĐÃ ĐỒNG BỘ CHUẨN XÁC
 # ==========================================
 
 def test_init_loads_data_to_table(manager_window):
@@ -92,7 +96,8 @@ def test_search_enter_key(qtbot, manager_window, mock_products):
 
 def test_open_create_dialog_success(qtbot, manager_window, mocker):
     manager_window.mock_service.reset_mock()
-    mock_dialog_class = mocker.patch('app.modules.product.ui.controllers.product_management_controller.ProductFormController')
+    mock_dialog_class = mocker.patch(
+        'app.modules.product.ui.controllers.product_management_controller.ProductFormController')
     mock_dialog_class.return_value.exec.return_value = 1
 
     qtbot.mouseClick(manager_window.ui.btn_create_product, Qt.MouseButton.LeftButton)
@@ -109,8 +114,9 @@ def test_open_create_dialog_success(qtbot, manager_window, mocker):
 
 def test_open_update_dialog_without_selection(qtbot, manager_window, mocker):
     manager_window.ui.tbl_products.clearSelection()
-    mock_msg_box = mocker.patch('app.modules.product.ui.controllers.product_management_controller.QMessageBox.information')
-    mock_dialog_class = mocker.patch('app.modules.product.ui.controllers.product_management_controller.ProductFormController')
+    mock_msg_box = mocker.patch(
+        'app.modules.product.ui.controllers.product_management_controller.QMessageBox.information')
+    mock_dialog_class = mocker.patch('app.modules.product.ui.controllers.product_form_controller.ProductFormController')
 
     qtbot.mouseClick(manager_window.ui.btn_update_product, Qt.MouseButton.LeftButton)
 
@@ -123,7 +129,8 @@ def test_open_update_dialog_success(qtbot, manager_window, mocker):
     manager_window.ui.tbl_products.setCurrentCell(0, 0)
     expected_id = int(manager_window.ui.tbl_products.item(0, 0).text())
 
-    mock_dialog_class = mocker.patch('app.modules.product.ui.controllers.product_management_controller.ProductFormController')
+    mock_dialog_class = mocker.patch(
+        'app.modules.product.ui.controllers.product_management_controller.ProductFormController')
     mock_dialog_class.return_value.exec.return_value = 1
 
     qtbot.mouseClick(manager_window.ui.btn_update_product, Qt.MouseButton.LeftButton)
@@ -141,7 +148,7 @@ def test_open_update_dialog_success(qtbot, manager_window, mocker):
 
 def test_delete_product_without_selection(qtbot, manager_window, mocker):
     manager_window.ui.tbl_products.clearSelection()
-    mock_info = mocker.patch('app.modules.product.ui.controllers.product_management_controller.QMessageBox.information')
+    mocker.patch('app.modules.product.ui.controllers.product_management_controller.QMessageBox.information')
     qtbot.mouseClick(manager_window.ui.btn_delete_product, Qt.MouseButton.LeftButton)
     manager_window.mock_service.delete_product.assert_not_called()
 

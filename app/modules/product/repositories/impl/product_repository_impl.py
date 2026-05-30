@@ -12,13 +12,16 @@ class ProductRepositoryImpl(BaseRepository, ProductRepository):
             SELECT p.id, p.sku, p.name, c.name AS category_name, u.name AS unit_name,
                    p.retail_price, p.wholesale_price, p.barcode, s.name AS supplier_name,
                    cu.name AS conversion_unit_name,
-                   uc.ratio AS conversion_ratio
+                   uc.ratio AS conversion_ratio,
+                   p.cost_price,
+                   IFNULL(inv.quantity, 0) AS stock_qty
             FROM products p
             LEFT JOIN categories c ON p.category_id = c.id
             LEFT JOIN suppliers s ON p.supplier_id = s.id
             LEFT JOIN units u ON p.base_unit_id = u.id
             LEFT JOIN unit_conversions uc ON p.id = uc.product_id
             LEFT JOIN units cu ON uc.to_unit_id = cu.id
+            LEFT JOIN inventory inv ON p.id = inv.product_id
             WHERE p.is_active = TRUE
             ORDER BY p.created_at DESC
         """
@@ -31,13 +34,16 @@ class ProductRepositoryImpl(BaseRepository, ProductRepository):
             SELECT p.id, p.sku, p.name, c.name AS category_name, u.name AS unit_name,
                    p.retail_price, p.wholesale_price, p.barcode, s.name AS supplier_name,
                    cu.name AS conversion_unit_name,
-                   uc.ratio AS conversion_ratio
+                   uc.ratio AS conversion_ratio,
+                   p.cost_price,
+                   IFNULL(inv.quantity, 0) AS stock_qty
             FROM products p
             LEFT JOIN categories c ON p.category_id = c.id
             LEFT JOIN suppliers s ON p.supplier_id = s.id
             LEFT JOIN units u ON p.base_unit_id = u.id
             LEFT JOIN unit_conversions uc ON p.id = uc.product_id
             LEFT JOIN units cu ON uc.to_unit_id = cu.id
+            LEFT JOIN inventory inv ON p.id = inv.product_id
             WHERE 1=1
         """
         params = []

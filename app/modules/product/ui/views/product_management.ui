@@ -233,22 +233,32 @@ QHeaderView::section {
         </column>
         <column>
          <property name="text">
-          <string>ĐVT Lẻ</string>
+          <string>Nhà cung cấp</string>
          </property>
         </column>
         <column>
          <property name="text">
-          <string>Giá lẻ</string>
+          <string>Tồn kho</string>
          </property>
         </column>
         <column>
          <property name="text">
-          <string>ĐVT Sỉ</string>
+          <string>Giá vốn MAC</string>
          </property>
         </column>
         <column>
          <property name="text">
-          <string>Giá sỉ</string>
+          <string>Giá bán lẻ</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Giá bán sỉ</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Biên LN lẻ</string>
          </property>
         </column>
         <column>
