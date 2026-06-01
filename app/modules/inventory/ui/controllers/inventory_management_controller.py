@@ -181,7 +181,7 @@ class InventoryManagementController(QWidget):
         self.ui.tbl_items.setCellWidget(row_idx, 3, spn_qty)
 
         # === ĐỂ TRỐNG GIÁ NHẬP KHÔNG TỰ ĐIỀN ===
-        # Thay vì điền cost_val lịch sử, ta để chuỗi rỗng bắt buộc người dùng tự gõ giá thực tế
+        # Thay vì điền cost_val lịch sử, để chuỗi rỗng bắt buộc người dùng tự gõ giá thực tế
         price_item = QTableWidgetItem("")
         self.ui.tbl_items.setItem(row_idx, 4, price_item)
 
@@ -209,12 +209,11 @@ class InventoryManagementController(QWidget):
     def calculate_cart_total(self, *args):
         """
         Tính toán tổng tiền dòng và tổng tiền giỏ hàng.
-        ĐÃ SỬA LỖI: Hỗ trợ tính cộng dồn lũy tiến khi một sản phẩm xuất hiện trên nhiều dòng (Sỉ & Lẻ).
         """
         self.ui.tbl_items.blockSignals(True)
         self.cart.clear()
 
-        # 2. Tạo biến tạm để tích lũy tổng tiền toàn bộ giỏ hàng
+        # Tạo biến tạm để tích lũy tổng tiền toàn bộ giỏ hàng
         running_total_cart_amount = 0.0
 
         for r in range(self.ui.tbl_items.rowCount()):
@@ -239,11 +238,11 @@ class InventoryManagementController(QWidget):
                     self.ui.tbl_items.setItem(r, 5, QTableWidgetItem("0"))
                     continue
 
-                # 3. Tính toán thành tiền trực tiếp của dòng hiện tại (Không qua object cart)
+                # Tính toán thành tiền trực tiếp của dòng hiện tại (Không qua object cart)
                 line_total = qty_val * price_val
                 self.ui.tbl_items.setItem(r, 5, QTableWidgetItem(f"{line_total:,.0f}"))
 
-                # 4. Cộng dồn trực tiếp vào tổng tiền chung của cả giỏ hàng
+                # Cộng dồn trực tiếp vào tổng tiền chung của cả giỏ hàng
                 running_total_cart_amount += line_total
 
             except ValueError:
@@ -253,7 +252,7 @@ class InventoryManagementController(QWidget):
                 print(f"Lỗi hệ thống không xác định tại dòng {r}: {str(e)}")
                 continue
 
-        # 5. Cập nhật con số tổng tiền chuẩn xác sau khi đã cộng dồn toàn bộ các dòng
+        # Cập nhật con số tổng tiền chuẩn xác sau khi đã cộng dồn toàn bộ các dòng
         self.ui.lbl_total_value.setText(f"{running_total_cart_amount:,.0f} VND")
 
         self.ui.tbl_items.blockSignals(False)

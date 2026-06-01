@@ -1,4 +1,3 @@
-# File: app/tests/sale/test_sale_overflow_boundaries.py
 import pytest
 from unittest.mock import MagicMock
 from decimal import Decimal

@@ -19,12 +19,12 @@ class CategoryServiceImpl(CategoryService):
             connection.close()
 
     def create_category(self, name: str) -> int:
-        # 1. Validation cơ bản
+        # Validation cơ bản
         clean_name = name.strip() if name else ""
         if not clean_name:
             raise ValidationException("Tên danh mục không được để trống!")
 
-        # 2. Quản lý Transaction cho thao tác ghi (WRITE)
+        # Quản lý Transaction cho thao tác ghi (WRITE)
         connection = DatabaseConnection.get_connection()
         transaction = TransactionManager(connection)
 

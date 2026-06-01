@@ -9,7 +9,6 @@ from app.modules.product.services.impl.product_service_impl import ProductServic
 # ==============================================================================
 class FakeProductState:
     def __init__(self):
-         Tách việc gán thuộc tính .name ra riêng biệt để MagicMock nhận diện đúng kiểu chuỗi (String)
         prod = MagicMock(id=1, sku="SP001", cost_price=4000.0, retail_price=5000.0, wholesale_price=4500.0)
         prod.name = "Bút bi Thiên Long"
 
@@ -69,7 +68,7 @@ def service(mocker, fake_state):
 
 
 # ==============================================================================
-# TEST CASES (HẬU QUYẾT & BẤT BIẾN THEO CHUẨN BLACK-BOX SUITE)
+# TEST CASES
 # ==============================================================================
 
 def test_update_product_prices_happy_path_state_changes(service, fake_state):

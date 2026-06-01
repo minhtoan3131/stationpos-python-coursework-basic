@@ -210,15 +210,15 @@ class ProductServiceImpl(ProductService):
         try:
             product_repo = ProductRepositoryImpl(connection)
 
-            # 1. Đọc thông tin cũ phục vụ việc kết xuất nội dung nhật ký hoạt động
+            # Đọc thông tin cũ phục vụ việc kết xuất nội dung nhật ký hoạt động
             product = product_repo.get_product_by_id(product_id)
             p_name = product.name if product else "Sản phẩm"
             p_sku = product.sku if product else ""
 
-            # 2. Thực thi cập nhật giá bán thông qua tầng Repository
+            # Thực thi cập nhật giá bán thông qua tầng Repository
             updated = product_repo.update_selling_prices(product_id, retail_price, wholesale_price)
 
-            # 3. Kết nối an toàn sang ActivityLog để lưu vết kiểm toán lên Dashboard
+            # Kết nối an toàn sang ActivityLog để lưu vết kiểm toán lên Dashboard
             from app.modules.dashboard.repositories.impl.activity_log_repository_impl import ActivityLogRepositoryImpl
             log_repo = ActivityLogRepositoryImpl(connection)
             log_repo.add_log(

@@ -85,7 +85,6 @@ def test_mac_raise_error_when_inventory_is_negative():
     with pytest.raises(ValueError) as exc_info:
         MACCalculator.calculate_standard_mac(-5, Decimal('-20000'), 10, Decimal('50000'))
 
-     Kiểm tra mã lỗi nghiệp vụ chuẩn thay vì câu chữ cũ
     assert "KHO_AM_CHAN_NGHIEP_VU" in str(exc_info.value)
 
 
@@ -95,5 +94,4 @@ def test_mac_raise_error_when_new_qty_is_zero():
         # Kho trống, cố tình nhập thêm 0 hoặc số âm (nếu có)
         MACCalculator.calculate_standard_mac(0, Decimal('0'), 0, Decimal('0'))
 
-     Kiểm tra mã lỗi nghiệp vụ chuẩn thay vì câu chữ cũ
     assert "NHAP_KHO_VAN_AM_CHAN_NGHIEP_VU" in str(exc_info.value)

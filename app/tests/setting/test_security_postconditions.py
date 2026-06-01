@@ -44,7 +44,7 @@ class FakeUnitOfWork:
 
 
 # ==============================================================================
-# PYTEST FIXTURES (Cấp phát môi trường sạch cô lập cho từng kịch bản)
+# PYTEST FIXTURES
 # ==============================================================================
 
 @pytest.fixture

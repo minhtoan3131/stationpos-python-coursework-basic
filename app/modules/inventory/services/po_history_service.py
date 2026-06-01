@@ -27,6 +27,5 @@ class PurchaseOrderHistoryService(ABC):
         2. Kiểm tra tồn kho hiện tại có đủ để trừ ngược lại không.
         3. Cập nhật trạng thái phiếu thành CANCELLED.
         4. Trừ tồn kho và ghi log hủy.
-        (Phải bọc trong Transaction)
         """
         pass

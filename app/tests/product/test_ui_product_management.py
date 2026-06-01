@@ -9,7 +9,7 @@ from app.modules.product.dtos.product_list_dto import ProductListDTO
 
 
 # ==========================================
-# FIXTURES ( ĐỒNG BỘ CẤU TRÚC UOM MỚI)
+# FIXTURES
 # ==========================================
 
 @pytest.fixture
@@ -47,7 +47,6 @@ def manager_window(qtbot, mock_products):
 
     mock_product_service.get_product_list.return_value = mock_products
 
-    # Khởi tạo UI và Bơm các mock service vào
     window = ProductManagementController(
         product_service=mock_product_service,
         category_service=mock_category_service,
@@ -55,14 +54,12 @@ def manager_window(qtbot, mock_products):
         unit_service=mock_unit_service
     )
     qtbot.addWidget(window)
-
-    # Lưu lại để các hàm test bên dưới có thể assert
     window.mock_service = mock_product_service
     return window
 
 
 # ==========================================
-# CÁC HÀM TEST ĐÃ ĐỒNG BỘ CHUẨN XÁC
+# CÁC HÀM TEST
 # ==========================================
 
 def test_init_loads_data_to_table(manager_window):

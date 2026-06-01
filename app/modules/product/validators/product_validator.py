@@ -23,10 +23,10 @@ class ProductValidator:
     # =========================
 
     def validate_create(self, dto: ProductCreateDTO) -> None:
-        # 1. Validate logic thuần (Không cần DB)
+        # Validate logic thuần (Không cần DB)
         self._validate_pure_logic(dto)
 
-        # 2. Validate với Database (Check trùng lặp)
+        # Validate với Database (Check trùng lặp)
         self._validate_unique_sku(dto.sku)
         if dto.barcode and str(dto.barcode).strip():
             self._validate_unique_barcode(str(dto.barcode).strip())
@@ -36,17 +36,17 @@ class ProductValidator:
     # =========================
 
     def validate_update(self, dto: ProductUpdateDTO) -> None:
-        # 1. Kiểm tra sự tồn tại của sản phẩm
+        # Kiểm tra sự tồn tại của sản phẩm
         existing_product = self.product_repository.get_product_by_id(dto.product_id)
         if existing_product is None:
             raise ValidationException("Sản phẩm không tồn tại trong hệ thống.")
         if not existing_product.is_active:
             raise ValidationException("Không thể cập nhật sản phẩm đã bị xóa.")
 
-        # 2. Validate logic thuần
+        # Validate logic thuần
         self._validate_pure_logic(dto)
 
-        # 3. Validate với Database (Loại trừ ID của chính nó)
+        # Validate với Database (Loại trừ ID của chính nó)
         self._validate_unique_sku_for_update(dto.sku, dto.product_id)
         if dto.barcode and str(dto.barcode).strip():
             self._validate_unique_barcode_for_update(str(dto.barcode).strip(), dto.product_id)
@@ -84,13 +84,11 @@ class ProductValidator:
         self._validate_inventory_and_misc(dto)
 
     def _validate_identity_and_classification(self, dto) -> None:
-        # 1. Tên sản phẩm
         if not dto.name or not dto.name.strip():
             raise ValidationException("Tên sản phẩm không được để trống.")
         if len(dto.name) > 255:
             raise ValidationException("Tên sản phẩm không được vượt quá 255 ký tự.")
 
-        # 2. Mã sản phẩm (SKU) - BẮT BUỘC NHẬP
         if not dto.sku or not str(dto.sku).strip():
             raise ValidationException("Mã sản phẩm (SKU) bắt buộc phải nhập.")
 
@@ -98,12 +96,10 @@ class ProductValidator:
         if len(sku_clean) > 50:
             raise ValidationException("Mã sản phẩm (SKU) không được vượt quá 50 ký tự.")
 
-        # Format SKU: Chỉ chữ cái, số, gạch ngang, gạch dưới. Không chứa khoảng trắng.
         if not re.match(r"^[A-Za-z0-9_-]+$", sku_clean):
             raise ValidationException(
                 "Mã sản phẩm (SKU) chỉ được chứa chữ cái không dấu, chữ số, dấu '-' hoặc '_'. Không chứa khoảng trắng.")
 
-        # 3. Mã vạch (Barcode) - Tùy chọn
         if dto.barcode and str(dto.barcode).strip():
             barcode_clean = str(dto.barcode).strip()
             if not barcode_clean.isdigit():
@@ -111,17 +107,15 @@ class ProductValidator:
             if len(barcode_clean) != 13:
                 raise ValidationException("Mã vạch (Barcode) phải có độ dài chuẩn xác là 13 chữ số.")
 
-        # 4. Danh mục (Bắt buộc)
         if not dto.category_id or dto.category_id <= 0:
             raise ValidationException("Vui lòng chọn một Danh mục hàng hóa hợp lệ.")
 
     def _validate_units_and_conversions(self, dto) -> None:
 
-        # 5. Đơn vị cơ bản (Bắt buộc)
         if not dto.base_unit_id or dto.base_unit_id <= 0:
             raise ValidationException("Vui lòng chọn Đơn vị tính cơ bản (Ví dụ: Cái, Cây).")
 
-        # 6. Ràng buộc Đơn vị quy đổi (Sỉ)
+        # Ràng buộc Đơn vị quy đổi (Sỉ)
         if dto.conversion_unit_id is not None and dto.conversion_unit_id > 0:
 
             if dto.base_unit_id == dto.conversion_unit_id:
@@ -131,11 +125,9 @@ class ProductValidator:
                 raise ValidationException("Tỷ lệ quy đổi phải lớn hơn 1 (Ví dụ: 1 Hộp = 12 Cái).")
 
     def _validate_inventory_and_misc(self, dto) -> None:
-        # 7. Tồn kho tối thiểu
         if dto.min_stock is None or not (0 <= dto.min_stock <= 999999):
             raise ValidationException("Ngưỡng cảnh báo tồn kho tối thiểu phải nằm trong khoảng từ 0 đến 999,999.")
 
-        # 8. Mô tả
         if dto.description and len(dto.description) > 1000:
             raise ValidationException("Mô tả sản phẩm quá dài (Tối đa 1000 ký tự).")
 

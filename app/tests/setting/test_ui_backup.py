@@ -8,7 +8,7 @@ from app.modules.setting.ui.controllers.setting_management_controller import Set
 
 
 # ==============================================================================
-# PYTEST FIXTURES (Cô lập hoàn toàn các dịch vụ hạ tầng bằng Mock)
+# PYTEST FIXTURES
 # ==============================================================================
 
 @pytest.fixture
@@ -151,7 +151,6 @@ def test_handle_manual_backup_success_should_show_info_popup(mocker, qtbot, ui_w
     # THEN:
     mock_backup_service.execute_backup.assert_called_once()
 
-    # SỬA LỖI 2: Đồng bộ hóa chuỗi khớp 100% với hàm handle_manual_backup trong Controller thực tế của bạn
     mock_msg_box.assert_called_once_with(
         ui_window, "Sao lưu thành công",
         "Hệ thống đã xuất dữ liệu an toàn thành công!\nTập tin: /Backup_Path/pos_backup_2026.sql"

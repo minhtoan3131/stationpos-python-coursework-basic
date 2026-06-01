@@ -6,12 +6,12 @@ from app.modules.report.repositories.impl.report_repository_impl import ReportRe
 
 
 # =========================================================================
-# BÀI TEST TÍCH HỢP SỬ DỤNG HẠ TẦNG GỐC DỰ ÁN (MŨI KHOAN SÂU TRÊN DB THẬT)
+# BÀI TEST TÍCH HỢP
 # =========================================================================
 
 def test_repository_sql_execution_with_real_db(db_test_connection):
     """
-    Mũi khoan sâu nhất: Sử dụng trực tiếp db_test_connection từ conftest.py.
+    Sử dụng trực tiếp db_test_connection từ conftest.py.
     Bơm data vật lý vào DB thật để kiểm chứng SQL thô và 8 chỉ số tài chính phát sinh từ View daily summary.
     """
     # Khởi tạo một cursor độc lập để thực hiện nhiệm vụ Seed dữ liệu mồi (GIVEN)

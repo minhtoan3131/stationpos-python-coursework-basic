@@ -22,7 +22,6 @@ class SupplierServiceImpl(SupplierService):
         if not clean_name:
             raise ValidationException("Tên nhà cung cấp không được để trống!")
 
-        # Mở connection và Transaction cho thao tác WRITE
         connection = DatabaseConnection.get_connection()
         transaction = TransactionManager(connection)
 

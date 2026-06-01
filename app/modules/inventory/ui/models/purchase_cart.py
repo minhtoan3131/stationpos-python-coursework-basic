@@ -11,7 +11,6 @@ class PurchaseCartItem:
     def line_total(self) -> float:
         """
         Toán học 1 dòng: Số lượng x Đơn giá
-        (Tương lai nếu có chiết khấu từng dòng thì sửa ở đây)
         """
         return self.qty * self.price
 
@@ -40,7 +39,6 @@ class PurchaseCart:
     def total_amount(self) -> float:
         """
         Toán học tổng: Cộng dồn tất cả các dòng
-        (Tương lai nếu có Thuế VAT 10% hay Giảm giá tổng đơn thì sửa ở đây)
         """
         sub_total = sum(item.line_total for item in self.items.values())
         return sub_total

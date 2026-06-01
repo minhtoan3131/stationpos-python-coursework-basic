@@ -8,7 +8,7 @@ from app.modules.setting.constants.setting_key import SettingKey
 
 
 # ==============================================================================
-# FAKE OBJECTS (Hạ tầng RAM phục vụ State-based Testing độc lập)
+# FAKE OBJECTS
 # ==============================================================================
 
 class FakeSettingRepository:
@@ -45,7 +45,7 @@ class FakeUnitOfWork:
 
 
 # ==============================================================================
-# PYTEST FIXTURES (Setup môi trường cô lập cho từng Test Case)
+# PYTEST FIXTURES
 # ==============================================================================
 
 @pytest.fixture
@@ -65,7 +65,7 @@ def store_config_service(fake_uow_factory):
 
 
 # ==============================================================================
-# POST-CONDITIONS TEST CASES (Đã đồng bộ hóa 100% với Production Code)
+# POST-CONDITIONS TEST CASES
 # ==============================================================================
 
 def test_get_store_config_should_return_fallback_defaults_when_db_is_empty(store_config_service, memory_db):

@@ -13,7 +13,7 @@ from app.core.config.settings import DB_CONFIG
 
 
 # ==============================================================================
-# FAKE OBJECTS (Hạ tầng RAM phục vụ State-based Testing cho DB Mutations)
+# FAKE OBJECTS
 # ==============================================================================
 
 class FakeSettingRepository:

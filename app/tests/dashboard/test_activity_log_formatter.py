@@ -1,4 +1,3 @@
-# tests/dashboard/test_activity_log_formatter.py
 import pytest
 import datetime
 from app.modules.dashboard.dtos.activity_log_dto import ActivityLogDTO

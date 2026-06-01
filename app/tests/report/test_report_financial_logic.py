@@ -1,4 +1,3 @@
-# File: app/tests/report/test_report_financial_logic.py
 import pytest
 from decimal import Decimal
 from app.modules.report.services.impl.report_service_impl import ReportServiceImpl
@@ -66,7 +65,7 @@ def test_financial_case_normal_sales(test_env):
 
 def test_financial_case_total_cancellation_should_not_go_negative(test_env):
     """
-    Nghiệp vụ 2 (KIỂM TRA BÚT TOÁN SỬA LỖI DOANH THU ÂM):
+    Nghiệp vụ 2:
     Người dùng tạo đơn 100k sau đó bấm HỦY TOÀN BỘ hóa đơn đó.
     Dưới góc nhìn tài chính chuẩn:
       - Doanh thu phát sinh ban đầu (Gross) vẫn là 100k.

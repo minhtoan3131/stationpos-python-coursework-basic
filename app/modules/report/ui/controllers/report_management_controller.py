@@ -97,7 +97,6 @@ class ReportManagementController(QWidget):
             self.render_charts(report_data.revenue_trend, report_data.top_products)
 
         except ValidationException as ve:
-            # Lỗi chọn sai ngày của người dùng chỉ hiện Cảnh báo màu vàng thân thiện
             QMessageBox.warning(self, "Lỗi bộ lọc", str(ve))
         except Exception as e:
             QMessageBox.critical(self, "Lỗi Hệ Thống", f"Không thể tải dữ liệu báo cáo thống kê:\n{str(e)}")

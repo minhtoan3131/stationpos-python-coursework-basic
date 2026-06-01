@@ -137,28 +137,24 @@ def test_validate_basic_info_no_barcode(validator, valid_create_dto):
 
 def test_validate_conversion_no_conversion(validator, valid_create_dto):
     valid_create_dto.conversion_unit_id = None
-     Hàm chạy thành công, không phát sinh ngoại lệ
     validator._validate_units_and_conversions(valid_create_dto)
 
 
 def test_validate_conversion_same_unit(validator, valid_create_dto):
     valid_create_dto.base_unit_id = 1
     valid_create_dto.conversion_unit_id = 1
-     Điều hướng sang hàm kiểm soát đơn vị tính mới
     with pytest.raises(ValidationException, match="KHÔNG ĐƯỢC TRÙNG"):
         validator._validate_units_and_conversions(valid_create_dto)
 
 
 def test_validate_conversion_missing_ratio(validator, valid_create_dto):
     valid_create_dto.conversion_ratio = None
-     Điều hướng sang hàm kiểm soát đơn vị tính mới
     with pytest.raises(ValidationException, match="phải lớn hơn 1"):
         validator._validate_units_and_conversions(valid_create_dto)
 
 
 def test_validate_conversion_invalid_ratio(validator, valid_create_dto):
     valid_create_dto.conversion_ratio = 1
-     Điều hướng sang hàm kiểm soát đơn vị tính mới
     with pytest.raises(ValidationException, match="lớn hơn 1"):
         validator._validate_units_and_conversions(valid_create_dto)
 
@@ -220,8 +216,6 @@ def test_validate_create_success(validator, valid_create_dto, mock_product_repo)
 def test_validate_create_success_no_barcode(validator, valid_create_dto, mock_product_repo):
     valid_create_dto.barcode = None
     mock_product_repo.exists_by_sku.return_value = False
-
-    # Sẽ pass và không bao giờ gọi hàm check trùng barcode
     validator.validate_create(valid_create_dto)
     mock_product_repo.exists_by_barcode.assert_not_called()
 

@@ -160,13 +160,11 @@ def test_uc4_export_excel_success_workflow(history_ui, mocker):
     controller.selected_invoice = "HD-001"
     mock_service.export_invoice_to_excel.return_value = {"metadata": {}, "items": []}
 
-     Đổi từ inventory_history_controller sang invoice_history_controller
     mock_file_dialog = mocker.patch(
         "app.modules.sale.ui.controllers.invoice_history_controller.QFileDialog.getSaveFileName"
     )
     mock_file_dialog.return_value = ("/tmp/HoaDon_HD-001.xlsx", "Excel Files (*.xlsx)")
 
-     Đổi từ inventory_history_controller sang invoice_history_controller (cho QMessageBox)
     mocker.patch("app.modules.sale.utils.invoice_history_excel_exporter.InvoiceHistoryExcelExporter.export_detail", return_value=True)
     mock_info_box = mocker.patch(
         "app.modules.sale.ui.controllers.invoice_history_controller.QMessageBox.information"
@@ -183,7 +181,6 @@ def test_uc4_export_excel_aborted_by_user_at_file_dialog(history_ui, mocker):
     controller, ui, mock_service, _ = history_ui
     controller.selected_invoice = "HD-001"
 
-     Đổi target sang invoice_history_controller
     mocker.patch(
         "app.modules.sale.ui.controllers.invoice_history_controller.QFileDialog.getSaveFileName",
         return_value=("", "")
@@ -217,7 +214,6 @@ def test_ui_cancel_invoice_action_shows_warning_popup_on_validation_exception(hi
         "app.modules.sale.ui.controllers.invoice_history_controller.QMessageBox.warning"
     )
 
-    # === ĐÃ SỬA: Gọi đúng tên hàm điều phối trong mã nguồn của bạn ===
     controller.handle_cancel_invoice()
 
     # KIỂM CHỨNG HẬU ĐIỀU KIỆN

@@ -133,7 +133,7 @@ class MainWindow(QMainWindow):
             security_service=self.security_service,
             backup_service=self.backup_service
         )
-        # Thêm các trang vào content_stack (Thứ tự khớp chính xác 100% với file .ui)
+        # Thêm các trang vào content_stack
         self.ui.content_stack.addWidget(self.page_home)  # Index 0
         self.ui.content_stack.addWidget(self.page_product)  # Index 1
         self.ui.content_stack.addWidget(self.page_inventory)  # Index 2
@@ -170,7 +170,6 @@ class MainWindow(QMainWindow):
             if hasattr(self.page_tax, 'load_history_master_table'):
                 self.page_tax.load_history_master_table()
         elif index == 6:
-            # Sẽ gọi hàm kéo dữ liệu Database lên đây (hiện tại ta cứ gọi sẵn)
             if hasattr(self.page_settings, 'load_current_settings'):
                 self.page_settings.load_current_settings()
 
@@ -201,7 +200,7 @@ class MainWindow(QMainWindow):
             # Gọi màn hình khóa ngay lập tức
             QTimer.singleShot(0, self.handle_startup_lock)
 
-            # CỰC KỲ QUAN TRỌNG: Lệnh return này chém đứt luồng chạy,
+            # QUAN TRỌNG: Lệnh return này chém đứt luồng chạy,
             # không cho cửa sổ chính (MainWindow) kịp vẽ ra màn hình, loại bỏ 100% hiện tượng chớp nháy!
             return
 

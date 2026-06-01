@@ -4,7 +4,7 @@ from typing import List
 
 @dataclass
 class KPIDTO:
-    """DTO chứa trọn vẹn bộ chỉ số kiểm toán hiển thị trên 8 thẻ KPI mới."""
+    """DTO chứa trọn vẹn bộ chỉ số kiểm toán hiển thị trên 8 thẻ KPI."""
     total_orders_created: int       # Tổng đơn phát sinh
     total_orders_completed: int     # Đơn thành công
     total_orders_cancelled: int     # Đơn đã hủy

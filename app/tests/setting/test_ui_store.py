@@ -8,7 +8,7 @@ from app.modules.setting.ui.controllers.setting_management_controller import Set
 
 
 # ==============================================================================
-# PYTEST FIXTURES (Cô lập hoàn toàn các dịch vụ hạ tầng bằng Mock)
+# PYTEST FIXTURES
 # ==============================================================================
 
 @pytest.fixture
@@ -64,14 +64,13 @@ def ui_window(qtbot, mock_store_config_service, mock_security_service, mock_back
 def test_initial_store_ui_state_should_render_correctly_and_keep_save_button_disabled(ui_window):
     """
     KỊCH BẢN 1: Mở phân hệ Giao diện cấu hình thiết lập shop
-     Đồng bộ hóa đúng chuỗi hiển thị thực tế của ComboBox K80
     """
     assert ui_window.ui.txt_ten.text() == "Văn phòng phẩm ABC"
     assert ui_window.ui.txt_sdt.text() == "0901234567"
     assert ui_window.ui.txt_diachi.text() == "123 Đường Láng, Hà Nội"
     assert ui_window.ui.txt_loichao.text() == "Cảm ơn quý khách, hẹn gặp lại!"
 
-    # SỬA LỖI 1: Khớp chuỗi chi tiết hiển thị trên UI thật
+    # Khớp chuỗi chi tiết hiển thị trên UI thật
     assert ui_window.ui.cb_giay.currentText() == "K80 — khổ lớn 80mm"
 
     # Nút lưu mặc định ẩn mờ chuẩn chỉ
@@ -81,7 +80,6 @@ def test_initial_store_ui_state_should_render_correctly_and_keep_save_button_dis
 def test_store_text_modification_should_trigger_dirty_checking_and_enable_save_button(ui_window):
     """
     KỊCH BẢN 2: Chủ quán dùng bàn phím chỉnh sửa thông tin trên Form
-     Sử dụng .setText() để kích hoạt textChanged an toàn, loại bỏ triệt để crash SIGABRT trên Mac
     """
     assert ui_window.ui.btn_save_bill.isEnabled() is False
 

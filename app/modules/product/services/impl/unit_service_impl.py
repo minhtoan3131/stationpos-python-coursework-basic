@@ -24,7 +24,6 @@ class UnitServiceImpl(UnitService):
         if not clean_name:
             raise ValidationException("Tên đơn vị tính không được để trống!")
 
-        # Mở connection và khởi tạo Transaction Manager
         connection = DatabaseConnection.get_connection()
         transaction = TransactionManager(connection)
 

@@ -6,7 +6,7 @@ from app.modules.report.dtos.report_dto import DashboardReportDTO
 
 
 # =========================================================================
-# KHỞI TẠO HỘP ĐEN CƠ SỞ DỮ LIỆU GIẢ LẬP TRÊN RAM (PHIÊN BẢN 8 CHỈ SỐ)
+# KHỞI TẠO HỘP ĐEN CƠ SỞ DỮ LIỆU GIẢ LẬP TRÊN RAM
 # =========================================================================
 class FakeReportRepository:
     def __init__(self):
@@ -195,7 +195,7 @@ def test_kpi_pipeline_financial_correctness_happy_path(report_service):
 
 def test_double_deduction_prevention_on_total_cancellation():
     """
-    KỊCH BẢN BIÊN (SỬA LỖI DOANH THU ÂM): Giả lập trường hợp hủy toàn bộ hóa đơn phát sinh trong kỳ.
+    KỊCH BẢN BIÊN: Giả lập trường hợp hủy toàn bộ hóa đơn phát sinh trong kỳ.
     KỲ VỌNG SẢN PHẨM: Doanh thu thuần và lợi nhuận thuần thực tế phải cán mốc 0 VND tuyệt đối,
     không bao giờ được phép âm vì đã loại trừ việc bị trừ kép dòng tiền.
     """

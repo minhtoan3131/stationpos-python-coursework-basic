@@ -1,6 +1,5 @@
 import pytest
 from decimal import Decimal
-import mysql.connector
 from app.modules.sale.repositories.impl.sale_repository_impl import SaleRepositoryImpl
 from app.modules.inventory.repositories.impl.inventory_repository_impl import InventoryRepositoryImpl
 from app.modules.sale.dtos.sale_dto import CheckoutDTO, CartItemDTO
@@ -55,7 +54,7 @@ def test_link_stock_transactions_to_invoice_by_specific_ids(real_repos, db_test_
     sale_repo, inv_repo = real_repos
     cursor = db_test_connection.cursor(dictionary=True)
 
-    # 1. GIVEN: ĐÃ BỔ SUNG - Mồi dữ liệu danh mục cơ bản để không bị vi phạm ràng buộc Khóa ngoại (Foreign Key)
+    # 1. Mồi dữ liệu danh mục cơ bản để không bị vi phạm ràng buộc Khóa ngoại (Foreign Key)
     cursor.execute("INSERT INTO units (id, name) VALUES (10, 'Cái')")
     cursor.execute("INSERT INTO categories (id, name) VALUES (1, 'VPP')")
     cursor.execute("INSERT INTO products (id, sku, name, category_id, base_unit_id) VALUES (100, 'SP01', 'Bút bi', 1, 10)")

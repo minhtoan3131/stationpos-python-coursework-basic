@@ -1,4 +1,3 @@
-# File: app/modules/report/services/impl/report_service_impl.py
 import datetime
 from app.modules.report.services.report_service import ReportService
 from app.modules.report.dtos.report_dto import DashboardReportDTO
@@ -71,6 +70,5 @@ class ReportServiceImpl(ReportService):
                     'detail': po.get('supplier_name') or "Không rõ"
                 })
 
-            # Thuật toán sắp xếp tuyến tính chạy trơn tru tuyệt đối vì toàn bộ key 'created_at' đều là String
             combined.sort(key=lambda x: x['created_at'], reverse=True)
             return combined

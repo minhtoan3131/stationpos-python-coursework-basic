@@ -1,4 +1,3 @@
-# File: app/modules/sale/repositories/impl/invoice_history_repository_impl.py
 from app.core.database.base_repository import BaseRepository
 from datetime import date
 from typing import List, Dict, Any

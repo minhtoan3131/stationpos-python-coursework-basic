@@ -1,4 +1,3 @@
-# app/modules/dashboard/repositories/impl/activity_log_repository_impl.py
 from typing import List
 from app.core.database.base_repository import BaseRepository
 from app.modules.dashboard.repositories.activity_log_repository import ActivityLogRepository

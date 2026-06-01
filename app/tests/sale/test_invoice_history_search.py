@@ -1,8 +1,7 @@
 import pytest
 from datetime import date, datetime
 from decimal import Decimal
-from PyQt6.QtWidgets import QWidget, QTableWidgetItem
-from PyQt6.QtCore import Qt
+
 
 from app.modules.sale.services.impl.invoice_history_service_impl import InvoiceHistoryServiceImpl
 from app.modules.sale.ui.controllers.invoice_history_controller import InvoiceHistoryController
@@ -105,7 +104,7 @@ def mock_ui_components(mocker):
 
 
 # ==========================================
-# 🎯 PHẦN 1: UNIT TEST CHO BỘ LỌC PHỨC TẠP (SERVICE LAYER)
+#  UNIT TEST CHO BỘ LỌC PHỨC TẠP (SERVICE LAYER)
 # ==========================================
 
 @pytest.mark.parametrize("filters, expected_count, first_code", [
@@ -137,7 +136,7 @@ def test_service_search_invoices_with_complex_combinatorial_filters(history_serv
 
 
 # ==========================================
-# 🎯 PHẦN 2: UI CONTROLLER TEST (MOCKING & STATE CORRELATION)
+# UI CONTROLLER TEST (MOCKING & STATE CORRELATION)
 # ==========================================
 
 def test_controller_load_master_data_extracts_ui_states_correctly(mock_ui_components, mocker):
@@ -183,7 +182,6 @@ def test_controller_handle_reset_filters_restores_default_dates_and_reloads(mock
     spy_reset_cbo_1 = mock_ui_components.cbo_payment_method_filter.setCurrentIndex
     spy_reset_cbo_2 = mock_ui_components.cbo_status_invoice.setCurrentIndex
 
-    #  Xóa sạch lịch sử gọi sinh ra do hàm __init__ kích hoạt trước đó ---
     spy_set_date_from.reset_mock()
     spy_set_date_to.reset_mock()
     spy_clear_text.reset_mock()

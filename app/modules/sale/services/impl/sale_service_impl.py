@@ -1,6 +1,5 @@
 from decimal import Decimal, ROUND_HALF_UP
 
-from app.core.database.unit_of_work import UnitOfWork
 from app.core.exceptions.validation_exception import ValidationException
 from app.modules.sale.dtos.sale_dto import CheckoutDTO
 from app.modules.sale.services.sale_service import SaleService
@@ -15,12 +14,12 @@ class SaleServiceImpl(SaleService):
 
     def process_checkout(self, checkout_data: CheckoutDTO) -> str:
         """
-        Luồng nghiệp vụ xử lý thanh toán và khấu trừ kho tự sửa lỗi chuẩn Enterprise.
+        Luồng nghiệp vụ xử lý thanh toán và khấu trừ kho.
         """
         SaleValidator.validate_checkout_data(checkout_data)
 
         with self.uow_factory() as uow:
-            # 1. Gom nhóm số lượng và quy đổi về Đơn vị cơ bản
+            # Gom nhóm số lượng và quy đổi về Đơn vị cơ bản
             product_deduction_map = {}
             for item in checkout_data.items:
                 base_qty = self._calculate_base_quantity(uow, item.product_id, item.unit_id, item.quantity)
@@ -31,7 +30,7 @@ class SaleServiceImpl(SaleService):
             # Khởi tạo danh sách chứa các ID giao dịch kho vừa sinh ra để chờ liên kết hóa đơn
             created_transaction_ids = []
 
-            # 2. Khóa dòng (FOR UPDATE) và thực hiện tính toán tài chính nghịch đảo
+            # Khóa dòng (FOR UPDATE) và thực hiện tính toán tài chính nghịch đảo
             for p_id, sold_qty in product_deduction_map.items():
 
                 # Gọi Repo có chứa khóa dòng FOR UPDATE để cô lập dữ liệu
@@ -71,7 +70,7 @@ class SaleServiceImpl(SaleService):
                 })
                 created_transaction_ids.append(tx_id)  # Lưu vết lại ID
 
-            # 3. Phân bổ chi phí COGS ngược lại cho từng dòng mặt hàng hóa đơn
+            # Phân bổ chi phí COGS ngược lại cho từng dòng mặt hàng hóa đơn
             for item in checkout_data.items:
                 line_base_qty = self._calculate_base_quantity(uow, item.product_id, item.unit_id, item.quantity)
                 total_product_sold = product_deduction_map[item.product_id]
@@ -84,14 +83,12 @@ class SaleServiceImpl(SaleService):
                 else:
                     item.total_cogs_amount = Decimal('0.0000')
 
-            # 4. Ghi nhận Header và chi tiết hóa đơn
+            # Ghi nhận Header và chi tiết hóa đơn
             if not checkout_data.code:
                 checkout_data.code = InvoiceCodeGenerator.generate()
 
             invoice_id = uow.sale_repo.create_invoice(checkout_data)
             uow.sale_repo.create_invoice_items(invoice_id, checkout_data.items)
-
-            # ---  GỌI HÀM REPO ĐỂ LIÊN KẾT THEO ID CHÍNH XÁC ---
             uow.inventory_repo.link_stock_transactions_to_invoice(created_transaction_ids, invoice_id)
 
             # Ghi log thao tác hệ thống

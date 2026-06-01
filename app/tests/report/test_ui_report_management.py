@@ -11,9 +11,6 @@ from app.modules.report.dtos.report_dto import (
 )
 
 
-# =========================================================================
-# THIẾT LẬP MÔI TRƯỜNG MOCK ĐỂ KIỂM THỬ HỘP ĐEN TẦNG UI ( ĐÚNG 8 CHỈ SỐ )
-# =========================================================================
 
 @pytest.fixture
 def sample_dashboard_dto():

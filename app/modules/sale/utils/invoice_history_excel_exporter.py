@@ -1,4 +1,3 @@
-# File: app/modules/sale/utils/invoice_history_excel_exporter.py
 import datetime
 import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
@@ -6,8 +5,7 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 
 class InvoiceHistoryExcelExporter:
     """
-    Tiện ích chuyên biệt kết xuất dữ liệu chi tiết Hóa đơn ra tệp Excel chuẩn chỉnh,
-    xử lý triệt để lỗi chồng chéo dòng XML khi gộp ô.
+    Tiện ích chuyên biệt kết xuất dữ liệu chi tiết Hóa đơn ra tệp Excel
     """
 
     @staticmethod

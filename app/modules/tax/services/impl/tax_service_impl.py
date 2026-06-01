@@ -89,12 +89,11 @@ class TaxService(ITaxService):
 
     def stage_temporary_ledger(self, year: int, threshold: Decimal, vat_percent: Decimal, pit_percent: Decimal,
                                pit_method: str) -> bool:
-        # 1. Kiểm tra tiên quyết an toàn số học ngay từ cửa ngõ RAM
+        # Kiểm tra tiên quyết an toàn số học ngay từ cửa ngõ RAM
         self._validate_inputs(threshold, vat_percent, pit_percent, pit_method)
 
-        # 2. MỞ PHIÊN GIAO DỊCH DUY NHẤT - Triệt tiêu hoàn toàn lỗi lãng phí Connection Pool
         with self.uow_factory() as uow:
-            # Kiểm tra trạng thái đóng băng kỳ thuế (Tiên quyết thực thể)
+            # Kiểm tra trạng thái đóng băng kỳ thuế (Tiên quyết)
             existing_ledger = uow.tax_ledger_repo.get_ledger_by_year(year)
             if existing_ledger and existing_ledger.status == 'CLOSED':
                 return False

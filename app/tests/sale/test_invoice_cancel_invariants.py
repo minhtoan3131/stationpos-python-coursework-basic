@@ -5,12 +5,8 @@ import copy
 from decimal import Decimal
 from datetime import datetime
 from app.modules.sale.services.impl.invoice_history_service_impl import InvoiceHistoryServiceImpl
-from app.tests.dashboard.test_activity_log_service import FakeActivityLogRepository
 
 
-# ==========================================
-# SETUP STATE SNAPSHOT FOR INVARIANTS
-# ==========================================
 class FakeProductRepo:
     def __init__(self):
         self.products = {100: {'cost_price': Decimal('4000.0000')}}
@@ -88,7 +84,7 @@ def history_service(uow): return InvoiceHistoryServiceImpl(lambda: uow)
 
 
 # ==========================================
-# BỘ TEST INVARIANTS CHÍNH THỨC
+# BỘ TEST INVARIANTS
 # ==========================================
 def test_cancel_invoice_transaction_rollback_on_unexpected_system_error(history_service, uow):
     """TC_Inv_01: Đảm bảo tính ACID - Đứt kết nối database giữa chừng phải rollback sạch sẽ kho bãi"""

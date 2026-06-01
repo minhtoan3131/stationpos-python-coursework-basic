@@ -3,7 +3,7 @@ import traceback
 from PyQt6.QtWidgets import (
     QWidget,
     QTableWidgetItem,
-    QMessageBox, QHeaderView
+    QMessageBox, QHeaderView, QAbstractItemView
 )
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QColor
@@ -31,7 +31,7 @@ class NumericTableWidgetItem(QTableWidgetItem):
         self.value = value
 
     def __lt__(self, other):
-        # Đánh chặn phép so sánh của Qt để so sánh 2 số thực thay vì 2 chuỗi text
+        # Chặn phép so sánh của Qt để so sánh 2 số thực thay vì 2 chuỗi text
         if isinstance(other, NumericTableWidgetItem):
             return self.value < other.value
         return super().__lt__(other)
@@ -172,6 +172,7 @@ class ProductManagementController(QWidget):
 
         # Mở khóa kích hoạt lại tính năng sorting sau khi toàn bộ dữ liệu đã được nạp
         self.ui.tbl_products.setSortingEnabled(True)
+        self.ui.tbl_products.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
 
     def search_products(self):
         try:

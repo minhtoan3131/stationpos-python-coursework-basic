@@ -26,7 +26,7 @@ class PoHistoryExcelExporter:
             # Đảm bảo hiển thị đường lưới ô (Gridlines)
             ws.views.sheetView[0].showGridLines = True
 
-            # ---- 1. ĐỊNH NGHĨA STYLE (Màu sắc Enterprise nhã nhặn) ----
+            # ---- ĐỊNH NGHĨA STYLE (Màu sắc nhã nhặn) ----
             font_title = Font(name="Segoe UI", size=16, bold=True, color="1E3A8A")
             font_section = Font(name="Segoe UI", size=11, bold=True, color="334155")
             font_header = Font(name="Segoe UI", size=11, bold=True, color="FFFFFF")
@@ -47,7 +47,7 @@ class PoHistoryExcelExporter:
             border_cell = Border(left=thin_border_side, right=thin_border_side, top=thin_border_side,
                                  bottom=thin_border_side)
 
-            # ---- 2. VẼ PHẦN TIÊU ĐỀ & THÔNG TIN CHUNG (META DATA) ----
+            # ---- VẼ PHẦN TIÊU ĐỀ & THÔNG TIN CHUNG (META DATA) ----
             ws["A1"] = "BÁO CÁO CHI TIẾT PHIẾU NHẬP KHO"
             ws["A1"].font = font_title
 
@@ -76,7 +76,7 @@ class PoHistoryExcelExporter:
                     cell_val.fill = fill_cancelled
                 current_row += 1
 
-            # ---- 3. VẼ BẢNG CHI TIẾT MẶT HÀNG (TABLE ITEMS) ----
+            # ---- VẼ BẢNG CHI TIẾT MẶT HÀNG (TABLE ITEMS) ----
             current_row += 1  # Cách ra 1 dòng trống trống trải
             headers = ["STT", "Mã SKU", "Tên Sản Phẩm / Ấn Phẩm", "Đơn Vị Tính", "Số Lượng", "Đơn Giá Nhập",
                        "Thành Tiền"]
@@ -124,7 +124,7 @@ class PoHistoryExcelExporter:
                         cell.alignment = align_right
                         cell.number_format = '#,##0'
 
-            # ---- 4. DÒNG TỔNG CỘNG (TOTAL BILL FOOTER) ----
+            # ---- DÒNG TỔNG CỘNG (TOTAL BILL FOOTER) ----
             current_row += 1
             ws.merge_cells(start_row=current_row, start_column=1, end_row=current_row, end_column=6)
             total_label_cell = ws.cell(row=current_row, column=1, value="TỔNG GIÁ TRỊ PHIẾU NHẬP:")
@@ -138,7 +138,7 @@ class PoHistoryExcelExporter:
             total_value_cell.number_format = '#,##0 "VND"'
             ws.row_dimensions[current_row].height = 25
 
-            # ---- 5. TỰ ĐỘNG CÂN ĐỐI ĐỘ RỘNG CÁC CỘT (AUTO-FIT WIDTH) ----
+            # ---- TỰ ĐỘNG CÂN ĐỐI ĐỘ RỘNG CÁC CỘT (AUTO-FIT WIDTH) ----
             for col in ws.columns:
                 max_len = 0
                 col_letter = get_column_letter(col[0].column)

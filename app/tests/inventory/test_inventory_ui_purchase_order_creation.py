@@ -33,7 +33,6 @@ def inventory_window(qtbot, mocker):
 
 
 def seed_cart_data(window, qtbot):
-    """Mồi data chuẩn: Đã sửa đổi để điền thủ công giá nhập vào ô QTableWidget"""
     window.ui.cbo_supplier.setCurrentIndex(1)
 
     mock_product = types.SimpleNamespace(

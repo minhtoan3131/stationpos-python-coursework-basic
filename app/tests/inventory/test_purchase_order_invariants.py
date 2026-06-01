@@ -147,7 +147,6 @@ def test_mathematical_limits_prevent_negative_inventory():
         service.create_purchase_order(dto)
 
     # THEN: Kiểm chứng chốt chặn an toàn nghiệp vụ
-     Xác minh đúng câu thông báo tiếng Việt nghiệp vụ hiển thị cho user
     assert "Phát hiện trạng thái kho âm bất hợp lệ (Mô hình bán khống chưa được kích hoạt)." in str(exc_info.value)
 
     # Tồn kho vật lý bắt buộc phải bị đóng băng hoàn toàn ở con số -5, tuyệt đối không được xử lý tiếp

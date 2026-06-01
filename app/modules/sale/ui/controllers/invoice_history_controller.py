@@ -1,4 +1,3 @@
-# File: app/modules/sale/ui/controllers/invoice_history_controller.py
 import datetime
 import traceback
 from PyQt6.QtWidgets import QTableWidgetItem, QMessageBox, QHeaderView, QAbstractItemView, QInputDialog, QFileDialog
@@ -51,7 +50,6 @@ class InvoiceHistoryController:
         self.ui.date_invoice_to.setDate(today)
         self.ui.txt_search_invoice.clear()
 
-        # Đồng bộ hóa bộ lọc CComboBox với file UI của bạn
         self.ui.cbo_payment_method_filter.setCurrentIndex(0)
         self.ui.cbo_status_invoice.setCurrentIndex(0)
 
@@ -137,7 +135,7 @@ class InvoiceHistoryController:
             meta = invoice_full_data['metadata']
             items = invoice_full_data['items']
 
-            # 1. Điền thông tin Metadata Panel
+            # Điền thông tin Metadata Panel
             self.ui.lbl_md_invoice_id.setText(f"<b>Mã HĐ:</b> {meta['code']}")
             self.ui.lbl_md_invoice_date.setText(f"<b>Ngày bán:</b> {meta['created_at'].strftime('%d/%m/%Y %H:%M')}")
 
@@ -146,11 +144,11 @@ class InvoiceHistoryController:
                 status_html = f"<span style='color:red;'><b>Đã hủy</b></span> | Lý do: {meta.get('cancel_reason') or 'Không rõ'}"
             self.ui.lbl_md_invoice_status.setText(f"<b>Trạng thái:</b> {status_html}")
 
-            # 2. Cập nhật số tiền hiển thị
+            # Cập nhật số tiền hiển thị
             self.ui.lbl_detail_total_value.setText(f"{float(meta['final_amount']):,.0f} VND")
             self.ui.lbl_detail_cash_received_label.setText(f"Tiền khách đưa: {float(meta['cash_received']):,.0f} VND")
 
-            # 3. Đổ dữ liệu sản phẩm chi tiết vào bảng phải
+            # Đổ dữ liệu sản phẩm chi tiết vào bảng phải
             self.ui.tbl_invoice_details.setRowCount(0)
             self.ui.tbl_invoice_details.setRowCount(len(items))
             for r, item in enumerate(items):
@@ -172,7 +170,7 @@ class InvoiceHistoryController:
                 total_item.setTextAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
                 self.ui.tbl_invoice_details.setItem(r, 4, total_item)
 
-            # 4. Quản lý quyền nút hành động (Chỉ cho hủy nếu trạng thái là COMPLETED)
+            # Quản lý quyền nút hành động (Chỉ cho hủy nếu trạng thái là COMPLETED)
             self.ui.btn_cancel_invoice.setEnabled(meta['status'] == 'COMPLETED')
 
         except Exception as e:
@@ -227,10 +225,10 @@ class InvoiceHistoryController:
         if not self.selected_invoice:
             return
 
-        # 1. Định nghĩa tên file mặc định dựa trên mã hóa đơn người dùng đang chọn
+        # Định nghĩa tên file mặc định dựa trên mã hóa đơn người dùng đang chọn
         default_filename = f"HoaDon_{self.selected_invoice}.xlsx"
 
-        # 2. Mở Hộp thoại lưu file của hệ điều hành (Windows/Mac)
+        #  Mở Hộp thoại lưu file của hệ điều hành (Windows/Mac)
         file_path, _ = QFileDialog.getSaveFileName(
             None,
             "Xuất Excel Chi tiết Hóa đơn",

@@ -1,4 +1,3 @@
-# File: app/tests/inventory/test_inventory_overflow_boundaries.py
 import pytest
 from unittest.mock import MagicMock
 from PyQt6.QtCore import Qt

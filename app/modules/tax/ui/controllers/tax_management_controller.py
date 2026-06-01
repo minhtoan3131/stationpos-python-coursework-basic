@@ -107,10 +107,8 @@ class TaxManagementController(QWidget):
             self.ui.val_total_revenue.setText(f"{report.total_revenue:,.0f} VND")
             self.ui.val_total_tax.setText(f"{report.total_tax_amount:,.0f} VND")
 
-            # : Đọc mốc phân khúc quy mô ngầm động từ database, không sử dụng số cứng
             limit_mid, limit_large = self.tax_service.get_tax_scale_limits()
 
-            # Cập nhật Thẻ trạng thái phân khúc phản ứng theo mốc động hệ thống
             if report.total_revenue <= threshold:
                 self.ui.val_tax_status.setText("MIỄN THUẾ")
                 self.ui.val_tax_status.setStyleSheet("color: #10b981; font-weight: 800; font-size: 20px;")

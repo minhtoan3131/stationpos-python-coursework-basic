@@ -56,7 +56,6 @@ class BackupServiceImpl(BackupService):
         file_name = f"pos_backup_{timestamp}.sql"
         dest_file_path = os.path.join(folder, file_name)
 
-        # CẬP NHẬT: Thêm tham số -h {DB_HOST} để đồng bộ triệt để với .env
         command = f'mysqldump -h {DB_HOST} -u {DB_USER} -p{DB_PASS} {DB_NAME} > "{dest_file_path}"'
 
         creation_flags = 0
@@ -78,7 +77,6 @@ class BackupServiceImpl(BackupService):
         if not os.path.exists(file_path):
             raise FileNotFoundError("Tập tin sao lưu phục hồi không tồn tại!")
 
-        # Thêm tham số -h {DB_HOST} để đồng bộ triệt để với .env
         command = f'mysql -h {DB_HOST} -u {DB_USER} -p{DB_PASS} {DB_NAME} < "{file_path}"'
 
         creation_flags = 0

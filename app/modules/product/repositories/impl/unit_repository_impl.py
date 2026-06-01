@@ -1,7 +1,6 @@
 from app.core.database.base_repository import BaseRepository
 from app.modules.product.repositories.unit_repository import UnitRepository
 
-# Đảm bảo kế thừa BaseRepository để xử lý tham số db_connection trong __init__
 class UnitRepositoryImpl(BaseRepository, UnitRepository):
     def get_all(self):
         self.cursor.execute("SELECT id, name FROM units ORDER BY name")

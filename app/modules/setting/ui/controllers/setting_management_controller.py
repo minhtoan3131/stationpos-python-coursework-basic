@@ -12,7 +12,7 @@ class SettingManagementController(QWidget):
         self.security_service = security_service
         self.backup_service = backup_service
 
-        # Cờ hiệu chống tín hiệu trễ (Lá chắn tối thượng thay cho blockSignals)
+        # Cờ hiệu chống tín hiệu trễ
         self.is_loading = False
 
         # Bộ nhớ đệm lưu trạng thái gốc dưới DB
@@ -22,7 +22,7 @@ class SettingManagementController(QWidget):
         self.ui = Ui_SettingWidget()
         self.ui.setupUi(self)
 
-        self.apply_disabled_stylesheets()  # Vá lỗi thị giác (CSS Trap)
+        self.apply_disabled_stylesheets()
         self.bind_events()
         self.bind_change_signals()
 

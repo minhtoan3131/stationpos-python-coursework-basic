@@ -7,7 +7,7 @@ from app.modules.setting.ui.controllers.setting_management_controller import Set
 
 
 # ==============================================================================
-# PYTEST FIXTURES (Cô lập hoàn toàn hạ tầng bằng Mock)
+# PYTEST FIXTURES
 # ==============================================================================
 
 @pytest.fixture
@@ -60,14 +60,11 @@ def ui_window(qtbot, mock_store_config_service, mock_security_service, mock_back
 def test_initial_security_ui_state_should_be_clean_and_keep_save_button_enabled(ui_window):
     """
     KỊCH BẢN 1: Mở tab Bảo mật thiết lập mã PIN
-     Khẳng định nút btn_save_security mặc định luôn SÁNG RÕ (True) để thu ngân bấm bất cứ lúc nào.
     """
     # THEN: Xác minh trạng thái hiển thị mặc định sạch sẽ của các ô nhập mật mã
     assert ui_window.ui.txt_pin_hientai.text() == ""
     assert ui_window.ui.txt_pin_moi.text() == ""
     assert ui_window.ui.txt_pin_xacnhan.text() == ""
-
-    #  Nút bảo mật luôn sẵn sàng nhận lệnh bấm
     assert ui_window.ui.btn_save_security.isEnabled() is True
 
 
@@ -91,7 +88,6 @@ def test_handle_change_pin_successfully_should_invoke_service_and_clear_fields(m
                                                                                mock_security_service):
     """
     KỊCH BẢN 3: Thu ngân thực hiện quy trình Thay đổi mã PIN chuẩn xác và thành công
-     Gọi assert_called_once_with dạng tham số vị trí (Positional Args) khớp với Controller.
     """
     # GIVEN: Điền thông số đổi mã PIN hợp lệ
     ui_window.ui.txt_pin_hientai.setText("1234")
@@ -108,16 +104,16 @@ def test_handle_change_pin_successfully_should_invoke_service_and_clear_fields(m
     ui_window.ui.btn_save_security.click()
 
     # THEN:
-     So khớp chính xác 3 chuỗi mật mã truyền dạng tham số vị trí theo đúng thực tế
+    # So khớp chính xác 3 chuỗi mật mã truyền dạng tham số vị trí theo đúng thực tế
     mock_security_service.change_pin.assert_called_once_with("1234", "5678", "5678")
 
-    # 2. Hộp thoại Popup thông báo đổi khóa an toàn thành công phải bắn lên
+    # Hộp thoại Popup thông báo đổi khóa an toàn thành công phải bắn lên
     mock_info_box.assert_called_once_with(
         ui_window,
         "Thành công",
         "Đã cập nhật mã PIN bảo mật hệ thống mới thành công!"
     )
-    # 3. ĐẢM BẢO TRẠNG THÁI: Tự động xóa trống các ô nhập để bảo mật thông tin sau khi lưu
+    # ĐẢM BẢO TRẠNG THÁI: Tự động xóa trống các ô nhập để bảo mật thông tin sau khi lưu
     assert ui_window.ui.txt_pin_hientai.text() == ""
     assert ui_window.ui.txt_pin_moi.text() == ""
     assert ui_window.ui.txt_pin_xacnhan.text() == ""

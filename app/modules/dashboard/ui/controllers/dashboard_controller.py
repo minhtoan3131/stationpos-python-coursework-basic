@@ -36,28 +36,27 @@ class HomeWelcomeController(QWidget):
             current_year = datetime.datetime.now().year
 
             # =========================================================================
-            # REPORT SERVICE: Chỉ lấy KPI Badge đơn hàng
+            # Chỉ lấy KPI Badge đơn hàng
             # =========================================================================
             report_data = self.report_service.get_dashboard_report(current_date_str, current_date_str)
             total_orders = report_data.kpis.total_orders_completed if report_data and report_data.kpis else 0
             self.ui.val_badge_orders.setText(f'{total_orders:,} hóa đơn')
 
             # =========================================================================
-            # DÁNH RIÊNG CHO SỔ EVENT: Đọc dữ liệu Timeline từ dịch vụ kiểm toán mới
+            # Đọc dữ liệu Timeline từ dịch vụ kiểm toán mới
             # =========================================================================
             self.ui.list_live_feed.clear()
             activities_feed = self.activity_log_service.get_daily_activity_feed(current_date_str)
 
             if activities_feed:
                 for feed_text in activities_feed:
-                    # Tầng Service/Formatter đã chuẩn hóa chuỗi text hoàn chỉnh kèm biểu tượng thích hợp
                     self.ui.list_live_feed.addItem(QListWidgetItem(feed_text))
             else:
                 self.ui.list_live_feed.addItem(
                     QListWidgetItem('Hôm nay hệ thống chưa ghi nhận biến động sự kiện nào.'))
 
             # =========================================================================
-            # INVENTORY SERVICE: Cảnh báo kho (Giữ nguyên gốc hệ thống cũ)
+            # INVENTORY SERVICE: Cảnh báo kho
             # =========================================================================
             inventory_list = self.inventory_service.get_inventory_list()
             low_stock_count = 0
@@ -74,7 +73,7 @@ class HomeWelcomeController(QWidget):
             self.ui.val_badge_stock.setText(f'{low_stock_count} sản phẩm')
 
             # =========================================================================
-            # TAX SERVICE: Cảnh báo thuế (Giữ nguyên gốc hệ thống cũ)
+            # TAX SERVICE: Cảnh báo thuế
             # =========================================================================
             tax_status = self.tax_service.get_tax_warning_status(current_year)
             self.ui.val_badge_tax.setText(f"{tax_status['percent']:.1f}%")

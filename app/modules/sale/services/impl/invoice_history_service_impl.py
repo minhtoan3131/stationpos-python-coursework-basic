@@ -1,5 +1,3 @@
-# File: app/modules/sale/services/impl/invoice_history_service_impl.py
-from datetime import date
 from typing import List, Dict, Any
 from decimal import Decimal, ROUND_HALF_UP
 from app.modules.sale.services.invoice_history_service import InvoiceHistoryService
@@ -51,7 +49,7 @@ class InvoiceHistoryServiceImpl(InvoiceHistoryService):
                 sold_qty = item['quantity']  # Số lượng gốc lúc mua (ví dụ: 1 Hộp)
                 total_cogs_amount = Decimal(str(item['total_cogs_amount']))
 
-                # ---  Truy vấn trực tiếp tỷ lệ quy đổi thật từ DB thông qua Repo ---
+                # --- Truy vấn trực tiếp tỷ lệ quy đổi thật từ DB thông qua Repo ---
                 conv_info = uow.inventory_repo.get_conversion_info(p_id, u_id)
                 conversion_ratio = Decimal(str(conv_info['ratio'])) if conv_info else Decimal('1')
 

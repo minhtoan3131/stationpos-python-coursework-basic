@@ -19,8 +19,8 @@ class InventoryService(ABC):
     def create_purchase_order(self, dto: PurchaseOrderCreateDTO) -> int:
         """
         Xử lý lưu phiếu nhập hàng và cộng dồn tồn kho.
-        - Hàm này phải đảm bảo tính Transaction (Lưu phiếu -> Lưu chi tiết -> Ghi log -> Cộng kho).
-        - Hàm này thực hiện quy đổi Số lượng Hộp -> Số lượng Cây trước khi cộng kho.
+        - Đảm bảo tính Transaction (Lưu phiếu -> Lưu chi tiết -> Ghi log -> Cộng kho).
+        - Thực hiện quy đổi Số lượng Hộp -> Số lượng Cây trước khi cộng kho.
         - Trả về: ID của Phiếu nhập vừa tạo.
         """
         pass

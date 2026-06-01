@@ -6,7 +6,7 @@ from app.core.exceptions.validation_exception import ValidationException
 
 
 # ==========================================
-# SETUP FAKE REPOSITORIES CHUẨN KIẾN TRÚC
+# SETUP FAKE REPOSITORIES
 # ==========================================
 class FakeProductRepo:
     def __init__(self):
@@ -131,6 +131,5 @@ def test_checkout_pre_product_not_found(sale_service, valid_checkout_dto):
     with pytest.raises(ValidationException) as exc_info:
         sale_service.process_checkout(valid_checkout_dto)
 
-     Khớp chuẩn xác thông điệp lỗi quy đổi đơn vị tính của sản phẩm ma từ Service
     assert "Đơn vị tính không hợp lệ" in str(exc_info.value)
     assert "ID 999" in str(exc_info.value)

@@ -44,7 +44,7 @@ class FakeUnitOfWork:
 
 
 # ==============================================================================
-# PYTEST FIXTURES (Cấp phát môi trường sạch cô lập cho từng kịch bản)
+# PYTEST FIXTURES
 # ==============================================================================
 
 @pytest.fixture
@@ -66,7 +66,7 @@ def security_service(fake_uow_factory):
 
 
 # ==============================================================================
-# PRE-CONDITIONS TEST CASES (Đồng bộ hóa 100% với Production Code)
+# PRE-CONDITIONS TEST CASES
 # ==============================================================================
 
 @pytest.mark.parametrize(

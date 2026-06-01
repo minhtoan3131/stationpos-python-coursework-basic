@@ -98,7 +98,7 @@ def test_ui_precondition_close_ledger_aborts_if_user_enters_incorrect_security_p
 
     # Giả lập hành vi người dùng click chọn dòng đầu tiên của bảng Master thông qua việc kích hoạt Signal
     window.ui.tbl_tax_history_master.selectRow(0)
-    window.handle_master_row_selected()   Gọi đúng hàm xử lý của Controller, không gọi qua đối tượng UI thô
+    window.handle_master_row_selected()  # Gọi đúng hàm xử lý của Controller, không gọi qua đối tượng UI thô
 
     # Patch tóm sống các hộp thoại hệ thống
     mocker.patch('PyQt6.QtWidgets.QMessageBox.warning', return_value=QMessageBox.StandardButton.Yes)

@@ -4,7 +4,6 @@ from PyQt6.QtWidgets import QWidget, QTableWidgetItem
 from PyQt6.QtCore import Qt
 
 from app.core.exceptions.validation_exception import ValidationException
-# Import DTOs và Controller
 from app.modules.inventory.dtos.po_history_dto import PurchaseOrderMasterDTO, PurchaseOrderDetailDTO
 from app.modules.inventory.ui.controllers.inventory_history_controller import InventoryHistoryController
 from app.modules.inventory.ui.generated.ui_inventory_management import Ui_InventoryManagementWidget
@@ -93,7 +92,7 @@ def test_uc2_select_completed_po_loads_details_and_enables_cancel_btn(history_ui
                                total_amount=50000, status="COMPLETED", note="Hàng test")
     ]
     ui.tbl_po_master.setRowCount(1)
-    #  Chèn Item vào để Controller tìm thấy dòng được chọn
+    # Chèn Item vào để Controller tìm thấy dòng được chọn
     ui.tbl_po_master.setItem(0, 0, QTableWidgetItem("PN-001"))
 
     mock_service.get_details.return_value = [

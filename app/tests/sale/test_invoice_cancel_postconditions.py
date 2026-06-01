@@ -4,7 +4,6 @@ import pytest
 from decimal import Decimal
 from datetime import datetime
 from app.modules.sale.services.impl.invoice_history_service_impl import InvoiceHistoryServiceImpl
-from app.modules.sale.dtos.sale_dto import CartItemDTO
 
 
 # ==========================================
@@ -211,11 +210,10 @@ def test_cancel_invoice_should_convert_multi_level_uom_to_base_unit_correctly(
     KỲ VỌNG KIỂM TOÁN: Dù khách mua bằng đơn vị sỉ hay lẻ, khi hủy đơn hoàn hàng,
     hạ tầng kho phải quy đổi chính xác về Số Lượng Cơ Bản nhỏ nhất trước khi cộng dồn vào két.
     """
-    # 1. ARRANGE: Sửa lại dữ liệu mồi của hóa đơn theo từng kịch bản unit sỉ/lẻ
     invoice_code = "HD-20260527-777"
     uow.invoice_history_repo.meta['code'] = invoice_code
 
-    #  Ánh xạ từ Tên đơn vị sang ID tương ứng phục vụ môi trường Fake Repo ---
+    # Ánh xạ từ Tên đơn vị sang ID tương ứng phục vụ môi trường Fake Repo ---
     unit_id_map = {"Cái": 10, "Hộp": 20, "Thùng": 30}
     target_unit_id = unit_id_map.get(sold_unit, 10)
 
@@ -225,7 +223,7 @@ def test_cancel_invoice_should_convert_multi_level_uom_to_base_unit_correctly(
     # Giả lập bản ghi chi tiết hóa đơn lưu thông tin đơn vị sỉ/lẻ thực tế
     uow.invoice_history_repo.fetch_invoice_details = lambda code: [{
         'product_id': 100,
-        'unit_id': target_unit_id,  # < Đưa unit_id vào giỏ hàng mồi để triệt tiêu KeyError
+        'unit_id': target_unit_id,  # Đưa unit_id vào giỏ hàng mồi để triệt tiêu KeyError
         'quantity': sold_qty,
         'unit_name': sold_unit,
         'total_cogs_amount': Decimal('15000.0000')

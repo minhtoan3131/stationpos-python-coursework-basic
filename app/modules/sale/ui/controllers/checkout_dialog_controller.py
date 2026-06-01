@@ -19,7 +19,7 @@ class CheckoutDialogController(QDialog):
         self.checkout_dto = checkout_dto
         self.store_config = store_config if store_config else StoreConfigDTO()
 
-        # Sinh mã hóa đơn ngay tại đây để hiển thị cho khách xem
+        # Sinh mã hóa đơn để hiển thị cho khách xem
         if not self.checkout_dto.code:
             self.checkout_dto.code = InvoiceCodeGenerator.generate()
 

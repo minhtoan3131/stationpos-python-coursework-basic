@@ -8,13 +8,11 @@ class SupplierRepositoryImpl(BaseRepository, SupplierRepository):
         return self.cursor.fetchall()
 
     def exists_by_name(self, name: str) -> bool:
-        # Thêm AS total để đặt tên rõ ràng cho cột
         self.cursor.execute("SELECT COUNT(1) AS total FROM suppliers WHERE name = %s", (name,))
         result = self.cursor.fetchone()
         return result['total'] > 0 if result else False
 
     def exists_by_id(self, supplier_id: int) -> bool:
-        # Thêm AS total để đặt tên rõ ràng cho cột
         self.cursor.execute("SELECT COUNT(1) AS total FROM suppliers WHERE id = %s", (supplier_id,))
         result = self.cursor.fetchone()
         return result['total'] > 0 if result else False

@@ -20,7 +20,6 @@ class InventoryRepositoryImpl(BaseRepository, InventoryRepository):
 
     def create_purchase_order(self, po_data):
         sql = "INSERT INTO purchase_orders (code, supplier_id, total_amount, note) VALUES (%s, %s, %s, %s)"
-        # Đã đổi thành self.cursor
         self.cursor.execute(sql, (po_data['code'], po_data['supplier_id'], po_data['total_amount'], po_data['note']))
         return self.cursor.lastrowid
 
@@ -28,14 +27,13 @@ class InventoryRepositoryImpl(BaseRepository, InventoryRepository):
         sql = """INSERT INTO purchase_order_items (purchase_order_id, product_id, unit_id, quantity, unit_price, total_price)
                  VALUES (%s, %s, %s, %s, %s, %s)"""
 
-         Thay đổi toàn bộ tên các Key truy cập dict cho khớp 100% với tầng Service gửi xuống
         self.cursor.execute(sql, (
-            item_data['purchase_order_id'],  # Thay cho 'po_id'
+            item_data['purchase_order_id'],
             item_data['product_id'],
             item_data['unit_id'],
-            item_data['quantity'],  # Thay cho 'qty'
-            item_data['unit_price'],  # Thay cho 'price'
-            item_data['total_price']  # Thay cho 'total'
+            item_data['quantity'],
+            item_data['unit_price'],
+            item_data['total_price']
         ))
 
     def add_stock_transaction(self, trans_data) -> int:

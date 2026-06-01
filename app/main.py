@@ -1,22 +1,18 @@
 import sys
 import traceback
 from PyQt6.QtWidgets import QApplication, QMessageBox
-
-# Import Database Connection để test kết nối trước khi khởi động
 from app.core.database.connection import DatabaseConnection
-
-# Import MainWindow (Đảm bảo đường dẫn này khớp với thư mục của bạn)
 from app.modules.main_window.main_window import MainWindow
 
 
 def main():
-    # 1. Khởi tạo Application
+    # Khởi tạo Application
     app = QApplication(sys.argv)
 
     # Ép sử dụng style "Fusion" để giao diện đồng bộ, đẹp mắt trên cả Mac và Windows
     app.setStyle("Fusion")
 
-    # 2. Kiểm tra kết nối CSDL (Fail-Fast: Báo lỗi sớm nếu MySQL chưa bật)
+    # Kiểm tra kết nối CSDL (Fail-Fast: Báo lỗi sớm nếu MySQL chưa bật)
     try:
         print("Đang kiểm tra kết nối Database...")
         conn = DatabaseConnection.get_connection()
@@ -30,7 +26,7 @@ def main():
         )
         sys.exit(1)
 
-    # 3. Khởi chạy giao diện chính
+    # Khởi chạy giao diện chính
     try:
         window = MainWindow()
         window.showMaximized()  # Hiển thị full màn hình ngay khi mở

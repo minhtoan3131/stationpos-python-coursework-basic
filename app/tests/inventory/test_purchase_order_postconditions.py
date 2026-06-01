@@ -7,7 +7,7 @@ from app.modules.inventory.services.impl.inventory_service_impl import Inventory
 
 
 # ==========================================
-# SETUP FAKE DB & REPOSITORIES (NÂNG CẤP CHẶT CHẼ)
+# SETUP FAKE DB & REPOSITORIES
 # ==========================================
 class FakeSupplierRepo:
     def exists_by_id(self, supplier_id):
@@ -58,7 +58,7 @@ class FakeInventoryRepo:
         self.purchase_order_items.append(item_data)
 
     def add_stock_transaction(self, trans_data):
-        #  Giả lập các cột mặc định dựa trên DB schema thực tế
+        # Giả lập các cột mặc định dựa trên DB schema thực tế
         if 'variance_amount' not in trans_data:
             trans_data['variance_amount'] = Decimal('0.0000')
         if 'note' not in trans_data:
@@ -96,7 +96,7 @@ def inventory_service(uow):
 
 
 # ==========================================
-# BÀI TEST CHÍNH THỨC (ĐÃ SIẾT CHẶT QUY TRÌNH)
+# BÀI TEST
 # ==========================================
 
 def test_create_purchase_order_happy_path_state_changes(inventory_service, uow):
@@ -110,7 +110,6 @@ def test_create_purchase_order_happy_path_state_changes(inventory_service, uow):
     db_inv = uow.inventory_repo
     db_prod = uow.product_repo
 
-    # --- Đã siết chặt kiểm tra làm tròn 4 chữ số thập phân cho cả 2 bảng ---
     assert db_inv.inventory[100]['quantity'] == 60
     assert db_inv.inventory[100]['total_value'] == Decimal('250000.0000')
     assert db_prod.products[100]['cost_price'] == Decimal('4166.6667')
@@ -164,7 +163,7 @@ def test_create_purchase_order_should_trigger_anomaly_clearance_log_and_exact_ma
     assert clearance_log['type'] == 'DATA_CORRECTION'  # Loại log điều chỉnh
     assert clearance_log['ref_id'] == saved_po_id
 
-     Xác minh con số âm triệt tiêu rác tài chính và chuỗi ghi chú đặc tả
+    # Xác minh con số âm triệt tiêu rác tài chính và chuỗi ghi chú đặc tả
     assert clearance_log['variance_amount'] == Decimal('-15000.0000')
     assert clearance_log['note'] == "Điều chỉnh dọn rác giá trị tồn đọng khi kho trống"
 

@@ -6,7 +6,7 @@ from app.modules.sale.ui.controllers.sales_management_controller import SalesMan
 
 
 # ==========================================
-# IXTURE KHỞI TẠO & HÀM PHỤ TRỢ
+# FIXTURE KHỞI TẠO & HÀM PHỤ TRỢ
 # ==========================================
 @pytest.fixture
 def sales_window(qtbot, mocker):
@@ -218,7 +218,7 @@ def test_should_show_error_and_preserve_cart_when_checkout_fails_at_backend(qtbo
 
 
 # ==============================================================================
-# BỔ SUNG: KIỂM THỬ GÁC CỔNG QUY ƯỚC GIÁ BÁN SỈ PHẲNG (CẢ HỘP) KHÔNG NHÂN RATIO
+# KIỂM THỬ GÁC CỔNG QUY ƯỚC GIÁ BÁN SỈ PHẲNG (CẢ HỘP) KHÔNG NHÂN RATIO
 # ==============================================================================
 def test_should_display_flat_wholesale_price_and_add_box_to_cart_correctly(qtbot, sales_window):
     """

@@ -141,7 +141,7 @@ def test_save_ledger_details_purges_old_records_to_prevent_leaks(tax_ledger_repo
 
 
 # =================================================================
-# 3. KIỂM THỬ CHỐT CHẶN BẢO MẬT KHÓA SỔ (STATE MACHINE🔒)
+# 3. KIỂM THỬ CHỐT CHẶN BẢO MẬT KHÓA SỔ
 # =================================================================
 
 def test_update_ledger_status_enforces_immutability_constraints(tax_ledger_repo, db_test_connection):
@@ -155,7 +155,6 @@ def test_update_ledger_status_enforces_immutability_constraints(tax_ledger_repo,
     """
     year = 2024
 
-     Sử dụng .replace(microsecond=0) để đồng bộ hóa tuyệt đối định dạng lưu trữ giữa Python và MySQL
     first_lock_time = datetime.now().replace(microsecond=0) - timedelta(days=10)
 
     # 1. Ghi cứng một chứng từ ĐÃ KHÓA SỔ (CLOSED) vào DB

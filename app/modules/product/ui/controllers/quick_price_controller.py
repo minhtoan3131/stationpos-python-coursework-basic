@@ -14,10 +14,10 @@ class QuickPriceDialogController(QDialog):
         self.product_service = product_service
         self.ratio = ratio if (ratio and ratio > 0) else 1.0  # Lưu tỷ lệ quy đổi để tính toán
 
-        # 1. Đổ dữ liệu định danh Master
+        # Đổ dữ liệu định danh Master
         self.ui.lbl_product_info.setText(f"📦 {sku} | {name}")
 
-        # 2. Đổ dữ liệu vào Khung tham chiếu thông minh (Tự quy đổi nhân hệ số hộp)
+        # Đổ dữ liệu vào Khung tham chiếu thông minh (Tự quy đổi nhân hệ số hộp)
         self.ui.lbl_base_unit_val.setText(base_unit)
         self.ui.lbl_conv_val.setText(f"{conv_display}")
 
@@ -37,7 +37,7 @@ class QuickPriceDialogController(QDialog):
         self.ui.spn_retail_price.wheelEvent = lambda e: e.ignore()
         self.ui.spn_wholesale_price.wheelEvent = lambda e: e.ignore()
 
-        # 🔔 ĐÃ THÊM: Kết nối sự kiện gõ chữ thay đổi số để tự động chia lẻ tiền thời gian thực
+        # Kết nối sự kiện gõ chữ thay đổi số để tự động chia lẻ tiền thời gian thực
         self.ui.spn_wholesale_price.valueChanged.connect(self.calculate_single_wholesale_price)
         # Chạy kiểm tra kích hoạt nhãn hiển thị ngay lần đầu mở form
         self.calculate_single_wholesale_price(self.ui.spn_wholesale_price.value())
@@ -49,7 +49,6 @@ class QuickPriceDialogController(QDialog):
     def calculate_single_wholesale_price(self, current_box_price):
         """Hàm tự động tính nhẩm: Lấy giá cả hộp chia cho tỷ lệ để hiển thị giá lẻ tương đương."""
         single_equiv = current_box_price / self.ratio
-        # Mượn tạm tooltip hoặc gán trực tiếp chữ gợi ý động vào phần nhãn để người dùng quan sát trực quan
         if self.ratio > 1:
             self.ui.lbl_wholesale.setText(
                 f"Giá bán sỉ mới (Cả hộp)  ➔  [ Tương đương: {single_equiv:,.0f} VND / ĐVT lẻ ]")

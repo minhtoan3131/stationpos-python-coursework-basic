@@ -31,11 +31,11 @@ class PurchaseOrderConfirmController(QDialog):
         self.ui.btn_cancel.clicked.connect(self.reject)
 
     def populate_data(self):
-        # 1. Đổ dữ liệu Header
+        # Đổ dữ liệu Header
         self.ui.lbl_supplier_name.setText(self.supplier_name)
         self.ui.lbl_note.setText(self.dto.note if self.dto.note else "Không có ghi chú")
 
-        # 2. Đổ dữ liệu Bảng chi tiết
+        # Đổ dữ liệu Bảng chi tiết
         self.ui.tbl_items.setRowCount(len(self.raw_item_details))
         total_amount = 0
 
@@ -68,5 +68,5 @@ class PurchaseOrderConfirmController(QDialog):
             self.ui.tbl_items.setItem(i, 4, price)
             self.ui.tbl_items.setItem(i, 5, total)
 
-        # 3. Đổ Tổng tiền
+        # Đổ Tổng tiền
         self.ui.lbl_total_amount.setText(f"{total_amount:,.0f} VNĐ")

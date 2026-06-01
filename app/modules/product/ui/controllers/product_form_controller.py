@@ -5,8 +5,6 @@ from app.modules.product.ui.generated.ui_product_form import Ui_ProductFormDialo
 from app.modules.product.dtos.product_create_dto import ProductCreateDTO
 from app.modules.product.dtos.product_update_dto import ProductUpdateDTO
 from app.core.exceptions.validation_exception import ValidationException
-
-# Import CÁC INTERFACE (Không import Impl)
 from app.modules.product.services.product_service import ProductService
 from app.modules.product.services.category_service import CategoryService
 from app.modules.product.services.supplier_service import SupplierService

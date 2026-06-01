@@ -1,4 +1,3 @@
-import traceback
 from decimal import Decimal
 from PyQt6.QtWidgets import (
     QWidget, QHeaderView, QTableWidgetItem, QMessageBox,
@@ -310,7 +309,6 @@ class SalesManagementController(QWidget):
             )
             return
 
-        # Khởi tạo CheckoutDTO gửi sang Dialog
         checkout_dto = CheckoutDTO(
             code="",  # Sẽ được sinh tự động ở màn hình Dialog
             total_amount=total_amount,

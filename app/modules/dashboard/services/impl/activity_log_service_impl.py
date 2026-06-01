@@ -1,4 +1,3 @@
-# app/modules/dashboard/services/impl/activity_log_service_impl.py
 from typing import Callable, List
 from app.modules.dashboard.services.activity_log_service import ActivityLogService
 from app.modules.dashboard.utils.activity_log_formatter import ActivityLogFormatter

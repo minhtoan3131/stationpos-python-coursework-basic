@@ -16,7 +16,7 @@ def unit_conv_repo(db_test_connection):
 def setup_dummy_product(db_test_connection):
     """
     Vì bảng unit_conversions yêu cầu khóa ngoại product_id,
-    ta cần một fixture để tạo nhanh 1 sản phẩm giả dưới DB Test.
+    nên cần một fixture để tạo nhanh 1 sản phẩm giả dưới DB Test.
     Trả về product_id vừa tạo.
     """
     cursor = db_test_connection.cursor()
@@ -86,7 +86,5 @@ def test_update_unit_conversion(unit_conv_repo, setup_dummy_product):
 
 
 def test_get_non_existent_conversion(unit_conv_repo):
-    # Khi truy vấn một product_id chưa từng có quy đổi
-    # Phải đảm bảo repo xử lý êm đẹp và trả về None (không bị crash)
     result = unit_conv_repo.get_unit_conversion(999999)
     assert result is None

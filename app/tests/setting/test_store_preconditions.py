@@ -6,7 +6,7 @@ from app.modules.setting.constants.setting_key import SettingKey
 
 
 # ==============================================================================
-# FAKE OBJECTS (Hạ tầng RAM cô lập hoàn toàn Database phục vụ State-based Test)
+# FAKE OBJECTS
 # ==============================================================================
 
 class FakeSettingRepository:
@@ -44,7 +44,7 @@ class FakeUnitOfWork:
 
 
 # ==============================================================================
-# PYTEST FIXTURES (Cấp phát môi trường sạch cô lập cho từng Test Case)
+# PYTEST FIXTURES
 # ==============================================================================
 
 @pytest.fixture
@@ -66,10 +66,9 @@ def store_config_service(fake_uow_factory):
 
 
 # ==============================================================================
-# PRE-CONDITIONS TEST CASES (Kiểm thử hàng rào chặn lỗi lối vào)
+# PRE-CONDITIONS TEST CASES
 # ==============================================================================
 
-# Áp dụng Bài 4 Parametrize: Quét sạch 4 biến thể dữ liệu bẩn của chuỗi tên trống
 @pytest.mark.parametrize("blank_name", [
     "",  # Chuỗi rỗng tuyệt đối
     "   ",  # Chuỗi chứa toàn ký tự khoảng trắng space
