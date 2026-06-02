@@ -1,16 +1,19 @@
+import os
+
 import pytest
 import mysql.connector
+from dotenv import load_dotenv
 
+load_dotenv()
 
-# Thiết lập kết nối tới DB Test một lần duy nhất cho toàn bộ session test
 @pytest.fixture(scope="session")
 def db_test_connection():
     connection = mysql.connector.connect(
-        host="localhost",
-        port=3306,
-        user="root",
+        host=os.getenv("DB_HOST", "localhost"),
+        port=int(os.getenv("DB_PORT", 3306)),
+        user=os.getenv("DB_USER", "root"),
         password=os.getenv("DB_PASSWORD", ""),
-        database="pos_vpp_test"
+        database=os.getenv("DB_NAME_TEST", "")
     )
     yield connection
     connection.close()
