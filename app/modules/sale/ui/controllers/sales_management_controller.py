@@ -129,7 +129,9 @@ class SalesManagementController(QWidget):
                 self.ui.tbl_products_sales.setItem(row_index, 3, price_item)
 
                 # Hiển thị số lượng lẻ
-                self.ui.tbl_products_sales.setItem(row_index, 4, QTableWidgetItem(str(stock_qty)))
+                qty_item = QTableWidgetItem(str(stock_qty))
+                qty_item.setTextAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+                self.ui.tbl_products_sales.setItem(row_index, 4, qty_item)
                 row_index += 1
 
             #  DÒNG ĐƠN VỊ QUY ĐỔI (Ví dụ: Hộp, Thùng)
@@ -167,7 +169,10 @@ class SalesManagementController(QWidget):
                     price_item_si.setForeground(Qt.GlobalColor.blue)
                     self.ui.tbl_products_sales.setItem(row_index, 3, price_item_si)
 
-                    self.ui.tbl_products_sales.setItem(row_index, 4, QTableWidgetItem(str(conv_stock)))
+                    conv_qty_item = QTableWidgetItem(str(conv_stock))
+                    conv_qty_item.setTextAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+                    conv_qty_item.setForeground(Qt.GlobalColor.blue)
+                    self.ui.tbl_products_sales.setItem(row_index, 4, conv_qty_item)
                     row_index += 1
 
     # ==========================================
