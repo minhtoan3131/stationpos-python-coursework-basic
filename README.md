@@ -117,7 +117,7 @@ Hệ thống bóc tách mã nguồn thành 4 tầng kiến trúc tách biệt đ
   </p>
 
 
-* **Quản Lý Danh Mục Sản Phẩm:** Quản lý hàng hóa dựa trên mã SKU và Barcode 13 số độc nhất. Hỗ trợ chức năng **Xóa mềm (`is_active = FALSE`)** giúp ẩn sản phẩm khỏi quầy bán nhưng giữ nguyên thực thể cấu trúc trên hóa đơn cũ và báo cáo để bảo toàn tính toàn vẹn dữ liệu tài chính.
+* **Quản Lý Danh Mục Sản Phẩm:** Quản lý hàng hóa dựa trên mã SKU và Barcode. Hỗ trợ chức năng **Xóa mềm (`is_active = FALSE`)** giúp ẩn sản phẩm khỏi quầy bán nhưng giữ nguyên thực thể cấu trúc trên hóa đơn cũ và báo cáo để bảo toàn tính toàn vẹn dữ liệu tài chính.
 * **Minh họa giao diện:**
   <p align="center">
     <img src="assets/screenshots/2_product_management.png" width="850" alt="Giao diện Quản lý Sản phẩm">
@@ -162,7 +162,7 @@ Hệ thống bóc tách mã nguồn thành 4 tầng kiến trúc tách biệt đ
 
 ### Điểm hạn chế
 
-* **Kiến trúc đơn chủ cục bộ:** Phần mềm hiện tại mới chỉ thiết kế chạy Offline cho kịch bản một người vận hành duy nhất (Chủ cửa hàng), chưa hỗ trợ đa máy trạm đồng thời và chưa phân quyền vai trò chuyên sâu (Thu ngân, Thủ kho, Quản lý).
+* **Kiến trúc đơn chủ cục bộ:** Phần mềm hiện tại mới chỉ thiết kế chạy Offline cho kịch bản cửa hàng nhỏ lẻ - một người vận hành duy nhất (Chủ cửa hàng), chưa hỗ trợ đa máy trạm đồng thời và chưa phân quyền vai trò chuyên sâu (Thu ngân, Thủ kho, Quản lý).
 
 
 * **Giả lập tương tác thiết bị vật lý:** Các nghiệp vụ tương tác phần cứng tại quầy mới dừng ở mức xử lý dữ liệu và giả lập hệ thống (Lệnh in bill kết nối Driver máy in mô phỏng), chưa độc lập nhận tín hiệu trực tiếp từ máy quét mã vạch cổng COM hay két tiền tự động nhảy.
@@ -249,17 +249,31 @@ station-pos/
 
 ## 🚀 Hướng Dẫn Cài Đặt & Khởi Chạy
 
-### Bước 1: Khởi tạo cấu trúc Cơ sở dữ liệu
 
-1. Khởi động dịch vụ MySQL Server trên máy tính (Thông qua XAMPP, Docker hoặc dịch vụ Local Services).
-2. Sử dụng Terminal để thực thi script cấu trúc nền tảng cho database chạy thật (`pos_vpp`):
+### Bước 1: Tải mã nguồn và Khởi tạo Cơ sở dữ liệu
+
+1. Mở Terminal (CMD/PowerShell trên Windows hoặc Terminal trên macOS) và chạy lệnh clone để tải dự án về máy:
+```bash
+git clone https://github.com/minhtoan3131/stationpos-python-coursework-basic.git
+
+```
+
+2. Di chuyển vào bên trong thư mục dự án vừa tải:
+
+```bash
+cd stationpos-python-coursework-basic
+
+```
+
+3. Khởi động dịch vụ MySQL Server trên máy tính (Thông qua XAMPP, Docker hoặc dịch vụ Local Services).
+4. Thực thi script cấu trúc nền tảng cho database chạy thật (`pos_vpp`):
 
 ```bash
 mysql -u root -p < database/schema.sql
 
 ```
 
-3. Nếu muốn chạy được test, sử dụng Terminal để thực thi script cấu trúc nền tảng cho database test (`pos_vpp_test`) giống hệt database chạy thật:
+5. Nếu muốn chạy được test, thực thi tiếp lệnh sau để tạo cấu trúc cho database test (`pos_vpp_test`):
 
 ```bash
 mysql -u root -p < database/schema_test.sql
