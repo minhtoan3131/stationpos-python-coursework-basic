@@ -47,12 +47,12 @@ class FakeReportRepository:
 
         # 4. Doanh số sản phẩm bán ra phục vụ vẽ biểu đồ Top
         self.raw_product_sales = [
-            {"product_name": "Bút bi Thiên Long", "total_qty": 100},
-            {"product_name": "Vở kẻ ngang", "total_qty": 85},
-            {"product_name": "Sách giáo khoa Toán 12", "total_qty": 20},
-            {"product_name": "Bút chì 2B", "total_qty": 10},
-            {"product_name": "Tẩy Gôm", "total_qty": 5},
-            {"product_name": "Thước kẻ", "total_qty": 2}  # Sản phẩm thứ 6 dùng để thử thách chốt chặn giới hạn Top 5
+            {"sku": "BBL01", "product_name": "Bút bi Thiên Long", "total_qty": 100},
+            {"sku": "VKN02", "product_name": "Vở kẻ ngang", "total_qty": 85},
+            {"sku": "SGK12", "product_name": "Sách giáo khoa Toán 12", "total_qty": 20},
+            {"sku": "BC2B03", "product_name": "Bút chì 2B", "total_qty": 10},
+            {"sku": "TG04", "product_name": "Tẩy Gôm", "total_qty": 5},
+            {"sku": "TK05", "product_name": "Thước kẻ", "total_qty": 2}
         ]
 
         # 5. Snapshot giá trị tồn kho vật lý thời gian thực (Độc lập bộ lọc ngày)
@@ -118,8 +118,10 @@ class FakeReportRepository:
 
     def get_top_products(self, start_date: str, end_date: str, limit: int = 5) -> list:
         sorted_products = sorted(self.raw_product_sales, key=lambda x: x["total_qty"], reverse=True)
-        return [{"product_name": p["product_name"], "quantity": p["total_qty"]} for p in sorted_products[:limit]]
-
+        return [
+            {"sku": p["sku"], "product_name": p["product_name"], "quantity": p["total_qty"]}
+            for p in sorted_products[:limit]
+        ]
     def get_transaction_history(self, start_date: str, end_date: str) -> list:
         """TC_Post_04: Lọc theo khoảng ngày, format YYYY-MM-DD HH:MM và sort created_at DESC"""
         start = datetime.strptime(start_date, "%Y-%m-%d").date()

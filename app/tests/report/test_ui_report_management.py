@@ -32,8 +32,8 @@ def sample_dashboard_dto():
         RevenueTrendItemDTO(date="16/05", revenue=Decimal('150000'))
     ]
     top_products = [
-        TopProductDTO(product_name="Bút bi Thiên Long", quantity=100),
-        TopProductDTO(product_name="Vở kẻ ngang", quantity=85)
+        TopProductDTO(product_name="Bút bi Thiên Long", sku="SKU001", quantity=100),
+        TopProductDTO(product_name="Vở kẻ ngang", sku="SKU002", quantity=85)
     ]
     transactions = [
         TransactionHistoryDTO(invoice_code="HD003", created_at="2026-05-16 10:00", total_amount=Decimal('150000'),

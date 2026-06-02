@@ -26,6 +26,7 @@ class RevenueTrendItemDTO:
 class TopProductDTO:
     """DTO cho từng sản phẩm nằm trong danh sách bán chạy."""
     product_name: str          # Tên sản phẩm
+    sku: str                    # Mã SKU
     quantity: int              # Tổng số lượng đã bán lẻ/sỉ (quy đổi về đơn vị cơ bản)
 
 @dataclass

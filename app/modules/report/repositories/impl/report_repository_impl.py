@@ -63,16 +63,17 @@ class ReportRepositoryImpl(BaseRepository, ReportRepository):
 
     def get_top_products(self, start_date: str, end_date: str, limit: int = 5) -> List[Dict[str, Any]]:
         sql = """
-            SELECT product_name, SUM(total_quantity) AS total_qty
+            SELECT product_sku AS sku, product_name, SUM(total_quantity) AS total_qty
             FROM vw_report_product_sales
             WHERE sale_date BETWEEN %s AND %s
-            GROUP BY product_name
+            GROUP BY product_sku, product_name
             ORDER BY total_qty DESC
             LIMIT %s
         """
         self.cursor.execute(sql, (start_date, end_date, limit))
         rows = self.cursor.fetchall()
-        return [{"product_name": row.get("product_name", ""), "quantity": row.get("total_qty", 0)} for row in rows]
+        return [{"sku": row.get("sku", ""), "product_name": row.get("product_name", ""),
+                 "quantity": row.get("total_qty", 0)} for row in rows]
 
     def get_transaction_history(self, start_date: str, end_date: str) -> List[Dict[str, Any]]:
         sql = """

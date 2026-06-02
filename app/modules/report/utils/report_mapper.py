@@ -42,6 +42,7 @@ class ReportMapper:
         return [
             TopProductDTO(
                 product_name=item["product_name"],
+                sku=item["sku"],
                 quantity=int(item["quantity"] or 0)
             ) for item in raw_list
         ]

@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import mplcursors
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from typing import List
 from app.modules.report.dtos.report_dto import RevenueTrendItemDTO, TopProductDTO
@@ -28,15 +29,26 @@ class ChartBuilder:
     @staticmethod
     def build_top_products_chart(top_products: List[TopProductDTO]) -> FigureCanvas:
         fig, ax = plt.subplots(figsize=(5, 3), dpi=100)
-        fig.tight_layout()
 
         if top_products:
-            products = [item.product_name for item in top_products]
-            sales = [item.quantity for item in top_products]
-            ax.bar(products, sales, color='#10b981')
+            # Dùng SKU làm nhãn trục X
+            x_labels = [p.sku for p in top_products]
+            # Tên đầy đủ dùng cho tooltip
+            full_names = [p.product_name for p in top_products]
+            sales = [p.quantity for p in top_products]
+
+            bars = ax.bar(x_labels, sales, color='#10b981')
+
+            # Xoay nhãn 45 độ để không bị đè
+            plt.xticks(rotation=45, ha='right', fontsize=9)
+
+            # Tích hợp Tooltip: SỬA LỖI bằng cách dùng sel.index
+            cursor = mplcursors.cursor(bars, hover=True)
+            cursor.connect("add", lambda sel: sel.annotation.set_text(full_names[sel.index]))
+
         else:
             ax.text(0.5, 0.5, "Không có dữ liệu", ha='center', va='center', color='gray')
 
         ax.set_title("Top 5 sản phẩm bán chạy", fontsize=10)
-
+        plt.tight_layout()
         return FigureCanvas(fig)
